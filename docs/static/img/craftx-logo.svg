@@ -1,0 +1,20 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="95" fill="#1B1F3B" stroke="#00F0FF" stroke-width="3"/>
+  
+  <!-- Snake Symbol (Python) -->
+  <path d="M60 120 Q70 100 90 110 Q110 120 130 100 Q150 80 170 100" 
+        stroke="#00F0FF" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <circle cx="75" cy="105" r="4" fill="#FFB300"/>
+  
+  <!-- X Symbol -->
+  <g transform="translate(85, 65)">
+    <path d="M0 0 L30 30 M30 0 L0 30" stroke="#FFB300" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="100" y="160" text-anchor="middle" fill="#00F0FF" font-family="JetBrains Mono, monospace" 
+        font-size="18" font-weight="bold">CraftX.py</text>
+  <text x="100" y="180" text-anchor="middle" fill="#FFB300" font-family="Inter, sans-serif" 
+        font-size="10" font-style="italic">modular by design</text>
+</svg>
