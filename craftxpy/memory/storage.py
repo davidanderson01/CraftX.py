@@ -56,7 +56,7 @@ class StorageBackend(ABC):
         Returns:
             List[str]: A list of session IDs.
         """
-        ...
+        raise NotImplementedError()
 
     @abstractmethod
     def delete_session(self, session_id: str) -> bool:
@@ -69,7 +69,7 @@ class StorageBackend(ABC):
         Returns:
             bool: True if the session was deleted successfully, False otherwise.
         """
-        ...
+        raise NotImplementedError()
 
 
 class JSONStorage(StorageBackend):
