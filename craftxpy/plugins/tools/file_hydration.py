@@ -77,7 +77,7 @@ class FileHydrationMonitor(BaseTool):
                 return self._check_file_hydration(clean_path)
             if os.path.isdir(clean_path):
                 if large_scale:
-                    return self.run_large_scale_scan(clean_path, max_files, deep_scan)
+                    return self.run_large_scale_scan(clean_path)
                 return self._check_directory_hydration(clean_path, max_files, deep_scan)
 
             return f"❓ Unknown path type: {clean_path}"
@@ -212,14 +212,14 @@ class FileHydrationMonitor(BaseTool):
             size_bytes /= 1024.0
         return f"{size_bytes:.1f} PB"
 
-    def run_large_scale_scan(self, path: str, max_files: int = 1000,
-                             deep_scan: bool = False) -> str:
-        """Run a large-scale hydration scan optimized for big directories.
+    def run_large_scale_scan(self, path: str) -> str:
+        """Perform a large-scale hydration scan optimized for big directories.
+
+        This is the main public method for large-scale scans, providing
+        advanced statistics and reporting for large storage volumes.
 
         Args:
             path: Directory path to scan
-            max_files: Maximum number of files to process (optional)
-            deep_scan: Whether to perform deep analysis (optional)
 
         Returns:
             Formatted scan results as string
@@ -308,106 +308,3 @@ class FileHydrationMonitor(BaseTool):
             result.append("📭 No files found in the specified path")
 
         return "\n".join(result)
-
-     def _run_large_scale_scan(self, path: str, max_files: int = None, deep_scan: bool = False) -> str:
-        """Run a large-scale hydration scan optimized for big directories.
-
-        Args:
-            path: Directory path to scan
-            max_files: Maximum number of files to process (optional)
-            deep_scan: Whether to perform deep analysis (optional)
-
-        Returns:
-            Formatted scan results as string
-        """
-        try:
-            if not os.path.exists(path):
-                return f"❌ Path not found: {path}"
-
-            if not os.path.isdir(path):
-                return self._check_file_hydration(path)
-
-            # Import large storage manager for advanced scanning
-            manager = LargeStorageManager()
-
-            # Quick scan for immediate results
-            result = [f"� Large-scale hydration scan for: {path}"]
-            result.append("=" * 50)
-
-            total_files = 0
-            total_size = 0
-            hydrated_files = 0
-            hydrated_size = 0
-
-            # Perform efficient scan
-            for progress in manager.scan_storage_efficient(path):
-                if progress["status"] == "completed":
-                    total_files = progress["total_files"]
-                    total_size = progress["total_size_gb"] * (1024**3)
-                    hydrated_files = progress["hydrated_files"]
-                    hydrated_size = progress["hydrated_size_gb"] * (1024**3)
-                    scan_duration = progress["scan_duration"]
-                    break
-
-            # Generate report
-            if total_files > 0:
-                hydration_percentage = (hydrated_files / total_files) * 100
-                size_percentage = (
-                    (hydrated_size / total_size * 100) if total_size > 0 else 0
-                )
-
-                status = (
-                    "✅" if hydration_percentage > 80 else
-                    "⚠️" if hydration_percentage > 50 else "❌"
-                )
-
-                result.append(f"{status} Hydration Summary:")
-                result.append(f"  📁 Total files: {total_files:,}")
-                result.append(
-                    f"  💧 Hydrated files: {hydrated_files:,} "
-                    f"({hydration_percentage:.1f}%)"
-                )
-                result.append(
-                    f"  📊 Total size: {self._format_size(int(total_size))}"
-                )
-                result.append(
-                    f"  💧 Hydrated size: {self._format_size(int(hydrated_size))} "
-                    f"({size_percentage:.1f}%)"
-                )
-                result.append(f"  ⏱️ Scan time: {scan_duration:.1f} seconds")
-                result.append(
-                    f"  🚀 Speed: {total_files/scan_duration:.0f} files/second"
-                )
-
-                # Get additional statistics
-                stats = manager.get_storage_statistics()
-                if stats["file_types"]:
-                    result.append("\n📋 Top file types by size:")
-                    for ft in stats["file_types"][:5]:
-                        size_str = self._format_size(ft["total_size"])
-                        result.append(
-                            f"  {ft['file_type'] or 'No extension'}: "
-                            f"{ft['count']} files ({size_str})"
-                        )
-
-                # Large files report
-                large_files = manager.find_large_files(
-                    min_size_gb=0.1, limit=5)
-                if large_files:
-                    result.append("\n🐘 Largest files:")
-                    for lf in large_files:
-                        hydration_status = "💧" if lf["is_hydrated"] else "❄️"
-                        result.append(
-                            f"  {hydration_status} {lf['size_gb']:.1f} GB - "
-                            f"{os.path.basename(lf['path'])}"
-                        )
-            else:
-                result.append("📭 No files found in the specified path")
-
-            return "\n".join(result)
-
-        except ImportError:
-            # Fallback to basic scan if large storage manager is not available
-            return self._check_directory_hydration(path, max_files, deep_scan)
-        except (OSError, PermissionError, IOError) as e:
-            return f"❌ Error during large-scale scan: {str(e)}"

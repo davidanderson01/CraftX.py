@@ -126,8 +126,10 @@ class StorageMigrator:
 
         return {
             "status": "success",
-            "message": (f"Successfully migrated {migrated_sessions} sessions "
-                        f"with {total_messages} messages"),
+            "message": (
+                f"Successfully migrated {migrated_sessions} sessions "
+                f"with {total_messages} messages"
+            ),
             "sessions_migrated": migrated_sessions,
             "messages_migrated": total_messages
         }
@@ -199,7 +201,10 @@ class StorageMigrator:
 
         return {
             "status": "success",
-           "message": f"Successfully migrated {migrated_sessions} sessions with {total_messages} messages",
+            "message": (
+                f"Successfully migrated {migrated_sessions} sessions "
+                f"with {total_messages} messages"
+            ),
             "sessions_migrated": migrated_sessions,
             "messages_migrated": total_messages
         }
@@ -327,7 +332,8 @@ def interactive_migration():
 
     while True:
         try:
-            choice = input(f"\nSelect migration operation (0-{len(available_migrations)}): ")
+            choice = input(
+                f"\nSelect migration operation (0-{len(available_migrations)}): ")
 
             if choice == "0":
                 print("👋 Goodbye!")
