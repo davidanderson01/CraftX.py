@@ -1,0 +1,44 @@
+svg
+<svg width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="snakeGradientBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#007bff"/>
+      <stop offset="100%" stop-color="#00c6ff"/>
+    </linearGradient>
+    <linearGradient id="snakeGradientOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff7f00"/>
+      <stop offset="100%" stop-color="#ffc107"/>
+    </linearGradient>
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#007bff"/>
+      <stop offset="50%" stop-color="#ff7f00"/>
+      <stop offset="100%" stop-color="#00c6ff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Placeholder for the geometric snake. This is a complex shape and would require
+       detailed path data derived from the image. The following is a simplified
+       representation and would need to be replaced with the actual path data
+       to accurately replicate the logo. -->
+  <g id="snake">
+    <!-- Blue parts of the snake -->
+    <path d="M 250 150 Q 300 100 350 150 T 250 250 T 150 350 T 250 400 Q 300 450 350 400" fill="url(#snakeGradientBlue)" stroke="#0056b3" stroke-width="5"/>
+    <!-- Orange parts of the snake -->
+    <path d="M 250 150 Q 200 100 150 150 T 250 250 T 350 350 T 250 400 Q 200 450 150 400" fill="url(#snakeGradientOrange)" stroke="#cc6600" stroke-width="5"/>
+    <!-- Add more detailed paths to represent the geometric segments -->
+  </g>
+
+  <!-- Text "CraftX.Py" -->
+  <text x="250" y="470" font-family="Arial, sans-serif" font-size="40" text-anchor="middle" fill="url(#textGradient)">CraftX.Py</text>
+
+  <!-- Placeholder for surrounding geometric elements. These would also require
+       detailed path data to accurately replicate the logo's full design. -->
+  <g id="geometric-elements">
+    <!-- Example circle -->
+    <circle cx="100" cy="100" r="10" fill="#00c6ff"/>
+    <!-- Example rectangle -->
+    <rect x="400" y="200" width="30" height="20" fill="#ffc107"/>
+    <!-- Add more elements based on the image -->
+  </g>
+
+</svg>

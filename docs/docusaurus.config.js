@@ -3,13 +3,13 @@ const { themes } = require('prism-react-renderer');
 module.exports = {
   title: 'CraftX.py',
   tagline: 'Python-native intelligence, modular by design.',
-  url: 'https://craftx.dev',
+  url: 'https://craftx.py',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/craftx-monogram.svg',
   
-  organizationName: 'davidanderson01',
+  organizationName: 'ElevateCraft',
   projectName: 'craftxpy',
 
   i18n: {
@@ -41,7 +41,7 @@ module.exports = {
       title: 'CraftX.py',
       logo: {
         alt: 'CraftX.py Logo',
-        src: 'img/craftx-monogram.svg',
+        src: 'img/craftxpy_logo.svg',
       },
       items: [
         {
@@ -109,11 +109,11 @@ module.exports = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} CraftX.py. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} DavidAnderson01. Built with Docusaurus.`,
       logo: {
         alt: 'CraftX.py Logo',
-        src: 'img/craftx-logo.svg',
-        href: 'https://craftx.dev',
+        src: 'img/craftxpy_logo.svg',
+        href: 'https://craftx.py',
         width: 120,
       },
     },

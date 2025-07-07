@@ -81,12 +81,14 @@ def build_craftx_page(title: str, content: str, output: str = "craftx_page.html"
             margin: 0;
             padding: 2rem;
             line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .header {
             text-align: center;
             margin-bottom: 3rem;
         }
-        .logo {
             color: #00F0FF;
             font-size: 2rem;
             font-weight: bold;
@@ -95,6 +97,10 @@ def build_craftx_page(title: str, content: str, output: str = "craftx_page.html"
         .tagline {
             color: #FFB300;
             font-style: italic;
+            margin-top: 0.5rem;
+        }
+        .logo-img {
+            width: 150px; /* Adjust size as needed */
         }
         .content {
             max-width: 800px;
@@ -125,7 +131,7 @@ def build_craftx_page(title: str, content: str, output: str = "craftx_page.html"
 
     branded_content = f"""
     <div class="header">
-        <div class="logo">CraftX.py</div>
+        <img src="../../assets/img/craftxpy_logo.svg" alt="CraftX.py Logo" class="logo-img">
         <div class="tagline">Python-native intelligence, modular by design.</div>
     </div>
     <div class="content">
