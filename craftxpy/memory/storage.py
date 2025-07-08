@@ -1,3 +1,9 @@
+
+"""
+Storage backends for CraftX: JSON, SQLite, and Hybrid implementations.
+Provides StorageBackend interface and StorageManager facade.
+"""
+
 import json
 import logging
 import sqlite3
@@ -5,6 +11,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
+import threading
 
 
 #
@@ -83,7 +90,7 @@ class JSONStorage(StorageBackend):
         filename = self.path / f"{session_id}.json"
         entry = {
             "timestamp": datetime.utcnow().isoformat() + "Z",
-            "role":    role,
+            "role": role,
             "message": message,
             "metadata": metadata or {}
         }
@@ -91,14 +98,18 @@ class JSONStorage(StorageBackend):
         records = []
         if filename.exists():
             try:
-                records = json.loads(filename.read_text(encoding="utf-8"))
+                records = json.loads(
+                    filename.read_text(encoding="utf-8")
+                )
             except (json.JSONDecodeError, OSError):
                 logging.warning("Corrupt JSON; overwriting file: %s", filename)
 
         records.append(entry)
         try:
-            filename.write_text(json.dumps(records, indent=2, ensure_ascii=False),
-                                encoding="utf-8")
+            filename.write_text(
+                json.dumps(records, indent=2, ensure_ascii=False),
+                encoding="utf-8"
+            )
             return True
         except IOError as e:
             logging.error("Failed to write JSON log: %s", e)
@@ -193,13 +204,22 @@ class SQLiteStorage(StorageBackend):
                 results = []
                 for row in cursor:
                     meta = row["metadata"]
-                    decoded = json.loads(meta) if isinstance(
-                        meta, str) else (meta or {})
+                    if isinstance(meta, str):
+                        try:
+                            decoded = json.loads(meta)
+                        except json.JSONDecodeError:
+                            logging.warning(
+                                "Corrupt metadata JSON in row for session %s; using empty dict.",
+                                session_id
+                            )
+                            decoded = {}
+                    else:
+                        decoded = meta or {}
                     results.append({
-                        "role":      row["role"],
-                        "message":   row["message"],
+                        "role": row["role"],
+                        "message": row["message"],
                         "timestamp": row["timestamp"],
-                        "metadata":  decoded
+                        "metadata": decoded
                     })
                 return results
         except (sqlite3.DatabaseError, sqlite3.OperationalError, OSError, json.JSONDecodeError) as e:
@@ -249,33 +269,44 @@ class HybridStorage(StorageBackend):
     ):
         self.primary_backend = primary_backend
         self.secondary_backends = secondary_backends or []
-        self._sync_enabled = sync_enabled
-        self._fallback_enabled = fallback_enabled
+        self.sync_enabled = sync_enabled
+        self.fallback_enabled = fallback_enabled
 
     def save_conversation(self, session_id, message, role, metadata=None):
-        """Save a conversation, with fallback and sync to secondaries."""
-        try:
-            ok = self.primary_backend.save_conversation(
-                session_id, message, role, metadata)
-        except (IOError, OSError, sqlite3.DatabaseError) as exc:
-            logging.warning("Primary save failed: %s", exc)
-            if self._fallback_enabled and self.secondary_backends:
-                try:
-                    return self.secondary_backends[0].save_conversation(
-                        session_id, message, role, metadata
-                    )
-                except (IOError, OSError, sqlite3.DatabaseError) as ex:
-                    logging.error("Fallback save failed: %s", ex)
-            return False
+        """Save a conversation with fallback and optional sync to secondary backends."""
 
-        if ok and self._sync_enabled:
+        def _handle_sync():
             for idx, sb in enumerate(self.secondary_backends):
                 try:
                     sb.save_conversation(session_id, message, role, metadata)
                 except (IOError, OSError, sqlite3.DatabaseError) as exc:
                     logging.warning(
                         "Sync to secondary %d failed: %s", idx, exc)
-        return ok
+
+        def _attempt_save(backend, label, idx=None):
+            try:
+                return backend.save_conversation(session_id, message, role, metadata)
+            except (IOError, OSError, sqlite3.DatabaseError) as exc:
+                if idx is not None:
+                    logging.error(
+                        "%s save to secondary %d failed: %s", label, idx, exc)
+                else:
+                    logging.warning("%s save failed: %s", label, exc)
+                return False
+
+        # Attempt primary save
+        ok = _attempt_save(self.primary_backend, "Primary")
+        if not ok and self.fallback_enabled and self.secondary_backends:
+            for idx, sb in enumerate(self.secondary_backends):
+                if _attempt_save(sb, "Fallback", idx):
+                    return True
+            return False
+
+        # If primary succeeded and sync is enabled, replicate to secondaries
+        if ok and self.sync_enabled and self.secondary_backends:
+            threading.Thread(target=_handle_sync, daemon=True).start()
+
+        return bool(ok)
 
     def load_conversation(self, session_id):
         """Load a conversation, with fallback to secondaries."""
@@ -283,7 +314,7 @@ class HybridStorage(StorageBackend):
             return self.primary_backend.load_conversation(session_id)
         except (IOError, OSError, sqlite3.DatabaseError, json.JSONDecodeError) as exc:
             logging.warning("Primary load failed: %s", exc)
-            if self._fallback_enabled:
+            if self.fallback_enabled:
                 for idx, sb in enumerate(self.secondary_backends):
                     try:
                         return sb.load_conversation(session_id)
@@ -292,32 +323,61 @@ class HybridStorage(StorageBackend):
                             "Secondary %d load failed: %s", idx, ex)
         return []
 
-    def list_sessions(self):
-        """List all sessions, with fallback to secondary."""
+    def list_sessions(self) -> List[str]:
+        """
+        List all conversation session identifiers, with fallback to secondary.
+
+        Returns:
+            List[str]: A list of session IDs.
+        """
         try:
             return self.primary_backend.list_sessions()
         except (IOError, OSError, sqlite3.DatabaseError) as exc:
             logging.warning("Primary list_sessions failed: %s", exc)
-            if self._fallback_enabled and self.secondary_backends:
-                try:
-                    return self.secondary_backends[0].list_sessions()
-                except (IOError, OSError, sqlite3.DatabaseError) as ex:
-                    logging.error("Secondary list_sessions failed: %s", ex)
+            if self.fallback_enabled and self.secondary_backends:
+                for idx, sb in enumerate(self.secondary_backends):
+                    try:
+                        return sb.list_sessions()
+                    except (IOError, OSError, sqlite3.DatabaseError) as ex:
+                        logging.warning(
+                            "Secondary %d list_sessions failed: %s", idx, ex)
         return []
 
-    def delete_session(self, session_id):
-        """Delete a session from all backends (best effort for secondaries)."""
-        success = False
+    def delete_session(self, session_id: str) -> bool:
+        """
+        Delete a conversation session from the storage backend, with fallback.
+
+        Args:
+            session_id (str): The unique identifier for the conversation session.
+
+        Returns:
+            bool: True if the session was deleted successfully, False otherwise.
+        """
         try:
-            success = self.primary_backend.delete_session(session_id)
+            if self.primary_backend.delete_session(session_id):
+                # If primary deletion is successful, attempt to delete from secondaries
+                for idx, sb in enumerate(self.secondary_backends):
+                    try:
+                        sb.delete_session(session_id)
+                    except (IOError, OSError, sqlite3.DatabaseError) as exc:
+                        logging.warning(
+                            "Secondary %d delete_session failed: %s", idx, exc)
+                return True
+            return False
         except (IOError, OSError, sqlite3.DatabaseError) as exc:
-            logging.warning("Primary delete failed: %s", exc)
-        for idx, sb in enumerate(self.secondary_backends):
-            try:
-                sb.delete_session(session_id)
-            except (IOError, OSError, sqlite3.DatabaseError) as exc:
-                logging.warning("Secondary %d delete failed: %s", idx, exc)
-        return success
+            logging.warning("Primary delete_session failed: %s", exc)
+            if self.fallback_enabled and self.secondary_backends:
+                for idx, sb in enumerate(self.secondary_backends):
+                    try:
+                        return sb.delete_session(session_id)
+                    except (IOError, OSError, sqlite3.DatabaseError) as ex:
+                        logging.warning(
+                            "Secondary %d delete_session failed: %s", idx, ex)
+        return False
+
+
+# (Duplicate StorageManager class and example usage removed to resolve redefinition error)
+    # """List all sessions, with fallback to secondary."""
 
 
 #
