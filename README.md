@@ -119,9 +119,8 @@ The Streamlit-based interface provides:
 
 ## 📚 Documentation
 
-- **Website**: [craftxpy.com](https://craftxpy.com)
-- **Documentation**: [craftx.dev](https://craftx.dev)
-- **AI Hub**: [craftx.ai](https://craftx.ai)
+- **Website**: [https://craftx.py](https://craftx.py)
+- **Documentation**: [https://docs.craftx.py](https://docs.craftx.py)
 
 ## 🧪 Testing
 
@@ -168,4 +167,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **CraftX.py** - *Python-native intelligence, modular by design.*
 
-[Get Started](https://craftx.dev) • [Documentation](https://craftx.dev/docs) • [Examples](examples/) • [Community](https://github.com/davidanderson01/craftxpy/discussions)
+[Get Started](https://docs.craftx.py) • [Documentation](https://docs.craftx.py/docs) • [Examples](examples/) • [Community](https://github.com/davidanderson01/craftxpy/discussions)

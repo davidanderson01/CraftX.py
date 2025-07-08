@@ -66,6 +66,12 @@ if not CRAFTX_AVAILABLE:
     st.stop()
 
 # Custom CSS for CraftX.py branding
+
+# Full absolute path for the logo
+logo_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets', 'img', 'craftxpy_logo.svg'))
+# Ensure the path uses forward slashes for CSS URL
+logo_url = f'file://{logo_path.replace(os.sep, "/")}'
+
 st.markdown("""
 <style>
     .main-header {
@@ -79,12 +85,18 @@ st.markdown("""
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         transition: all 0.3s ease;
     }
+    .header-content {
+        display: flex;
+        align-items: center;
+    }
     .main-header:hover {
         box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
         transform: translateY(-2px);
     }
-    .logo-text {
+    .logo-img {
+        height: 60px; /* Adjust height as needed */
         color: #00F0FF;
+        margin-right: 1rem;
         font-size: 2rem;
         font-weight: bold;
         margin-left: 1rem;
@@ -119,16 +131,19 @@ st.markdown("""
     /* Mobile responsiveness */
     @media (max-width: 768px) {
         .logo-text {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
+        }
+        .logo-img {
+            height: 40px; /* Adjust height for smaller screens */
         }
     }
 </style>
 """, unsafe_allow_html=True)
 
 # Header
+# Update the header to use the image logo instead of text
 st.markdown(f"""
-<div class="main-header">
-    <div class="logo-text">🧠 CraftX.py Assistant <span style="font-size: 0.6em; vertical-align: super; opacity: 0.8;">v{APP_VERSION}</span></div>
+<div class="main-header"><div class="header-content"><img src="{logo_url}" alt="CraftX.Py Logo" class="logo-img"><div class="logo-text">Assistant <span style="font-size: 0.6em; vertical-align: super; opacity: 0.8;">v{APP_VERSION}</span></div></div>
 </div>
 <div class="tagline">Python-native intelligence, modular by design.</div>
 """, unsafe_allow_html=True)
@@ -470,7 +485,7 @@ st.markdown(f"""
     <p>CraftX.py v{APP_VERSION} - Python-native intelligence, modular by design.</p>
     <p>
         🔗 <a href="https://craftx.dev" target="_blank" rel="noopener noreferrer" style="color:#005A9E; text-decoration:underline;">Visit the CraftX Developer Portal</a> |
-        🔗 <a href="https://craftxpy.com" target="_blank" rel="noopener noreferrer" style="color:#005A9E; text-decoration:underline;">Learn more at CraftXPy.com</a> |
+        🔗 <a href="https://craftx.py" target="_blank" rel="noopener noreferrer" style="color:#005A9E; text-decoration:underline;">Learn more at CraftXPy.com</a> |
         🔗 <a href="https://craftx.ai" target="_blank" rel="noopener noreferrer" style="color:#005A9E; text-decoration:underline;">Explore CraftX AI Solutions</a>
     </p>
     <p style='font-size: 0.8rem; opacity: 0.7;'>

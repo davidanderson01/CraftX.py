@@ -8,16 +8,16 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
     name="craftxpy",
     version="0.1.0",
-    author="Jordan",
-    author_email="jordan@craftx.dev",
+    author="DavidAnderson01",
+    author_email="questions@craftx.py",
     description="Python-native intelligence, modular by design",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/davidanderson01/craftxpy",
     project_urls={
-        "Documentation": "https://craftx.dev",
+        "Documentation": "https://docs.craftx.py",
         "Source": "https://github.com/davidanderson01/craftxpy",
-        "Website": "https://craftxpy.com",
+        "Website": "https://craftx.py",
     },
     packages=find_packages(),
     classifiers=[
