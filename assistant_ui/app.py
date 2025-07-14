@@ -137,7 +137,9 @@ def main():
     with chat_container:
         for message in st.session_state.messages:
             with st.chat_message(message["role"]):
-                st.markdown(message["content"])
+                # Handle both "content" and "message" keys for compatibility
+                content = message.get("content") or message.get("message", "")
+                st.markdown(content)
 
     # Chat input
     if prompt := st.chat_input("Ask CraftX.py anything..."):
