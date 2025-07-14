@@ -131,6 +131,12 @@ chat_logs/*.json
 temp/
 .streamlit/
 
+# Azure Functions Core Tools
+.azure-functions-core-tools/
+azure-functions-core-tools/
+Functions/
+ExtensionBundles/
+
 # IDE files
 .vscode/
 .idea/
