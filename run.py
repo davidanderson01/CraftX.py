@@ -49,9 +49,21 @@ def run_tests():
     """Run the test suite."""
     print("🧪 Running tests...")
     try:
-        subprocess.call([sys.executable, "tests/test_router.py"])
+        # Try to run with pytest first
+        result = subprocess.call(
+            [sys.executable, "-m", "pytest", "tests/", "-v"])
+        if result == 0:
+            print("✅ All tests passed!")
+        else:
+            print("❌ Some tests failed. Check output above.")
     except FileNotFoundError:
-        print("❌ Test file not found. Make sure you're in the CraftX.py directory.")
+        print("❌ pytest not found. Installing...")
+        try:
+            subprocess.check_call(
+                [sys.executable, "-m", "pip", "install", "pytest>=7.0.0"])
+            print("✅ pytest installed. Rerun tests.")
+        except subprocess.CalledProcessError:
+            print("❌ Failed to install pytest. Please install manually.")
 
 
 def main():

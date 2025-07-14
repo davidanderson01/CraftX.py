@@ -1,99 +1,78 @@
-"""Memory and logging system for CraftX.py."""
+"""CraftX.py Logger Module
 
-import os
-import json
-from datetime import datetime
-from typing import List, Dict, Any
+Logging and memory management for AI assistant interactions.
+"""
+
+import logging
+from typing import Any, Dict, List
 
 
-class ChatLogger:
-    """Logger for chat sessions and conversation history."""
+class Logger:
+    """Enhanced logger with memory capabilities."""
 
-    def __init__(self, path: str = "chat_logs"):
-        """Initialize the chat logger.
-
-        Args:
-            path: Directory path to store log files
-        """
-        self.path = path
-        os.makedirs(path, exist_ok=True)
-
-    def save(self, session_id: str, message: str, role: str = "user") -> None:
-        """Save a message to the chat log.
+    def __init__(self, name: str = "craftxpy"):
+        """Initialize the logger.
 
         Args:
-            session_id: Unique identifier for the chat session
-            message: The message content
-            role: The role of the message sender ('user' or 'assistant')
+            name: Logger name
         """
-        filename = os.path.join(self.path, f"{session_id}.json")
-        entry = {
-            "timestamp": datetime.now().isoformat(),
-            "role": role,
-            "message": message
+        self.name = name
+        self.logger = logging.getLogger(name)
+        self.memory: List[Dict[str, Any]] = []
+
+        if not self.logger.handlers:
+            handler = logging.StreamHandler()
+            formatter = logging.Formatter(
+                '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+            )
+            handler.setFormatter(formatter)
+            self.logger.addHandler(handler)
+            self.logger.setLevel(logging.INFO)
+
+    def log(self, level: str, message: str, **kwargs) -> None:
+        """Log a message and store in memory.
+
+        Args:
+            level: Log level (info, warning, error, debug)
+            message: Message to log
+            **kwargs: Additional metadata
+        """
+        # Store in memory
+        log_entry = {
+            "level": level,
+            "message": message,
+            "metadata": kwargs
         }
+        self.memory.append(log_entry)
 
-        # Load existing data or create new list
-        data = []
-        if os.path.exists(filename):
-            try:
-                with open(filename, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-            except (json.JSONDecodeError, IOError):
-                data = []
+        # Log to standard logger
+        log_method = getattr(self.logger, level.lower(), self.logger.info)
+        log_method(message)
 
-        # Append new entry and save
-        data.append(entry)
-        try:
-            with open(filename, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
-        except IOError as e:
-            print(f"⚠️ Failed to save chat log: {e}")
+    def info(self, message: str, **kwargs) -> None:
+        """Log info message."""
+        self.log("info", message, **kwargs)
 
-    def load(self, session_id: str) -> List[Dict[str, Any]]:
-        """Load chat history for a session.
+    def warning(self, message: str, **kwargs) -> None:
+        """Log warning message."""
+        self.log("warning", message, **kwargs)
 
-        Args:
-            session_id: The session identifier
+    def error(self, message: str, **kwargs) -> None:
+        """Log error message."""
+        self.log("error", message, **kwargs)
 
-        Returns:
-            List of message entries
-        """
-        filename = os.path.join(self.path, f"{session_id}.json")
-        if os.path.exists(filename):
-            try:
-                with open(filename, "r", encoding="utf-8") as f:
-                    return json.load(f)
-            except (json.JSONDecodeError, IOError):
-                return []
-        return []
+    def debug(self, message: str, **kwargs) -> None:
+        """Log debug message."""
+        self.log("debug", message, **kwargs)
 
-    def list_sessions(self) -> List[str]:
-        """List all available chat sessions.
+    def get_memory(self) -> List[Dict[str, Any]]:
+        """Get stored log memory.
 
         Returns:
-            List of session IDs
+            List of log entries
         """
-        sessions = []
-        for filename in os.listdir(self.path):
-            if filename.endswith(".json"):
-                sessions.append(filename[:-5])  # Remove .json extension
-        return sorted(sessions)
+        return self.memory.copy()
 
-    def delete_session(self, session_id: str) -> bool:
-        """Delete a chat session.
-
-        Args:
-            session_id: The session to delete
-
-        Returns:
-            True if deleted successfully, False otherwise
-        """
-        filename = os.path.join(self.path, f"{session_id}.json")
-        try:
-            if os.path.exists(filename):
-                os.remove(filename)
-                return True
-        except IOError:
-            pass
-        return False
+    def clear_memory(self) -> None:
+        """Clear stored log memory."""
+        self.memory.clear()

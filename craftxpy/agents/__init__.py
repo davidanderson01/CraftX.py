@@ -1,5 +1,8 @@
-"""CraftX.py agents package."""
+"""CraftX.py Agents Module
 
-from .router import AgentRouter
+This module contains the routing and agent management functionality.
+"""
 
-__all__ = ["AgentRouter"]
+from .router import Router
+
+__all__ = ['Router']

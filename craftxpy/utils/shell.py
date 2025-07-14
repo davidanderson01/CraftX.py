@@ -1,84 +1,102 @@
-"""Secure shell execution utilities for CraftX.py."""
+"""CraftX.py Shell Executor Module
+
+Shell command execution utilities.
+"""
 
 import subprocess
-from typing import List
-
-# Whitelist of safe commands for secure execution
-WHITELIST: List[str] = [
-    "whoami", "ls", "dir", "echo", "ipconfig", "ifconfig",
-    "hostname", "pwd", "date", "time", "uname", "systeminfo"
-]
+import sys
+from typing import Dict, List, Optional, Tuple
 
 
-def run_safe_command(cmd: str) -> str:
-    """Execute a command safely using a whitelist approach.
+class ShellExecutor:
+    """Execute shell commands safely."""
 
-    Args:
-        cmd: The command string to execute
+    def __init__(self, timeout: int = 30):
+        """Initialize the shell executor.
 
-    Returns:
-        Command output or error message
-    """
-    if not cmd.strip():
-        return "❌ Empty command"
+        Args:
+            timeout: Command timeout in seconds
+        """
+        self.timeout = timeout
+        self.last_result: Optional[Dict] = None
 
-    # Extract the base command (first word)
-    base_command = cmd.split()[0]
+    def execute(self, command: str, shell: bool = True, capture_output: bool = True) -> Dict:
+        """Execute a shell command.
 
-    if base_command not in WHITELIST:
-        return f"❌ Command `{base_command}` not allowed. Allowed commands: {', '.join(WHITELIST)}"
+        Args:
+            command: Command to execute
+            shell: Use shell for execution
+            capture_output: Capture stdout/stderr
 
-    try:
-        result = subprocess.check_output(
-            cmd,
-            shell=True,
-            stderr=subprocess.STDOUT,
-            timeout=5,
-            text=True
-        )
-        return result.strip()
-    except subprocess.TimeoutExpired:
-        return "⚠️ Command timed out after 5 seconds"
-    except subprocess.CalledProcessError as e:
-        return f"⚠️ Command failed with exit code {e.returncode}: {e.output}"
-    except (OSError, FileNotFoundError) as e:
-        return f"⚠️ Command execution error: {str(e)}"
+        Returns:
+            Execution result dictionary
+        """
+        try:
+            result = subprocess.run(
+                command,
+                shell=shell,
+                capture_output=capture_output,
+                text=True,
+                timeout=self.timeout
+            )
 
+            execution_result = {
+                "command": command,
+                "returncode": result.returncode,
+                "stdout": result.stdout if capture_output else "",
+                "stderr": result.stderr if capture_output else "",
+                "success": result.returncode == 0
+            }
 
-def add_safe_command(command: str) -> bool:
-    """Add a command to the whitelist.
+            self.last_result = execution_result
+            return execution_result
 
-    Args:
-        command: The command to add
+        except subprocess.TimeoutExpired:
+            error_result = {
+                "command": command,
+                "returncode": -1,
+                "stdout": "",
+                "stderr": f"Command timed out after {self.timeout} seconds",
+                "success": False
+            }
+            self.last_result = error_result
+            return error_result
 
-    Returns:
-        True if added successfully, False if already exists
-    """
-    if command not in WHITELIST:
-        WHITELIST.append(command)
-        return True
-    return False
+        except Exception as e:
+            error_result = {
+                "command": command,
+                "returncode": -1,
+                "stdout": "",
+                "stderr": str(e),
+                "success": False
+            }
+            self.last_result = error_result
+            return error_result
 
+    def get_last_result(self) -> Optional[Dict]:
+        """Get the last execution result.
 
-def remove_safe_command(command: str) -> bool:
-    """Remove a command from the whitelist.
+        Returns:
+            Last execution result or None
+        """
+        return self.last_result
 
-    Args:
-        command: The command to remove
+    def is_command_available(self, command: str) -> bool:
+        """Check if a command is available.
 
-    Returns:
-        True if removed successfully, False if not found
-    """
-    if command in WHITELIST:
-        WHITELIST.remove(command)
-        return True
-    return False
+        Args:
+            command: Command to check
 
+        Returns:
+            True if command is available
+        """
+        try:
+            if sys.platform == "win32":
+                check_cmd = f"where {command}"
+            else:
+                check_cmd = f"which {command}"
 
-def get_safe_commands() -> List[str]:
-    """Get the current list of safe commands.
-
-    Returns:
-        List of whitelisted commands
-    """
-    return WHITELIST.copy()
+            result = self.execute(check_cmd)
+            return result["success"]
+        except:
+            return False

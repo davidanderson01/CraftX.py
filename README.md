@@ -1,106 +1,83 @@
 # CraftX.py
 
+![CraftX.py Logo](assets/img/craftx-logo.png)
+
+[![PyPI version](https://badge.fury.io/py/craftxpy.svg)](https://badge.fury.io/py/craftxpy)
+[![Python Version](https://img.shields.io/pypi/pyversions/craftxpy.svg)](https://pypi.org/project/craftxpy/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Downloads](https://pepy.tech/badge/craftxpy)](https://pepy.tech/project/craftxpy)
+
 **Python-native intelligence, modular by design.**
 
-[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://python.org)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.1.0-blue)](https://github.com/davidanderson01/craftxpy)
+[Installation](#-installation) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Examples](#-examples) • [Support](#-support-craftxpy)
 
-CraftX.py is a modular AI scripting framework designed specifically for Python developers. It provides seamless integration with multiple AI models, secure automation tools, and an extensible plugin architecture.
+## 💖 Support CraftX.py
 
-## 🚀 Features
+If you find CraftX.py helpful, please consider supporting the project:
 
-- **🤖 Multi-Model Support**: Integrate WizardCoder, CommandR7B, CodeGeeX4, and Qwen2.5-Coder
-- **🔧 Modular Tools**: Extensible plugin system with built-in utilities
-- **🛡️ Secure Execution**: Safe shell commands with whitelist protection
-- **💾 Memory System**: Persistent conversation history and session management
-- **🎨 Beautiful UI**: Modern Streamlit-based interface
-- **🐍 Python-Native**: Clean APIs with type hints and pythonic design
+[![Sponsor on GitHub](https://img.shields.io/badge/Sponsor_on_GitHub-F7514A?style=for-the-badge&logo=github-sponsors&logoColor=white)](https://github.com/sponsors/davidanderson01)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy_Me_a_Coffee-yellow?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://coff.ee/honnalulu0c)
+
+**Your support enables:** 🔧 Maintenance • 🤖 New AI models • 📦 Plugin development • 📚 Documentation • 🐛 Bug fixes
+
+[Learn more about sponsoring →](SPONSORS.md)
+
+## 🚀 What is CraftX.py?
+
+CraftX.py is a modular, Python-native AI framework designed for building intelligent applications with ease. It provides a clean, extensible architecture for integrating multiple AI models, managing conversations, and extending functionality through plugins.
+
+### ✨ Key Features
+
+- **🔌 Multi-Model Support**: Works with OpenAI, Claude, Ollama, and more
+- **🧩 Plugin Architecture**: Extensible system for custom functionality
+- **💾 Flexible Storage**: JSON, SQLite, and hybrid storage backends
+- **🎨 Modern UI**: Beautiful Streamlit-based interface
+- **🛡️ Security First**: Command whitelisting and input validation
+- **📱 Cross-Platform**: Works on Windows, macOS, and Linux
 
 ## 📦 Installation
 
-### Quick Start
+### Quick Install from PyPI
 
 ```bash
-git clone https://github.com/davidanderson01/craftxpy.git
-cd craftxpy
-pip install -r requirements.txt
+pip install craftxpy
 ```
 
 ### Development Installation
 
 ```bash
+git clone https://github.com/davidanderson01/CraftX.py.git
+cd CraftX.py
 pip install -e .[dev]
 ```
 
-## 🎯 Quick Start
-
-### 1. Basic Usage
+## 🚀 Quick Start
 
 ```python
-from craftxpy.agents.router import AgentRouter
-from craftxpy.plugins.wizardcoder import WizardCoder
+import craftxpy
 
-# Initialize AI model router
-router = AgentRouter({"codegen": WizardCoder()})
+# Initialize the framework
+from craftxpy.agents import Router
+from craftxpy.memory import Logger
 
-# Generate code
-response = router.route("codegen", "Create a FastAPI endpoint for user auth")
+# Create a router for handling messages
+router = Router()
+
+# Set up memory logging
+logger = Logger()
+
+# Process a message
+response = router.route_message("Hello, CraftX.py!")
 print(response)
 ```
 
-### 2. Web Interface
+## 🎨 Web Interface
+
+Launch the Streamlit interface:
 
 ```bash
 streamlit run assistant_ui/app.py
 ```
-
-### 3. Run Demo
-
-```bash
-python examples/demo.py
-```
-
-## 🏗️ Architecture
-
-```text
-craftxpy/
-├── agents/          # AI model routing and management
-├── plugins/         # Model integrations and tools
-│   ├── wizardcoder.py
-│   ├── commandr7b.py
-│   ├── codegeex4.py
-│   ├── qwen25coder.py
-│   └── tools/       # Extensible tool plugins
-├── memory/          # Conversation logging and history
-├── utils/           # Utilities (shell, page builder)
-└── assistant_ui/    # Streamlit web interface
-```
-
-## 🔧 Built-in Tools
-
-- **🌐 DNS Validator**: Validate domain resolution
-- **🔒 SSL Checker**: Check certificate status and expiration
-- **📁 File Monitor**: Monitor OneDrive file hydration (Windows)
-- **🛠️ Custom Tools**: Easy plugin creation system
-
-## 💡 Creating Custom Tools
-
-```bash
-python scripts/new_tool.py "My Custom Tool"
-```
-
-Or programmatically:
-
-```python
-from craftxpy.plugins.tools.base_tool import BaseTool
-
-class MyTool(BaseTool):
-    def run(self, **kwargs) -> str:
-        return "✅ Tool executed successfully!"
-```
-
-## 🎨 Web Interface
 
 The Streamlit-based interface provides:
 
@@ -125,11 +102,48 @@ The Streamlit-based interface provides:
 ## 🧪 Testing
 
 ```bash
-# Run all tests
-python -m pytest tests/
+# Run all tests with beautiful output
+python run_tests.py
+
+# Run with pytest
+python -m pytest tests/ -v
 
 # Run specific test
-python tests/test_router.py
+python -m pytest tests/test_ui.py::test_logo_files -v
+```
+
+## 🌐 Static Website
+
+The project includes a complete static website:
+
+```bash
+# View locally
+python -m http.server 8000
+# Visit: http://localhost:8000
+```
+
+The website is also GitHub Pages ready with automatic deployment.
+
+## 🌟 Examples
+
+Check out our example implementations in the [`examples/`](examples/) directory:
+
+- **Storage Demo** - Showcase different storage backends
+- **Large Storage Demo** - Handle big datasets efficiently
+- **Plugin Examples** - Custom plugin development
+
+## 🔧 Configuration
+
+CraftX.py supports multiple configuration options:
+
+```python
+from craftxpy.memory import Config
+
+config = Config({
+    "storage_backend": "sqlite",
+    "model_provider": "ollama",
+    "debug_mode": True
+})
 ```
 
 ## 🤝 Contributing
@@ -139,8 +153,8 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 ### Development Setup
 
 ```bash
-git clone https://github.com/davidanderson01/craftxpy.git
-cd craftxpy
+git clone https://github.com/davidanderson01/CraftX.py.git
+cd CraftX.py
 pip install -e .[dev]
 pre-commit install
 ```
@@ -149,22 +163,15 @@ pre-commit install
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
-
-- **AI Models**: Thanks to the teams behind WizardCoder, CommandR7B, CodeGeeX4, and Qwen2.5-Coder
-- **Framework**: Built with Streamlit, Python, and modern web technologies
-- **Community**: Special thanks to all contributors and early adopters
-
 ## 🔗 Links
 
-- **GitHub**: [github.com/davidanderson01/craftxpy](https://github.com/davidanderson01/craftxpy)
+- **GitHub**: [github.com/davidanderson01/CraftX.py](https://github.com/davidanderson01/CraftX.py.git)
 - **PyPI**: [pypi.org/project/craftxpy](https://pypi.org/project/craftxpy)
-- **Docker**: [hub.docker.com/r/craftx/craftxpy](https://hub.docker.com/r/craftx/craftxpy)
+- **Issues**: [GitHub Issues](https://github.com/davidanderson01/CraftX.py/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/davidanderson01/CraftX.py/discussions)
 
 ---
 
-![CraftX.py Logo](assets/img/craftx-logo.png)
+**Made with ❤️ by [ElevateCraft](https://elevatecraft.org)**
 
-**CraftX.py** - *Python-native intelligence, modular by design.*
-
-[Get Started](https://docs.craftx.py) • [Documentation](https://docs.craftx.py/docs) • [Examples](examples/) • [Community](https://github.com/davidanderson01/craftxpy/discussions)
+[⭐ Star us on GitHub](https://github.com/davidanderson01/CraftX.py) • [💖 Sponsor this project](https://github.com/sponsors/davidanderson01)

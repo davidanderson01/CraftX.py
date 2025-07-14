@@ -22,7 +22,12 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     package_data={
-        'craftxpy': ['assets/img/*.svg'],
+        'craftxpy': ['**/*.py'],
+        'craftxpy.agents': ['*.py'],
+        'craftxpy.memory': ['*.py'],
+        'craftxpy.plugins': ['*.py'],
+        'craftxpy.plugins.tools': ['*.py'],
+        'craftxpy.utils': ['*.py'],
     },
     classifiers=[
         "Development Status :: 3 - Alpha",
@@ -44,18 +49,14 @@ setup(
     ],
     extras_require={
         "dev": [
-            "pytest>=6.0",
-            "pytest-cov>=2.0",
-            "black>=21.0",
-            "isort>=5.0",
-            "flake8>=3.8",
-            "mypy>=0.800",
-            "pre-commit>=2.0",
+            "pytest>=7.0.0",
+            "black",
+            "flake8",
+            "mypy",
         ],
         "docs": [
-            "sphinx>=4.0",
-            "sphinx-rtd-theme>=0.5",
-            "myst-parser>=0.15",
+            "sphinx",
+            "sphinx-rtd-theme",
         ],
     },
     entry_points={
@@ -63,5 +64,9 @@ setup(
             "craftx-demo=examples.demo:main",
             "craftx-new-tool=scripts.new_tool:main",
         ],
+    },
+    include_package_data=True,
+    package_data={
+        "craftxpy": ["assets/img/*.svg"],
     },
 )

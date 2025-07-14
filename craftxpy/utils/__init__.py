@@ -1,9 +1,9 @@
-"""CraftX.py utilities package."""
+"""CraftX.py Utils Module
 
-from .shell import run_safe_command, add_safe_command, remove_safe_command, get_safe_commands
-from .page_builder import build_page, build_craftx_page
+This module contains utility functions and helper classes.
+"""
 
-__all__ = [
-    "run_safe_command", "add_safe_command", "remove_safe_command", 
-    "get_safe_commands", "build_page", "build_craftx_page"
-]
+from .page_builder import PageBuilder
+from .shell import ShellExecutor
+
+__all__ = ['PageBuilder', 'ShellExecutor']

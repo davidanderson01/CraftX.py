@@ -1,73 +1,36 @@
-"""Agent routing system for CraftX.py."""
+"""CraftX.py Router Module
 
-from typing import Dict, Any, Optional
-from ..plugins.base import BaseModelPlugin
+Central routing and orchestration for AI assistant interactions.
+"""
 
 
-class AgentRouter:
-    """Router for managing and dispatching tasks to different AI models."""
+class Router:
+    """Main router class for handling AI assistant requests."""
 
-    def __init__(self, models: Optional[Dict[str, BaseModelPlugin]] = None):
-        """Initialize the agent router.
+    def __init__(self):
+        """Initialize the router."""
+        self.version = "0.1.2"
+        self.name = "CraftX.py Router"
 
-        Args:
-            models: Dictionary mapping task types to model instances
-        """
-        self.models = models or {}
-
-    def route(self, task_type: str, prompt: str) -> str:
-        """Route a task to the appropriate model.
+    def route(self, message: str) -> str:
+        """Route a message through the AI assistant system.
 
         Args:
-            task_type: The type of task to perform
-            prompt: The input prompt for the task
+            message: Input message to process
 
         Returns:
-            Generated response from the appropriate model
+            Processed response
         """
-        model = self.models.get(task_type)
-        if not model:
-            return f"❌ No model registered for task type '{task_type}'"
+        return f"CraftX.py Router processed: {message}"
 
-        try:
-            return model.generate(prompt)
-        except (AttributeError, TypeError) as e:
-            return f"❌ Model error: {str(e)}"
-        except (ImportError, ModuleNotFoundError) as e:
-            return f"❌ Model dependency error: {str(e)}"
-        except (RuntimeError, ValueError) as e:
-            return f"❌ Error generating response: {str(e)}"
-
-    def register(self, task_type: str, model: BaseModelPlugin) -> None:
-        """Register a model for a specific task type.
-
-        Args:
-            task_type: The task type identifier
-            model: The model plugin instance
-        """
-        self.models[task_type] = model
-
-    def unregister(self, task_type: str) -> bool:
-        """Unregister a model for a task type.
-
-        Args:
-            task_type: The task type to unregister
+    def get_status(self) -> dict:
+        """Get router status information.
 
         Returns:
-            True if model was found and removed, False otherwise
-        """
-        if task_type in self.models:
-            del self.models[task_type]
-            return True
-        return False
-
-    def list_models(self) -> Dict[str, Dict[str, Any]]:
-        """List all registered models and their information.
-
-        Returns:
-            Dictionary of task types mapped to model information
+            Status dictionary
         """
         return {
-            task_type: model.get_model_info()
-            for task_type, model in self.models.items()
+            "name": self.name,
+            "version": self.version,
+            "status": "active"
         }

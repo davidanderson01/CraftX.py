@@ -1,5 +1,11 @@
-"""CraftX.py plugins package."""
+"""CraftX.py Plugins Module
 
-from .base import BaseModelPlugin
+This module contains the plugin system and base plugin functionality.
+"""
 
-__all__ = ["BaseModelPlugin"]
+from .base import BasePlugin, DemoPlugin
+
+__all__ = [
+    'BasePlugin',
+    'DemoPlugin'
+]

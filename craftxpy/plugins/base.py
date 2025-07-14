@@ -1,34 +1,85 @@
-"""Base plugin interface for CraftX.py model integrations."""
+"""CraftX.py Base Plugin Module
+
+Base plugin class and plugin system for extensible AI assistants.
+"""
+
+from abc import ABC, abstractmethod
+from typing import Any, Dict, Optional
 
 
-class BaseModelPlugin:
-    """Base class for all AI model plugins in CraftX.py."""
+class BasePlugin(ABC):
+    """Base class for all CraftX.py plugins."""
 
-    def __init__(self):
-        self.model_name = self.__class__.__name__
-
-    def generate(self, prompt: str) -> str:
-        """Generate a response from the model given a prompt.
+    def __init__(self, name: str, version: str = "1.0.0"):
+        """Initialize the plugin.
 
         Args:
-            prompt: The input prompt string
-
-        Returns:
-            Generated response string
-
-        Raises:
-            NotImplementedError: Must be implemented by subclasses
+            name: Plugin name
+            version: Plugin version
         """
-        raise NotImplementedError("Must implement generate() method")
+        self.name = name
+        self.version = version
+        self.enabled = True
+        self.config: Dict[str, Any] = {}
 
-    def get_model_info(self) -> dict:
-        """Get information about this model plugin.
+    @abstractmethod
+    def execute(self, input_data: Any, **kwargs) -> Any:
+        """Execute the plugin functionality.
+
+        Args:
+            input_data: Input data to process
+            **kwargs: Additional parameters
 
         Returns:
-            Dictionary containing model metadata
+            Processed output
+        """
+        pass
+
+    def configure(self, config: Dict[str, Any]) -> None:
+        """Configure the plugin.
+
+        Args:
+            config: Configuration dictionary
+        """
+        self.config.update(config)
+
+    def enable(self) -> None:
+        """Enable the plugin."""
+        self.enabled = True
+
+    def disable(self) -> None:
+        """Disable the plugin."""
+        self.enabled = False
+
+    def get_info(self) -> Dict[str, Any]:
+        """Get plugin information.
+
+        Returns:
+            Plugin information dictionary
         """
         return {
-            "name": self.model_name,
-            "version": getattr(self, "version", "unknown"),
-            "description": getattr(self, "description", "No description available")
+            "name": self.name,
+            "version": self.version,
+            "enabled": self.enabled,
+            "config": self.config
         }
+
+
+class DemoPlugin(BasePlugin):
+    """Demo plugin for testing purposes."""
+
+    def __init__(self):
+        """Initialize the demo plugin."""
+        super().__init__("Demo Plugin", "0.1.2")
+
+    def execute(self, input_data: Any, **kwargs) -> str:
+        """Execute demo functionality.
+
+        Args:
+            input_data: Input data
+            **kwargs: Additional parameters
+
+        Returns:
+            Demo response
+        """
+        return f"Demo plugin processed: {input_data}"

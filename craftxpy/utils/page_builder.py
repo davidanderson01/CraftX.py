@@ -1,142 +1,88 @@
-"""HTML page building utilities for CraftX.py."""
+"""CraftX.py Page Builder Module
 
-from typing import Optional
+HTML page building utilities for web interfaces.
+"""
 
-
-def build_page(title: str, content: str, output: str = "page.html",
-               css_styles: Optional[str] = None) -> str:
-    """Build a simple HTML page with the given content.
-
-    Args:
-        title: Page title
-        content: HTML content for the body
-        output: Output filename
-        css_styles: Optional CSS styles to include
-
-    Returns:
-        Success message with filename
-    """
-    default_styles = """
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            padding: 2rem;
-            line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        h1 { color: #1B1F3B; }
-        .highlight { color: #00F0FF; }
-        .warning { color: #FFB300; }
-        code {
-            background: #f4f4f4;
-            padding: 0.2rem 0.4rem;
-            border-radius: 3px;
-            font-family: 'JetBrains Mono', monospace;
-        }
-    """
-
-    styles = css_styles or default_styles
-
-    html = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{title}</title>
-    <style>{styles}</style>
-</head>
-<body>
-    <h1>{title}</h1>
-    <div class="content">
-        {content}
-    </div>
-</body>
-</html>"""
-
-    try:
-        with open(output, "w", encoding="utf-8") as f:
-            f.write(html)
-        return f"✅ Page saved as {output}"
-    except IOError as e:
-        return f"❌ Failed to save page: {str(e)}"
+from typing import Dict, List, Optional
 
 
-def build_craftx_page(title: str, content: str, output: str = "craftx_page.html") -> str:
-    """Build an HTML page with CraftX.py branding.
+class PageBuilder:
+    """HTML page builder for creating web interfaces."""
 
-    Args:
-        title: Page title
-        content: HTML content
-        output: Output filename
+    def __init__(self, title: str = "CraftX.py"):
+        """Initialize the page builder.
 
-    Returns:
-        Success message with filename
-    """
-    craftx_styles = """
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #1B1F3B;
-            color: #F0F0F0;
-            margin: 0;
-            padding: 2rem;
-            line-height: 1.6;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-            color: #00F0FF;
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-        .tagline {
-            color: #FFB300;
-            font-style: italic;
-            margin-top: 0.5rem;
-        }
-        .logo-img {
-            width: 150px; /* Adjust size as needed */
-        }
-        .content {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        h1, h2, h3 { color: #00F0FF; }
-        .highlight { color: #FFB300; }
-        code {
-            background: #2E2E2E;
-            color: #00F0FF;
-            padding: 0.2rem 0.4rem;
-            border-radius: 3px;
-            font-family: 'JetBrains Mono', monospace;
-        }
-        .cta {
-            background: #00F0FF;
-            color: #1B1F3B;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            margin: 1rem 0;
-        }
-    """
+        Args:
+            title: Page title
+        """
+        self.title = title
+        self.head_content: List[str] = []
+        self.body_content: List[str] = []
+        self.css_styles: List[str] = []
+        self.js_scripts: List[str] = []
 
-    branded_content = f"""
-    <div class="header">
-        <img src="../../assets/img/craftxpy_logo.svg" alt="CraftX.py Logo" class="logo-img">
-        <div class="tagline">Python-native intelligence, modular by design.</div>
-    </div>
-    <div class="content">
-        {content}
-    </div>
-    """
+    def add_css(self, css: str) -> None:
+        """Add CSS styles.
 
-    return build_page(title, branded_content, output, craftx_styles)
+        Args:
+            css: CSS content
+        """
+        self.css_styles.append(css)
+
+    def add_js(self, js: str) -> None:
+        """Add JavaScript.
+
+        Args:
+            js: JavaScript content
+        """
+        self.js_scripts.append(js)
+
+    def add_content(self, content: str) -> None:
+        """Add body content.
+
+        Args:
+            content: HTML content
+        """
+        self.body_content.append(content)
+
+    def build(self) -> str:
+        """Build the complete HTML page.
+
+        Returns:
+            Complete HTML page as string
+        """
+        html_parts = [
+            "<!DOCTYPE html>",
+            "<html lang='en'>",
+            "<head>",
+            f"    <title>{self.title}</title>",
+            "    <meta charset='UTF-8'>",
+            "    <meta name='viewport' content='width=device-width, initial-scale=1.0'>",
+        ]
+
+        # Add CSS
+        if self.css_styles:
+            html_parts.append("    <style>")
+            html_parts.extend(f"        {css}" for css in self.css_styles)
+            html_parts.append("    </style>")
+
+        html_parts.extend([
+            "</head>",
+            "<body>",
+        ])
+
+        # Add body content
+        html_parts.extend(f"    {content}" for content in self.body_content)
+
+        # Add JavaScript
+        if self.js_scripts:
+            html_parts.append("    <script>")
+            html_parts.extend(f"        {js}" for js in self.js_scripts)
+            html_parts.append("    </script>")
+
+        html_parts.extend([
+            "</body>",
+            "</html>"
+        ])
+
+        return "\n".join(html_parts)
