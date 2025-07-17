@@ -81,7 +81,7 @@ http://localhost:8000
 
 ## 🧪 Testing Coverage
 
-**Website Tests: 7 test cases**
+### Website Tests: 7 test cases
 
 - ✅ Static website files existence
 - ✅ Index HTML content validation  
