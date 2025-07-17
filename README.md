@@ -96,8 +96,8 @@ The Streamlit-based interface provides:
 
 ## 📚 Documentation
 
-- **Website**: [https://craftx.py](https://craftx.py)
-- **Documentation**: [https://docs.craftx.py](https://docs.craftx.py)
+- **Website**: [https://craftx.elevatecraft.org](https://craftx.elevatecraft.org)
+- **Documentation**: [https://craftx.elevatecraft.org](https://craftx.elevatecraft.org)
 
 ## 🧪 Testing
 
