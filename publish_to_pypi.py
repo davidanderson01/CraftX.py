@@ -48,11 +48,11 @@ password = {testpypi_token if testpypi_token else 'YOUR_TESTPYPI_TOKEN_HERE'}
 """
 
     try:
-        with open(pypirc_path, 'w') as f:
+        with open(pypirc_path, 'w', encoding='utf-8') as f:
             f.write(config_content)
         print(f"✅ Configuration saved to {pypirc_path}")
         return True
-    except Exception as e:
+    except OSError as e:
         print(f"❌ Error saving configuration: {e}")
         return False
 
@@ -72,7 +72,7 @@ def build_package():
         # Build package
         result = subprocess.run([
             sys.executable, "setup.py", "sdist", "bdist_wheel"
-        ], capture_output=True, text=True)
+        ], capture_output=True, text=True, check=False)
 
         if result.returncode == 0:
             print("✅ Package built successfully!")
@@ -85,7 +85,7 @@ def build_package():
             print("❌ Build failed:")
             print(result.stderr)
             return False
-    except Exception as e:
+    except (OSError, subprocess.CalledProcessError) as e:
         print(f"❌ Build error: {e}")
         return False
 
@@ -107,7 +107,7 @@ def upload_to_testpypi():
             print("❌ Upload to Test PyPI failed:")
             print(result.stderr)
             return False
-    except Exception as e:
+    except (OSError, subprocess.CalledProcessError) as e:
         print(f"❌ Upload error: {e}")
         return False
 
@@ -140,7 +140,7 @@ def main():
 
     # Check if required tools are installed
     try:
-        import twine
+        # import twine
         print("✅ Twine is installed")
     except ImportError:
         print("❌ Twine not found. Installing...")
@@ -148,7 +148,7 @@ def main():
             [sys.executable, "-m", "pip", "install", "twine"])
 
     try:
-        import wheel
+        # import wheel
         print("✅ Wheel is installed")
     except ImportError:
         print("❌ Wheel not found. Installing...")

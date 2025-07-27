@@ -17,14 +17,14 @@ class DNSValidator(BaseTool):
                 "type": "string",
                 "description": "Domain name to validate",
                 "required": True
+            },
+            "record_type": {
+                "type": "string",
+                "description": ("Type of DNS record to retrieve " +
+                                "(A, AAAA, MX, TXT, etc.). Defaults to A."),
+                "required": False,
+                "default": "A"
             }
-            ,
- "record_type": {
- "type": "string",
- "description": "Type of DNS record to retrieve (A, AAAA, MX, TXT, etc.). Defaults to A.",
- "required": False,
- "default": "A"
- }
         }
 
     def run(self, domain: str = None, record_type: str = "A", **kwargs) -> str:
@@ -40,21 +40,22 @@ class DNSValidator(BaseTool):
             DNS validation result
         """
         if not domain:
- return "❌ Domain parameter is required."
+            return "❌ Domain parameter is required."
 
         if not domain.strip():
- return "❌ Domain cannot be empty."
+            return "❌ Domain cannot be empty."
 
         try:
- resolver = dns.resolver.Resolver()
- resolver.timeout = 5
- resolver.lifetime = 5
- answers = resolver.resolve(domain.strip(), record_type.strip().upper())
- result = f"✅ {record_type.strip().upper()} records for {domain}:\n"
- for rdata in answers:
- result += f"- {rdata}\n"
- return result
+            resolver = dns.resolver.Resolver()
+            resolver.timeout = 5
+            resolver.lifetime = 5
+            answers = resolver.resolve(
+                domain.strip(), record_type.strip().upper())
+            result = f"✅ {record_type.strip().upper()} records for {domain}:\n"
+            for rdata in answers:
+                result += f"- {rdata}\n"
+            return result
         except dns.resolver.NoAnswer:
- return f"❌ No {record_type.strip().upper()} records found for {domain}."
+            return f"❌ No {record_type.strip().upper()} records found for {domain}."
         except dns.exception.DNSException as e:
- return f"❌ DNS query failed for {domain} ({record_type.strip().upper()}): {str(e)}"
+            return f"❌ DNS query failed for {domain} ({record_type.strip().upper()}): {str(e)}"

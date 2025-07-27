@@ -6,7 +6,7 @@ Tests the Streamlit-based user interface components.
 import pytest
 import sys
 import os
-import tempfile
+# import tempfile
 import json
 
 # Add the project root to Python path
@@ -100,10 +100,9 @@ def test_run_assistant_command():
 
 def test_logs_handling():
     """Test that log files can be created and managed properly."""
-    project_root = os.path.dirname(os.path.dirname(__file__))
+    import tempfile
 
     # Test that we can create a temporary log file
-    import tempfile
     temp_dir = tempfile.gettempdir()
     temp_log_path = os.path.join(temp_dir, 'test_craftx.log')
 

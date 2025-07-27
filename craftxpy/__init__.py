@@ -13,7 +13,7 @@ Key Features:
 Example Usage:
     from craftxpy.agents import Router
     from craftxpy.plugins.base import BasePlugin
-    
+
     router = Router()
     # Use the router to manage AI assistant interactions
 """

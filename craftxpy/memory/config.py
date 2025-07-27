@@ -3,7 +3,7 @@
 Configuration management for memory and storage systems.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 import os
 
 

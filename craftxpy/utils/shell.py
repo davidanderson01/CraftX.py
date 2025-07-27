@@ -5,7 +5,7 @@ Shell command execution utilities.
 
 import subprocess
 import sys
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional
 
 
 class ShellExecutor:
@@ -37,7 +37,8 @@ class ShellExecutor:
                 shell=shell,
                 capture_output=capture_output,
                 text=True,
-                timeout=self.timeout
+                timeout=self.timeout,
+                check=False
             )
 
             execution_result = {
@@ -62,7 +63,7 @@ class ShellExecutor:
             self.last_result = error_result
             return error_result
 
-        except Exception as e:
+        except (subprocess.SubprocessError, OSError) as e:
             error_result = {
                 "command": command,
                 "returncode": -1,
@@ -98,5 +99,5 @@ class ShellExecutor:
 
             result = self.execute(check_cmd)
             return result["success"]
-        except:
+        except Exception:
             return False

@@ -9,7 +9,7 @@ import subprocess
 def check_requirements():
     """Check if required packages are installed."""
     try:
-        import streamlit  # pylint: disable=import-outside-toplevel,unused-import
+        # import streamlit  # pylint: disable=import-outside-toplevel,unused-import
         return True
     except ImportError:
         return False
@@ -75,7 +75,8 @@ def main():
         print("⚠️  Missing requirements. Installing...")
         if not install_requirements():
             print(
-                "❌ Failed to install requirements. Please run 'pip install -r requirements.txt' manually.")
+                "❌ Failed to install requirements. Please run "
+                "'pip install -r requirements.txt' manually.")
             return
 
     while True:

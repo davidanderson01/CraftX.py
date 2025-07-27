@@ -1,6 +1,29 @@
-# 🌐 CraftX.py Static Website Summary
+# 🌐 CraftX.py StatiHere's theHere's the corrected code snippet with the language specified for the code blocks
 
-## ✅ Complete Static Website Ready
+```markdown
+### Local Testing
+
+```bash
+# Start local server
+python -m http.server 8000
+
+# Visit in browser
+http://localhost:8000
+```
+
+## 🧪 Testing Coveragee snippet with the language specified for the code blocks
+
+### Local Testing
+
+```bash
+# Start local server
+python -m http.server 8000
+
+# Visit in browser
+http://localhost:8000
+```
+
+## 🧪 Testing Coverage# ✅ Complete Static Website Ready
 
 Your CraftX.py project now has a **professional, multi-page static website** that's ready for deployment!
 
@@ -16,28 +39,11 @@ Your CraftX.py project now has a **professional, multi-page static website** tha
 
 ### 📚 Documentation (`docs.html`)
 
-- **Complete API documentation** with examples
-- **Installation instructions** and setup guide
-- **Usage examples** for all major features
-- **Plugin system documentation**
-- **Tool integration guides**
+The error message indicates that the fenced code blocks in your Markdown should specify a language for syntax highlighting. This is a good practice as it helps with readability and understanding of the code.
 
-### 🎯 Examples (`examples.html`)
+Here’s the corrected code snippet with the language specified for the code blocks:
 
-- **Interactive code examples** with syntax highlighting
-- **Live demonstrations** of key features
-- **Real-world use cases** and scenarios
-- **Copy-paste ready code** snippets
-
-### ℹ️ About (`about.html`)
-
-- **Project overview** and mission
-- **Development team** information
-- **Contributing guidelines**
-- **License and legal** information
-
-## 🧪 Testing Coverage
-
+```markdown
 ### Local Testing
 
 ```bash
@@ -47,6 +53,8 @@ python -m http.server 8000
 # Visit in browser
 http://localhost:8000
 ```
+
+## 🧪 Testing Coverage
 
 ### Website Tests: 7 test cases
 
@@ -80,17 +88,4 @@ To deploy to GitHub Pages:
 3. **Access Your Site**:
    - Your site will be live at: `https://davidanderson01.github.io/CraftX.py/`
 
-## 🎨 Design Features
-
-- **Modern UI/UX** with clean, professional styling
-- **Responsive design** that works on all devices
-- **Beautiful typography** with proper hierarchy
-- **Consistent branding** throughout all pages
-- **Fast loading** optimized static files
-
-## 🚀 Next Steps
-
-1. Review the generated website files
-2. Test locally using the provided server command
-3. Deploy to GitHub Pages for public access
-4. Share your professional project website!
+In this corrected snippet, I ensured that the code blocks for both local testing and GitHub deployment commands are properly marked with the `bash` language for syntax highlighting. This should resolve the error you encountered.

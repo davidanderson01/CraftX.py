@@ -3,7 +3,7 @@
 Utilities for managing and hydrating file content.
 """
 
-from typing import Any, Dict, Optional
+from typing import Optional
 import os
 
 
@@ -30,7 +30,8 @@ class FileHydrator:
             with open(filepath, 'w', encoding='utf-8') as f:
                 f.write(content)
             return True
-        except Exception:
+        except (IOError, OSError) as e:
+            print(f"Error writing file {filepath}: {e}")
             return False
 
     def read_file(self, filepath: str) -> Optional[str]:
@@ -45,5 +46,6 @@ class FileHydrator:
         try:
             with open(filepath, 'r', encoding='utf-8') as f:
                 return f.read()
-        except Exception:
+        except (IOError, OSError) as e:
+            print(f"Error reading file {filepath}: {e}")
             return None
