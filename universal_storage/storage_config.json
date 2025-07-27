@@ -1,0 +1,19 @@
+{
+  "version": "1.0.0",
+  "created_at": "2025-07-27T13:18:52.071038",
+  "max_storage_bytes": 1099511627776,
+  "compression": true,
+  "encryption": true,
+  "auto_cleanup": true,
+  "retention_policy": {
+    "chat_sessions": 365,
+    "temp_files": 7,
+    "logs": 30,
+    "cache": 1
+  },
+  "storage_stats": {
+    "total_files": 0,
+    "total_size_bytes": 0,
+    "last_cleanup": "2025-07-27T13:18:52.071054"
+  }
+}

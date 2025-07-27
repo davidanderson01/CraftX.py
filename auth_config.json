@@ -1,0 +1,15 @@
+{
+  "enabled_providers": [],
+  "security_settings": {
+    "session_timeout": 86400,
+    "require_2fa": false,
+    "password_min_length": 8,
+    "session_encryption": true
+  },
+  "privacy_settings": {
+    "store_email": true,
+    "store_profile": true,
+    "analytics_enabled": false,
+    "data_retention_days": 365
+  }
+}

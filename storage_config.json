@@ -1,0 +1,14 @@
+{
+  "enabled_providers": [],
+  "storage_usage": {},
+  "sync_settings": {
+    "auto_sync": true,
+    "sync_interval": 300,
+    "conflict_resolution": "newest_wins"
+  },
+  "encryption": {
+    "enabled": true,
+    "key_derivation": "pbkdf2",
+    "iterations": 100000
+  }
+}
