@@ -3,8 +3,8 @@
 Utilities for managing and hydrating file content.
 """
 
-from typing import Any, Dict, Optional
 import os
+from typing import Any, Dict, Optional
 
 
 class FileHydrator:

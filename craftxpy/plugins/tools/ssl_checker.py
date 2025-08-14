@@ -1,8 +1,9 @@
 """SSL certificate checker tool for CraftX.py."""
 
-import ssl
 import socket
+import ssl
 from datetime import datetime
+
 from .base_tool import BaseTool
 
 

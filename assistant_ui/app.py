@@ -3,12 +3,13 @@ CraftX.py Assistant - Streamlit Web Interface
 A modern, interactive UI for CraftX.py intelligence framework.
 """
 
-import streamlit as st
 import json
 import os
 import sys
-from datetime import datetime
 import tempfile
+from datetime import datetime
+
+import streamlit as st
 
 # Add project root to path
 project_root = os.path.dirname(os.path.dirname(__file__))

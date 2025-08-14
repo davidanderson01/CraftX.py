@@ -1,6 +1,6 @@
 """Setup configuration for CraftX.py package."""
 
-from setuptools import setup, find_packages  # pylint: disable=import-error
+from setuptools import find_packages, setup  # pylint: disable=import-error
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()

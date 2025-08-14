@@ -3,8 +3,8 @@
 Configuration management for memory and storage systems.
 """
 
-from typing import Any, Dict, Optional
 import os
+from typing import Any, Dict, Optional
 
 
 class MemoryConfig:

@@ -3,9 +3,9 @@ Simple test runner for CraftX.py
 Run this script to execute all tests with nice output.
 """
 
+import os
 import subprocess
 import sys
-import os
 
 
 def run_tests():

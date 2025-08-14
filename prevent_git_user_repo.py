@@ -17,6 +17,7 @@ import subprocess
 from datetime import datetime
 from pathlib import Path
 
+
 def check_and_fix_user_git_repo():
     """Check for and fix dangerous Git repository in user directory."""
     

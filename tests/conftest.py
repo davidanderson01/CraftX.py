@@ -3,9 +3,10 @@ Test configuration for CraftX.py test suite.
 Configures pytest settings and test discovery.
 """
 
-import pytest
 import os
 import sys
+
+import pytest
 
 # Add the project root to Python path for all tests
 project_root = os.path.dirname(os.path.dirname(__file__))

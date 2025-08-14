@@ -4,9 +4,10 @@ Git Configuration Cleanup Script
 Fixes sparse checkout, line ending warnings, and Git configuration issues.
 """
 
+import os
 import subprocess
 import sys
-import os
+
 
 def run_git_command(command, description):
     """Run a git command and handle errors."""

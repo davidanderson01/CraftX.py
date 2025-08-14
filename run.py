@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """CraftX.py Quick Start Script"""
 
-import sys
 import os
 import subprocess
+import sys
 
 
 def check_requirements():
