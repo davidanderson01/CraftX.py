@@ -152,4 +152,7 @@ Thumbs.db
 *.temp
 *.bak
 
+# Backup directories
+backup/
+
 .fake
