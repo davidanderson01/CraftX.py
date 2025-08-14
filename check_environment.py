@@ -4,9 +4,10 @@ Environment checker for CraftX.py project
 Helps diagnose Python and package import issues
 """
 
-import sys
 import os
 import subprocess
+import sys
+
 
 def check_python_info():
     """Check Python interpreter information."""

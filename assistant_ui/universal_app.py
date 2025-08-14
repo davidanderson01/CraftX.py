@@ -13,20 +13,21 @@ CraftX.py Universal Mobile Application
 Zero functionality loss across platforms
 """
 
-import streamlit as st
+import base64
 import json
 import os
-import sys
 import platform
 import subprocess
-import base64
+import sys
 from datetime import datetime
 from pathlib import Path
 
+import streamlit as st
+
 # Import universal systems
 try:
-    from craftxpy.utils.cloud_storage import cloud_storage
     from craftxpy.utils.auth import universal_auth
+    from craftxpy.utils.cloud_storage import cloud_storage
     from craftxpy.utils.data_storage import universal_storage
 except ImportError:
     # Fallback if modules not available
@@ -96,6 +97,7 @@ def get_elevatecraft_logo_base64():
 
     # Try to load the uploaded ElevateCraft logo
     elevatecraft_logo_paths = [
+        "assets/img/elevatecraft-logo.svg",
         "static/elevatecraft-logo.png",
         "assets/img/elevatecraft-logo.png"
     ]
@@ -105,8 +107,12 @@ def get_elevatecraft_logo_base64():
             try:
                 with open(logo_path, "rb") as f:
                     logo_bytes = f.read()
-                    logo_base64 = base64.b64encode(logo_bytes).decode()
-                    return f"data:image/png;base64,{logo_base64}"
+                    if logo_path.endswith('.svg'):
+                        logo_base64 = base64.b64encode(logo_bytes).decode()
+                        return f"data:image/svg+xml;base64,{logo_base64}"
+                    else:
+                        logo_base64 = base64.b64encode(logo_bytes).decode()
+                        return f"data:image/png;base64,{logo_base64}"
             except Exception as e:
                 continue
 
@@ -847,8 +853,142 @@ window.addEventListener('unhandledrejection', (e) => {
     console.error('Unhandled promise rejection:', e.reason);
     // Could send to analytics or error reporting service
 });
-</script>
+
 """, unsafe_allow_html=True)
+
+
+def show_privacy_policy_modal():
+    """Show privacy policy modal."""
+    st.markdown("### 🔒 Privacy Policy")
+
+    st.markdown("""
+    **Last updated: July 27, 2025**
+
+    ---
+
+    ## Introduction
+
+    ElevateCraft ("we," "us," or "our") is committed to protecting your privacy and ensuring the ethical handling of your personal data. This Privacy Policy describes how we collect, use, disclose, and safeguard your information when you visit elevatecraft.org, sign in via OAuth providers, or download and use CraftX.py.
+
+    ---
+
+    ## Information We Collect
+
+    We collect data to provide secure access, prevent malicious activity, and improve our services.
+
+    - **Account Information**  
+      When you sign in using Microsoft, Apple, Google, Okta, ORCID, or GitHub, we receive basic profile details (name, email, unique user ID).
+
+    - **Authentication Tokens**  
+      We store the tokens necessary to validate and refresh your session securely.
+
+    - **Usage Data**  
+      We log your interactions with our site and CraftX.py (IP address, timestamps, pages visited, download activity, and error reports).
+
+    - **Cookies and Tracking Technologies**  
+      We use cookies and similar technologies to maintain your session, remember preferences, and analyze site performance.
+
+    ---
+
+    ## How We Use Your Information
+
+    We process your data for the following purposes:
+
+    - **Secure Authentication**  
+      To verify your identity, gate downloads, and prevent unauthorized or malicious use.
+
+    - **AI Oversight**  
+      To feed our embedded AI Safety Officer a risk assessment of configuration and usage patterns, ensuring CraftX.py is used responsibly.
+
+    - **Service Improvement**  
+      To analyze usage trends, fix bugs, and enhance features.
+
+    - **Communication**  
+      To send important notices, updates, or request feedback about CraftX.py and ElevateCraft services.
+
+    ---
+
+    ## Data Sharing & Disclosure
+
+    We do not sell or rent your personal information. We may share data in limited circumstances:
+
+    - **Service Providers**  
+      Third-party providers who help power authentication, analytics, hosting, and email notifications. They are bound by confidentiality obligations.
+
+    - **Legal Requirements**  
+      When required by law or to protect our rights, safety, or property, we may disclose information to comply with legal processes.
+
+    ---
+
+    ## Data Retention
+
+    We retain personal data only as long as necessary to fulfill the purposes outlined in this policy or as required by applicable law. Authentication logs and usage records are stored for up to 24 months, after which they are deleted or anonymized.
+
+    ---
+
+    ## Data Security
+
+    We implement administrative, technical, and physical safeguards to protect your data. Measures include encryption of data in transit and at rest, strict access controls, and routine security audits.
+
+    ---
+
+    ## Third-Party OAuth Providers
+
+    When you use external sign-in options, the provider's privacy policy governs their handling of your data. We recommend reviewing:
+
+    - **Microsoft**: https://privacy.microsoft.com  
+    - **Apple**: https://www.apple.com/legal/privacy/  
+    - **Google**: https://policies.google.com/privacy  
+    - **Okta**: https://www.okta.com/privacy/  
+    - **ORCID**: https://info.orcid.org/privacy/  
+    - **GitHub**: https://docs.github.com/en/site-policy/privacy-policies
+
+    ---
+
+    ## Your Rights
+
+    Depending on your jurisdiction, you may have the right to:
+
+    - Access, correct, or delete your personal data  
+    - Restrict or object to our processing of your data  
+    - Withdraw consent for certain processing activities  
+    - Lodge a complaint with a supervisory authority
+
+    To exercise these rights, please contact us at privacy@elevatecraft.org.
+
+    ---
+
+    ## International Data Transfers
+
+    ElevateCraft is based in the United States. If you access our services from outside the U.S., your information may be transferred, stored, and processed here. We take steps to ensure adequate protections are in place.
+
+    ---
+
+    ## Children's Privacy
+
+    Our services are not directed to individuals under 13. We do not knowingly collect personal information from children. If you believe a child has provided us data, please contact us, and we will promptly delete that information.
+
+    ---
+
+    ## Changes to This Privacy Policy
+
+    We may update this policy to reflect changes in our practices or legal requirements. We will post the revised date at the top and notify you of significant changes via email or on our website.
+
+    ---
+
+    ## Contact Us
+
+    For questions or requests concerning this Privacy Policy, please contact:
+
+    **ElevateCraft Privacy Team**  
+    Email: support@elevatecraft.org  
+    Address: 123 Innovation Drive, Hiawatha, IA 52233, United States
+    """)
+
+    st.markdown("---")
+    if st.button("❌ Close", key="close_privacy_policy"):
+        st.session_state.show_privacy_policy = False
+        st.rerun()
 
 
 def show_authentication_modal():
@@ -863,37 +1003,356 @@ def show_authentication_modal():
         return
 
     providers = universal_auth.get_all_providers()
+    config = universal_auth.get_auth_config()
+    configured_providers = config.get("enabled_providers", [])
+
+    if not configured_providers:
+        st.warning("⚠️ No authentication providers configured yet")
+        st.info(
+            "Please configure OAuth providers using the admin panel below to enable sign-in.")
+        st.caption(
+            "💡 Administrators need to set up OAuth credentials from providers like Google, Microsoft, GitHub, etc.")
+
+        # Show admin configuration button prominently
+        if st.button("🔧 Configure Providers (Admin)", use_container_width=True, type="primary"):
+            st.session_state.show_auth_admin = True
+            st.rerun()
+        st.caption(
+            "🔧 Click above to open the admin panel and configure OAuth providers")
+
+        if st.button("❌ Close", key="close_auth_no_providers"):
+            st.session_state.show_auth = False
+            st.rerun()
+        return
 
     st.info("Choose your preferred sign-in method:")
+    st.caption(
+        "🔐 Select one of the configured OAuth providers below to authenticate")
 
-    # Create provider buttons
-    cols = st.columns(2)
-    for i, (provider_id, provider_info) in enumerate(providers.items()):
-        with cols[i % 2]:
-            if st.button(
-                f"{provider_info['icon']} {provider_info['name']}",
-                key=f"auth_{provider_id}",
-                help=f"Sign in with {provider_info['name']}"
-            ):
-                if universal_auth.is_provider_configured(provider_id):
-                    # Generate OAuth URL (this would normally redirect to the provider)
-                    st.info(f"Redirecting to {provider_info['name']}...")
-                    st.write(
-                        "OAuth implementation would handle the actual authentication flow")
-                else:
-                    st.warning(
-                        f"{provider_info['name']} not configured by administrator")
+    # Create provider buttons for configured providers only
+    configured_provider_ids = [p["provider_id"] for p in configured_providers]
+    available_providers = {
+        k: v for k, v in providers.items() if k in configured_provider_ids}
+
+    if available_providers:
+        cols = st.columns(min(2, len(available_providers)))
+        for i, (provider_id, provider_info) in enumerate(available_providers.items()):
+            with cols[i % len(cols)]:
+                if st.button(
+                    f"{provider_info['icon']} {provider_info['name']}",
+                    key=f"auth_{provider_id}",
+                    help=f"Sign in with {provider_info['name']}"
+                ):
+                    if universal_auth.is_provider_configured(provider_id):
+                        # Generate OAuth URL (this would normally redirect to the provider)
+                        redirect_uri = "http://localhost:8080/auth/callback"
+                        try:
+                            oauth_url = universal_auth.generate_oauth_url(
+                                provider_id, redirect_uri)
+                            st.success(
+                                f"✅ {provider_info['name']} authentication ready!")
+                            st.info(
+                                "📋 OAuth URL generated. In a real deployment, this would redirect to the provider.")
+                            st.code(oauth_url, language="text")
+
+                            # Simulate successful login for demo
+                            mock_user_data = {
+                                "id": f"demo_user_{provider_id}",
+                                "name": f"Demo User ({provider_info['name']})",
+                                "email": f"demo@{provider_id}.com",
+                                "provider": provider_info['name'],
+                                "created_at": datetime.now().isoformat()
+                            }
+                            session_id = universal_auth.create_session(
+                                mock_user_data, provider_id)
+                            st.session_state.current_user = mock_user_data
+                            st.session_state.session_id = session_id
+                            st.session_state.user_id = mock_user_data["id"]
+
+                            st.success(
+                                f"🎉 Successfully signed in as {mock_user_data['name']}!")
+                            st.balloons()
+                        except ValueError as e:
+                            st.error(f"❌ Configuration error: {str(e)}")
+                    else:
+                        st.warning(
+                            f"{provider_info['name']} not configured by administrator")
 
     st.markdown("---")
     col1, col2 = st.columns([1, 1])
     with col1:
         if st.button("🔒 Privacy Policy"):
-            st.info(
-                "Your privacy is important to us. We only store necessary authentication data.")
+            st.session_state.show_privacy_policy = True
+            st.rerun()
+        st.caption("📋 Click to view our privacy policy")
     with col2:
-        if st.button("❌ Close"):
+        if st.button("❌ Close", key="close_auth_main"):
             st.session_state.show_auth = False
             st.rerun()
+        st.caption("✖️ Close this authentication dialog")
+
+
+def show_auth_admin_modal():
+    """Show authentication provider admin configuration modal."""
+    st.markdown("### ⚙️ OAuth Provider Configuration (Admin)")
+
+    if not universal_auth:
+        st.error("Authentication system not available")
+        if st.button("Close"):
+            st.session_state.show_auth_admin = False
+            st.rerun()
+        return
+
+    st.warning(
+        "🔐 **Admin Access Required** - This panel configures OAuth providers for all users.")
+
+    providers = universal_auth.get_all_providers()
+    config = universal_auth.get_auth_config()
+    configured_providers = {p["provider_id"]
+        : p for p in config.get("enabled_providers", [])}
+
+    # Quick setup for testing
+    st.subheader("🚀 Quick Demo Setup")
+    st.info("For testing purposes, you can enable providers with demo credentials")
+    st.caption(
+        "⚠️ These are demo credentials only - use the manual configuration below for production")
+
+    demo_providers = ["google", "microsoft", "github", "apple"]
+    cols = st.columns(2)
+
+    for i, provider_id in enumerate(demo_providers):
+        provider_info = providers.get(provider_id, {})
+        with cols[i % 2]:
+            if provider_id in configured_providers:
+                if st.button(f"✅ {provider_info.get('icon', '🔑')} {provider_info.get('name', provider_id.title())} (Configured)", key=f"demo_{provider_id}"):
+                    st.success(
+                        f"{provider_info.get('name', provider_id.title())} is already configured!")
+            else:
+                if st.button(f"🔧 Setup {provider_info.get('icon', '🔑')} {provider_info.get('name', provider_id.title())}", key=f"demo_{provider_id}"):
+                    # Add demo configuration
+                    result = universal_auth.add_provider_config(
+                        provider_id=provider_id,
+                        client_id=f"demo_client_{provider_id}",
+                        client_secret=f"demo_secret_{provider_id}",
+                        domain="" if not provider_info.get(
+                            "requires_domain") else "demo.com"
+                    )
+                    if result:
+                        st.success(
+                            f"✅ {provider_info.get('name', provider_id.title())} configured with demo credentials!")
+                        st.rerun()
+                    else:
+                        st.error(
+                            f"❌ Failed to configure {provider_info.get('name', provider_id.title())}")
+
+    st.markdown("---")
+
+    # Manual provider configuration
+    st.subheader("🔧 Manual Provider Configuration")
+    st.caption("Configure real OAuth providers for production use")
+
+    with st.expander("➕ Add New Provider", expanded=False):
+        st.info(
+            "💡 Select a provider below and enter your OAuth credentials from their developer console")
+        provider_options = [
+            pid for pid in providers.keys() if pid not in configured_providers]
+
+        if provider_options:
+            selected_provider = st.selectbox(
+                "Select Provider",
+                provider_options,
+                format_func=lambda x: f"{providers[x].get('icon', '🔑')} {providers[x].get('name', x.title())}",
+                help="Choose which OAuth provider you want to configure"
+            )
+            st.caption(
+                "📝 Select the OAuth provider you want to set up for user authentication")
+
+            provider_info = providers[selected_provider]
+
+            st.write(f"**Setting up {provider_info['name']}**")
+            st.info(f"🌐 Authorization URL: `{provider_info['auth_url']}`")
+
+            # Provider-specific instructions with detailed guidance
+            setup_instructions = {
+                "google": "Get these from Google Cloud Console → APIs & Services → Credentials → Create OAuth 2.0 Client ID",
+                "microsoft": "Get these from Azure Portal → App Registrations → New Registration → Authentication",
+                "github": "Get these from GitHub → Settings → Developer settings → OAuth Apps → New OAuth App",
+                "apple": "Get these from Apple Developer → Certificates, Identifiers & Profiles → Services → Sign In with Apple",
+                "orcid": "Get these from ORCID.org → Sign In → Developer Tools → Register for the public API (requires ORCID account)",
+                "okta": "Get these from Okta Admin Console → Applications → Create App Integration → OIDC - Web Application",
+                "auth0": "Get these from Auth0 Dashboard → Applications → Create Application → Regular Web Applications",
+                "discord": "Get these from Discord Developer Portal → Applications → New Application → OAuth2",
+                "linkedin": "Get these from LinkedIn Developer Portal → My Apps → Create App → Auth tab",
+                "twitter": "Get these from Twitter Developer Portal → Projects & Apps → Create App → Keys and tokens"
+            }
+
+            instruction = setup_instructions.get(
+                selected_provider, "Get these from your OAuth provider's developer console")
+            st.caption(f"💡 {instruction}")
+
+            # Provider-specific placeholders and detailed help
+            placeholders = {
+                "google": "123456789012-abcdefghijklmnopqrstuvwxyz.apps.googleusercontent.com",
+                "microsoft": "12345678-1234-1234-1234-123456789012",
+                "github": "Iv1.1234567890123456",
+                "apple": "com.yourcompany.yourapp.signin",
+                "orcid": "APP-ABCDEFGHIJKLMNOP (16-character alphanumeric)",
+                "okta": "0oa1234567890abcdef0h7",
+                "auth0": "AbCdEfGhIjKlMnOpQrStUvWxYz123456",
+                "discord": "123456789012345678",
+                "linkedin": "12345678901234",
+                "twitter": "1234567890123456789"
+            }
+
+            help_texts = {
+                "google": "From Google Cloud Console: Create credentials → OAuth 2.0 Client IDs. This is your Client ID.",
+                "microsoft": "From Azure Portal: App registrations → Your app → Overview. This is your Application (client) ID.",
+                "github": "From GitHub Developer settings: Create OAuth App. This is your Client ID (starts with 'Iv1.').",
+                "apple": "From Apple Developer: Create Service ID. This is your Services ID (reverse domain format).",
+                "orcid": "From ORCID Developer Tools: Register public API client. This is your Client ID (format: APP-XXXXXXXXXXXXXXXX).",
+                "okta": "From Okta Admin Console: Create OIDC web app. This is your Client ID.",
+                "auth0": "From Auth0 Dashboard: Create Regular Web Application. This is your Client ID.",
+                "discord": "From Discord Developer Portal: Create Application → OAuth2. This is your Client ID (18-digit number).",
+                "linkedin": "From LinkedIn Developer Portal: Create App → Auth tab. This is your Client ID.",
+                "twitter": "From Twitter Developer Portal: Create App → Keys and tokens. This is your Client ID."
+            }
+
+            client_id = st.text_input(
+                "Client ID",
+                key=f"client_id_{selected_provider}",
+                help=help_texts.get(
+                    selected_provider, "The public identifier for your OAuth application. This is safe to share and will be visible in requests."),
+                placeholder=placeholders.get(
+                    selected_provider, "Enter your client ID here")
+            )
+            st.caption(
+                f"📋 Copy the Client ID from your {provider_info['name']} app settings")
+
+            # Special note for ORCID
+            if selected_provider == "orcid":
+                st.info("💡 **ORCID Note**: Your Client ID will start with 'APP-' followed by 16 characters (letters/numbers). Example: APP-ABCDEFGHIJKLMNOP")
+
+            client_secret = st.text_input(
+                "Client Secret",
+                type="password",
+                key=f"client_secret_{selected_provider}",
+                help="The private key for your OAuth application. Keep this secret and never share it publicly.",
+                placeholder="Enter your client secret here"
+            )
+            st.caption(
+                f"🔐 Copy the Client Secret from your {provider_info['name']} app settings (keep this private!)")
+
+            # Special note for ORCID secret
+            if selected_provider == "orcid":
+                st.warning(
+                    "🔒 **ORCID Security**: Your Client Secret is a long random string. Keep this completely private and never share it in public code or repositories.")
+
+            domain = ""
+            if provider_info.get("requires_domain"):
+                domain = st.text_input(
+                    "Domain",
+                    key=f"domain_{selected_provider}",
+                    help=f"Your {provider_info['name']} domain without https://",
+                    placeholder=f"your-company.{selected_provider}.com"
+                )
+                st.caption(
+                    f"🌐 Enter your {provider_info['name']} domain (e.g., your-company.{selected_provider}.com)")
+
+            if st.button("💾 Save Configuration", key=f"save_{selected_provider}"):
+                if client_id and client_secret:
+                    if provider_info.get("requires_domain") and not domain:
+                        st.error(
+                            "❌ Domain is required for this provider - please enter your domain above")
+                    else:
+                        result = universal_auth.add_provider_config(
+                            provider_id=selected_provider,
+                            client_id=client_id,
+                            client_secret=client_secret,
+                            domain=domain
+                        )
+                        if result:
+                            st.success(
+                                f"✅ {provider_info['name']} configured successfully!")
+                            st.rerun()
+                        else:
+                            st.error(
+                                f"❌ Failed to configure {provider_info['name']}")
+                else:
+                    st.error(
+                        "❌ Please fill in both Client ID and Client Secret fields above")
+        else:
+            st.info("All available providers are already configured!")
+
+    # Show configured providers
+    if configured_providers:
+        st.subheader("✅ Configured Providers")
+        st.caption(
+            "These OAuth providers are currently set up and ready for user authentication")
+
+        for provider_id, provider_config in configured_providers.items():
+            provider_info = providers.get(provider_id, {})
+
+            with st.expander(f"{provider_info.get('icon', '🔑')} {provider_info.get('name', provider_id.title())}", expanded=False):
+                col1, col2 = st.columns([2, 1])
+
+                with col1:
+                    st.write(
+                        f"**Client ID:** `{provider_config.get('client_id', 'Not set')[:20]}...`")
+                    st.write(
+                        f"**Status:** {'✅ Enabled' if provider_config.get('enabled', True) else '❌ Disabled'}")
+                    st.write(
+                        f"**Added:** {provider_config.get('added_date', 'Unknown')[:10]}")
+                    if provider_config.get('domain'):
+                        st.write(f"**Domain:** `{provider_config['domain']}`")
+
+                with col2:
+                    if st.button("🗑️ Remove", key=f"remove_{provider_id}"):
+                        # Remove provider
+                        config = universal_auth.get_auth_config()
+                        config["enabled_providers"] = [
+                            p for p in config["enabled_providers"]
+                            if p["provider_id"] != provider_id
+                        ]
+                        universal_auth.save_auth_config(config)
+                        st.success(
+                            f"Removed {provider_info.get('name', provider_id)}")
+                        st.rerun()
+
+    # Instructions
+    st.markdown("---")
+    st.subheader("📋 Setup Instructions")
+    st.caption(
+        "Step-by-step guides for setting up OAuth applications with each provider")
+
+    instructions = {
+        "google": "1. Go to [Google Cloud Console](https://console.cloud.google.com/)\n2. Create a new project or select existing\n3. Enable Google+ API or Google OAuth2 API\n4. Go to Credentials → Create Credentials → OAuth 2.0 Client IDs\n5. Set Application type to 'Web application'\n6. Add redirect URI: `http://localhost:8080/auth/callback`\n7. Copy the Client ID and Client Secret",
+        "microsoft": "1. Go to [Azure Portal](https://portal.azure.com/)\n2. Navigate to Azure Active Directory → App registrations\n3. Click 'New registration'\n4. Set redirect URI: `http://localhost:8080/auth/callback`\n5. After creation, go to Certificates & secrets → New client secret\n6. Copy the Application (client) ID and the generated secret value",
+        "github": "1. Go to [GitHub Developer Settings](https://github.com/settings/developers)\n2. Click 'OAuth Apps' → 'New OAuth App'\n3. Fill in application details\n4. Set Authorization callback URL: `http://localhost:8080/auth/callback`\n5. Click 'Register application'\n6. Copy the Client ID and generate a Client Secret",
+        "apple": "1. Go to [Apple Developer Portal](https://developer.apple.com/)\n2. Sign in with your Apple Developer account\n3. Go to Certificates, Identifiers & Profiles → Services\n4. Create new Service ID for 'Sign in with Apple'\n5. Configure domains and redirect URI: `http://localhost:8080/auth/callback`\n6. Copy the Services ID as your Client ID\n7. Generate a client secret using your private key",
+        "orcid": "**ORCID Setup (Detailed Steps):**\n\n1. **Create ORCID Account**: Go to [ORCID.org](https://orcid.org) and create an account if you don't have one\n2. **Access Developer Tools**: Sign in → Click your name/icon → Developer Tools\n3. **Register Public API Client**: Click 'Register for the public API'\n4. **Fill Application Details**:\n   - Name: Your application name (e.g., 'CraftX.py Authentication')\n   - Website: Your website URL or `http://localhost:8080`\n   - Description: Brief description of your application\n   - Redirect URI: `http://localhost:8080/auth/callback`\n5. **Get Credentials**: After registration, copy:\n   - **Client ID**: Format APP-XXXXXXXXXXXXXXXX (16 characters after APP-)\n   - **Client Secret**: Long random string (keep this secure!)\n6. **Important**: ORCID Client ID always starts with 'APP-' followed by 16 alphanumeric characters",
+        "okta": "1. Go to [Okta Admin Console](https://dev.okta.com/)\n2. Create developer account if needed\n3. Navigate to Applications → Create App Integration\n4. Choose 'OIDC - OpenID Connect' → 'Web Application'\n5. Set redirect URI: `http://localhost:8080/auth/callback`\n6. Copy the Client ID and Client Secret",
+        "auth0": "1. Go to [Auth0 Dashboard](https://manage.auth0.com/)\n2. Create account if needed\n3. Navigate to Applications → Create Application\n4. Choose 'Regular Web Applications'\n5. Go to Settings tab\n6. Add `http://localhost:8080/auth/callback` to Allowed Callback URLs\n7. Copy the Client ID and Client Secret",
+        "discord": "1. Go to [Discord Developer Portal](https://discord.com/developers/applications)\n2. Click 'New Application'\n3. Give your application a name\n4. Go to OAuth2 → General\n5. Add redirect URL: `http://localhost:8080/auth/callback`\n6. Copy the Client ID and Client Secret",
+        "linkedin": "1. Go to [LinkedIn Developer Portal](https://www.linkedin.com/developers/)\n2. Click 'Create app'\n3. Fill in required information\n4. Go to Auth tab\n5. Add `http://localhost:8080/auth/callback` to Authorized redirect URLs\n6. Copy the Client ID and Client Secret",
+        "twitter": "1. Go to [Twitter Developer Portal](https://developer.twitter.com/)\n2. Create developer account if needed\n3. Create a new project and app\n4. Go to app settings → Keys and tokens\n5. Generate OAuth 2.0 Client ID and Client Secret\n6. Add `http://localhost:8080/auth/callback` to callback URLs"
+    }
+
+    for provider_id, instruction in instructions.items():
+        provider_info = providers.get(provider_id, {})
+        with st.expander(f"📖 {provider_info.get('icon', '🔑')} {provider_info.get('name', provider_id.title())} Setup"):
+            st.markdown(instruction)
+
+    st.markdown("---")
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        if st.button("🔄 Refresh"):
+            st.rerun()
+        st.caption("🔄 Refresh the configuration panel")
+    with col2:
+        if st.button("❌ Close", key="close_auth_admin"):
+            st.session_state.show_auth_admin = False
+            st.rerun()
+        st.caption("✖️ Close the admin configuration panel")
 
 
 def show_storage_settings_modal():
@@ -928,7 +1387,8 @@ def show_storage_settings_modal():
 
     providers = cloud_storage.get_all_providers()
     config = cloud_storage.get_storage_config()
-    enabled_providers = {p["provider_id"]: p for p in config.get("enabled_providers", [])}
+    enabled_providers = {p["provider_id"]
+        : p for p in config.get("enabled_providers", [])}
 
     for provider_id, provider_info in providers.items():
         with st.expander(f"{provider_info['icon']} {provider_info['name']} - {provider_info['max_storage']}"):
@@ -984,7 +1444,7 @@ def show_storage_settings_modal():
             # Restore logic would go here
 
     st.markdown("---")
-    if st.button("❌ Close"):
+    if st.button("❌ Close", key="close_storage"):
         st.session_state.show_storage = False
         st.rerun()
 
@@ -1079,9 +1539,257 @@ def show_profile_modal():
                     st.success("Account deletion initiated...")
 
     st.markdown("---")
-    if st.button("❌ Close"):
+    if st.button("❌ Close", key="close_profile"):
         st.session_state.show_profile = False
         st.rerun()
+
+
+def show_landing_page(platform_info):
+    """Show the landing page with CraftX.py and ElevateCraft information and authentication options."""
+
+    # Hero Section
+    st.markdown("""
+    <div style="text-align: center; padding: 2rem 0; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); border-radius: 1rem; margin: 1rem 0;">
+        <h2 style="color: var(--accent-color, #2196F3); margin-bottom: 1rem;">🚀 Welcome to CraftX.py</h2>
+        <p style="font-size: 1.2rem; color: var(--text-primary, #000); margin-bottom: 1.5rem; max-width: 800px; margin-left: auto; margin-right: auto;">
+            The Universal AI Assistant that works flawlessly on <strong>every device</strong> and <strong>every platform</strong> - 
+            from the latest smartphones to legacy computers, with zero compatibility issues.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # What is CraftX.py?
+    st.markdown("### 🤖 What is CraftX.py?")
+
+    col1, col2 = st.columns([2, 1])
+
+    with col1:
+        st.markdown("""
+        **CraftX.py** is a revolutionary AI-powered assistant designed with one core principle: 
+        **Universal Compatibility**. Unlike other AI tools that may break on older devices or 
+        certain platforms, CraftX.py guarantees:
+        
+        ✅ **Works on ALL devices**: Android, iPhone, Windows, Mac, Linux, ChromeOS  
+        ✅ **Zero compatibility issues**: From Windows XP to the latest iOS  
+        ✅ **Cross-platform consistency**: Same experience everywhere  
+        ✅ **Progressive Web App**: No app store required, works in any browser  
+        ✅ **Offline capability**: Core features work without internet  
+        ✅ **Touch & keyboard optimized**: Perfect for both mobile and desktop  
+        
+        Whether you're using a 10-year-old laptop or the newest smartphone, 
+        CraftX.py delivers the same powerful AI assistance with intelligent 
+        code generation, problem-solving, and creative support.
+        """)
+
+    with col2:
+        # Platform compatibility grid
+        st.markdown("""
+        <div style="background: var(--bg-secondary, #f5f5f5); padding: 1rem; border-radius: 0.5rem; text-align: center;">
+            <h4 style="margin-bottom: 1rem; color: var(--text-primary, #000);">✅ 100% Compatible</h4>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; font-size: 0.9rem;">
+                <div>📱 Android</div>
+                <div>🍎 iOS</div>
+                <div>🪟 Windows</div>
+                <div>🖥️ macOS</div>
+                <div>🐧 Linux</div>
+                <div>🌐 ChromeOS</div>
+                <div>📟 Legacy Systems</div>
+                <div>📱 Any Browser</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # What is ElevateCraft?
+    st.markdown("### 🏢 About ElevateCraft")
+
+    col1, col2 = st.columns([1, 2])
+
+    with col1:
+        # Get ElevateCraft logo
+        elevatecraft_logo = get_elevatecraft_logo_base64()
+        st.markdown(f"""
+        <div style="text-align: center; padding: 1rem;">
+            <img src="{elevatecraft_logo}" style="width: 120px; height: 120px; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" alt="ElevateCraft Logo">
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col2:
+        st.markdown("""
+        **ElevateCraft** is a forward-thinking technology organization dedicated to creating 
+        innovative solutions that bridge the digital divide. Our mission is simple yet powerful:
+        
+        🎯 **Mission**: Make advanced technology accessible to everyone, regardless of their device or technical expertise  
+        🌍 **Vision**: A world where technology limitations never prevent someone from achieving their goals  
+        💡 **Values**: Universal accessibility, open-source innovation, and community-driven development  
+        
+        **Our Projects:**
+        - 🤖 **CraftX.py**: Universal AI Assistant Platform
+        - 🔧 **Universal Tools**: Cross-platform utilities and applications
+        - 📚 **Open Source Libraries**: Developer tools for universal compatibility
+        - 🎓 **Educational Resources**: Making technology learning accessible to all
+        
+        Founded on the principle that good technology should work for everyone, 
+        ElevateCraft is committed to eliminating compatibility barriers and 
+        creating inclusive digital experiences.
+        """)
+
+    st.markdown("---")
+
+    # Key Features Section
+    st.markdown("### ⭐ Key Features")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.markdown("""
+        **🧠 AI-Powered Intelligence**
+        - Advanced language models
+        - Code generation & debugging
+        - Creative writing assistance
+        - Problem-solving guidance
+        - Multi-language support
+        """)
+
+    with col2:
+        st.markdown("""
+        **🌐 Universal Compatibility**
+        - Works on any device/OS
+        - Progressive Web App
+        - Offline functionality
+        - Legacy browser support
+        - Touch & keyboard optimized
+        """)
+
+    with col3:
+        st.markdown("""
+        **🔒 Privacy & Security**
+        - Secure authentication
+        - Encrypted data storage
+        - Privacy-first design
+        - GDPR compliant
+        - No tracking or ads
+        """)
+
+    st.markdown("---")
+
+    # Authentication Section
+    st.markdown("### 🔐 Get Started - Sign In or Create Account")
+
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(33, 150, 243, 0.1)); 
+                padding: 1.5rem; border-radius: 0.8rem; margin: 1rem 0; text-align: center;">
+        <h4 style="color: var(--accent-color, #2196F3); margin-bottom: 1rem;">
+            🚀 Ready to experience universal AI assistance?
+        </h4>
+        <p style="margin-bottom: 1.5rem; color: var(--text-primary, #000);">
+            Sign in with your preferred provider to access all features, sync your data across devices, 
+            and join the CraftX.py community!
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Center the authentication button
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        if st.button("🔑 Sign In / Create Account", key="landing_auth",
+                     help="Choose from 10+ authentication providers including Google, Microsoft, GitHub, and more"):
+            st.session_state.show_auth = True
+            st.rerun()
+
+    # Why sign in benefits
+    st.markdown("### 🎁 Benefits of Creating an Account")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("""
+        **🔄 Sync Across Devices**
+        - Access your chats on any device
+        - Seamless experience everywhere
+        - Automatic backup & restore
+        
+        **📊 Enhanced Features**
+        - Unlimited chat history
+        - Advanced AI models
+        - Custom preferences
+        """)
+
+    with col2:
+        st.markdown("""
+        **☁️ Cloud Storage**
+        - Secure data backup
+        - Multi-provider support
+        - Privacy-focused encryption
+        
+        **🎯 Personalization**
+        - Tailored AI responses
+        - Custom workflows
+        - Usage analytics
+        """)
+
+    # Demo Access
+    st.markdown("---")
+    st.markdown("### 🎯 Try Before You Sign In")
+
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.info("💡 **Demo Mode**: Want to try CraftX.py first? You can explore basic features without signing in, but full functionality requires an account.")
+
+        if st.button("🔍 Continue as Guest", key="demo_mode"):
+            st.session_state.demo_mode = True
+            st.rerun()
+
+    # Footer with current site reference and privacy policy
+    st.markdown("---")
+    st.markdown("""
+    <div style="text-align: center; padding: 1rem; background: var(--bg-secondary, #f5f5f5); border-radius: 0.5rem; margin-top: 2rem;">
+        <p style="margin: 0; color: var(--text-secondary, #666); font-size: 0.9rem;">
+            🌟 This platform replaces the content currently shown at 
+            <a href="https://craftx.elevatecraft.org" target="_blank" style="color: var(--accent-color, #2196F3);">
+                craftx.elevatecraft.org
+            </a> with a fully interactive AI assistant experience
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Privacy Policy and Legal Links
+    st.markdown("---")
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.markdown("""
+        <div style="text-align: center; margin: 1rem 0;">
+            <p style="font-size: 0.85rem; color: var(--text-secondary, #666); margin-bottom: 0.5rem;">
+                By using CraftX.py, you agree to our terms and privacy practices
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Privacy policy button
+        if st.button("🔒 Privacy Policy", key="landing_privacy",
+                     help="View our comprehensive privacy policy and data protection practices"):
+            st.session_state.show_privacy_policy = True
+            st.rerun()
+
+    # Copyright notice
+    st.markdown("""
+    <div style="text-align: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color, #e0e0e0);">
+        <p style="font-size: 0.75rem; color: var(--text-secondary, #999); margin: 0;">
+            © 2025 ElevateCraft • Open Source • Universal Compatibility • 
+            <a href="mailto:support@elevatecraft.org" style="color: var(--accent-color, #2196F3); text-decoration: none;">
+                Contact Support
+            </a>
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Handle modals on landing page
+    if st.session_state.get('show_privacy_policy', False):
+        show_privacy_policy_modal()
+
+    if st.session_state.get('show_auth', False):
+        show_authentication_modal()
 
 
 def main():
@@ -1145,6 +1853,10 @@ def main():
     </div>
     """, unsafe_allow_html=True)
 
+    # Check if user is authenticated - show landing page if not
+    current_user = st.session_state.get('current_user')
+    demo_mode = st.session_state.get('demo_mode', False)
+
     # Universal Header with Logo
     # Get the logo first to avoid issues with f-string
     craftx_logo = get_logo_base64()
@@ -1158,10 +1870,32 @@ def main():
         <p style="margin:0; opacity:0.9; font-size:clamp(12px, 2.5vw, 16px);">
             AI-Powered • Cross-Platform • Zero Compatibility Issues
         </p>
+        <p style="margin:0.5rem 0 0 0; opacity:0.8; font-size:clamp(11px, 2vw, 14px);">
+            Made with ❤️ by <a href="https://elevatecraft.org" target="_blank" style="color: white; text-decoration: none; font-weight: bold;">ElevateCraft</a>
+        </p>
     </div>
     """, unsafe_allow_html=True)
 
-    # Platform-specific welcome message
+    # Show landing page if not authenticated and not in demo mode
+    if not current_user and not demo_mode:
+        show_landing_page(platform_info)
+        return
+
+    # Demo mode banner
+    if demo_mode and not current_user:
+        st.warning(
+            "🎯 **Demo Mode**: You're trying CraftX.py with limited features. [Sign in](javascript:void(0)) for the full experience!")
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col1:
+            if st.button("🔑 Sign In for Full Access"):
+                st.session_state.show_auth = True
+                st.rerun()
+        with col2:
+            if st.button("← Back to Landing"):
+                st.session_state.demo_mode = False
+                st.rerun()
+
+    # Platform-specific welcome message for authenticated users
     if platform_info["system"] == "windows":
         welcome_msg = "Welcome Windows user! 🪟"
     elif platform_info["system"] == "darwin":
@@ -1171,7 +1905,10 @@ def main():
     else:
         welcome_msg = "Welcome! 🌐"
 
-    st.info(f"{welcome_msg} CraftX.py is fully optimized for your platform.")
+    if current_user:
+        st.info(f"{welcome_msg} Welcome back, {current_user.get('name', 'User')}!")
+    else:
+        st.info(f"{welcome_msg} CraftX.py is fully optimized for your platform.")
 
     # Apply custom styling to make the info message white text
     st.markdown("""
@@ -1385,6 +2122,14 @@ def main():
     if st.session_state.get('show_auth', False):
         show_authentication_modal()
 
+    # Show Authentication Admin Modal
+    if st.session_state.get('show_auth_admin', False):
+        show_auth_admin_modal()
+
+    # Show Privacy Policy Modal
+    if st.session_state.get('show_privacy_policy', False):
+        show_privacy_policy_modal()
+
     # Show Storage Settings Modal
     if st.session_state.get('show_storage', False):
         show_storage_settings_modal()
@@ -1418,15 +2163,69 @@ def main():
             <img src="{elevatecraft_logo}" style="width: 24px; height: 24px; margin-left: 0.5rem; vertical-align: middle;" alt="ElevateCraft Logo">
         </div>
         
-        <div style="margin-top: 1.5rem; font-size: 14px; color: var(--text-secondary, #666);">
-            <p>Questions, Comments, or Collaboration? Let us know at 
-                <a href="mailto:craftx@elevatecraft.org" style="color: var(--accent-color, #2196F3); font-weight: bold; text-decoration: none;">
-                    craftx@elevatecraft.org
+        <div style="margin-top: 1.5rem; text-align: center;">
+            <p style="font-size: 14px; color: var(--text-secondary, #666); margin: 0;">
+                Issues, Comments, Collaborations?! Email us @ 
+                <a href="mailto:support@elevatecraft.org" style="color: var(--accent-color, #2196F3); text-decoration: none;">
+                    support@elevatecraft.org
                 </a>
             </p>
         </div>
     </div>
     """, unsafe_allow_html=True)
+
+    # Sponsor Buttons using Streamlit columns
+    st.markdown('<div style="text-align: center; margin: 1rem 0;">',
+                unsafe_allow_html=True)
+
+    # Create columns for sponsor buttons
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        st.markdown("""
+        <a href="https://venmo.com/elevatecraft" target="_blank" style="text-decoration: none;">
+            <div style="background: #3D95CE; color: white; padding: 12px; border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.3s ease; border: none; width: 100%; font-weight: bold;" 
+                 onmouseover="this.style.background='#2a7bb8'" 
+                 onmouseout="this.style.background='#3D95CE'">
+                💸 Venmo
+            </div>
+        </a>
+        """, unsafe_allow_html=True)
+
+    with col2:
+        st.markdown("""
+        <a href="https://coff.ee/honnalulu0c" target="_blank" style="text-decoration: none;">
+            <div style="background: #FFDD00; color: black; padding: 12px; border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.3s ease; border: none; width: 100%; font-weight: bold;" 
+                 onmouseover="this.style.background='#e6c500'" 
+                 onmouseout="this.style.background='#FFDD00'">
+                ☕ Buy Coffee
+            </div>
+        </a>
+        """, unsafe_allow_html=True)
+
+    with col3:
+        st.markdown("""
+        <a href="https://github.com/sponsors/davidanderson01" target="_blank" style="text-decoration: none;">
+            <div style="background: #181C17; color: white; padding: 12px; border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.3s ease; border: none; width: 100%; font-weight: bold;" 
+                 onmouseover="this.style.background='#0d1011'" 
+                 onmouseout="this.style.background='#181C17'">
+                💝 GitHub
+            </div>
+        </a>
+        """, unsafe_allow_html=True)
+
+    with col4:
+        st.markdown("""
+        <a href="https://patreon.com/DavidAnderson01" target="_blank" style="text-decoration: none;">
+            <div style="background: #FF4464; color: white; padding: 12px; border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.3s ease; border: none; width: 100%; font-weight: bold;" 
+                 onmouseover="this.style.background='#e03954'" 
+                 onmouseout="this.style.background='#FF4464'">
+                🎯 Patreon
+            </div>
+        </a>
+        """, unsafe_allow_html=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # Footer text
     st.markdown("""

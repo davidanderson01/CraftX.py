@@ -1,8 +1,8 @@
 """Tool generator script for CraftX.py."""
 
 import os
-import sys
 import re
+import sys
 
 TOOL_TEMPLATE = '''"""{{description}} for CraftX.py."""
 

@@ -16,14 +16,14 @@ Compatible with:
 ZERO functionality loss across any platform!
 """
 
-import subprocess
-import sys
+import json
 import os
 import platform
-import webbrowser
-import time
-import json
 import socket
+import subprocess
+import sys
+import time
+import webbrowser
 from pathlib import Path
 
 

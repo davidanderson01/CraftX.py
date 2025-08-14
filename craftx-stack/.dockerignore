@@ -1,0 +1,43 @@
+# Git files
+.git
+.gitignore
+
+# Environment files (these should be mounted, not copied)
+.env
+.env.*
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Virtual environments
+.venv
+venv/
+env/
+
+# IDE files
+.vscode
+.idea
+
+# Documentation
+README.md
+*.md
+
+# Logs
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Node modules (if any)
+node_modules/
+
+# Build artifacts
+build/
+dist/

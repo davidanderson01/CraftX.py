@@ -3,8 +3,9 @@
 Test script to validate CraftX.py Assistant app configuration
 """
 
-import sys
 import os
+import sys
+
 
 def test_imports():
     """Test that all required imports work."""

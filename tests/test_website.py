@@ -3,9 +3,11 @@ Test suite for CraftX.py static website functionality.
 Tests the HTML pages and static site structure.
 """
 
-import pytest
-import sys
 import os
+import sys
+
+import pytest
+
 # from pathlib import Path
 
 # Add the project root to Python path

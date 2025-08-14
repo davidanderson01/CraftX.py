@@ -294,7 +294,9 @@ def run_universal_setup():
 
     # Generate PWA manifest
     try:
-        from universal_pwa import create_universal_pwa_manifest, create_apple_touch_icons, create_microsoft_tiles
+        from universal_pwa import (create_apple_touch_icons,
+                                   create_microsoft_tiles,
+                                   create_universal_pwa_manifest)
         create_universal_pwa_manifest()
         create_apple_touch_icons()
         create_microsoft_tiles()

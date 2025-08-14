@@ -74,7 +74,7 @@ def test_craftxpy_package():
 
         # Test Memory Storage
         print("\n6. 💾 Testing Memory Storage...")
-        from craftxpy.memory import MemoryStorage, MemoryConfig
+        from craftxpy.memory import MemoryConfig, MemoryStorage
 
         storage = MemoryStorage()
         storage.store("demo_key", "Hello from CraftX.py storage!")

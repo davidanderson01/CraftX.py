@@ -24,8 +24,8 @@ __description__ = "Advanced AI-Powered Assistant Framework"
 
 # Import key components for easy access
 from .agents import Router
-from .plugins.base import BasePlugin, DemoPlugin
 from .memory import Logger, MemoryConfig, MemoryStorage
+from .plugins.base import BasePlugin, DemoPlugin
 from .utils import PageBuilder, ShellExecutor
 
 __all__ = [

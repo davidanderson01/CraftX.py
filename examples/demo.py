@@ -1,20 +1,20 @@
 """CraftX.py Demo - Basic usage examples."""
 
-import sys
 import os
+import sys
 
 # Add parent directory to path so we can import craftxpy
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 try:
     from craftxpy.agents.router import AgentRouter
-    from craftxpy.plugins.wizardcoder import WizardCoder
-    from craftxpy.plugins.commandr7b import CommandR7B
-    from craftxpy.plugins.codegeex4 import CodeGeeX4
-    from craftxpy.plugins.qwen25coder import Qwen25Coder
     from craftxpy.memory.logger import ChatLogger
-    from craftxpy.utils.shell import run_safe_command
+    from craftxpy.plugins.codegeex4 import CodeGeeX4
+    from craftxpy.plugins.commandr7b import CommandR7B
+    from craftxpy.plugins.qwen25coder import Qwen25Coder
     from craftxpy.plugins.tools import get_tools
+    from craftxpy.plugins.wizardcoder import WizardCoder
+    from craftxpy.utils.shell import run_safe_command
 
     CRAFTX_AVAILABLE = True
 except ImportError as e:

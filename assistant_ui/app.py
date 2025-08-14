@@ -6,8 +6,9 @@ A modern, interactive UI for CraftX.py intelligence framework.
 import json
 import os
 import sys
-import streamlit as st
 from datetime import datetime
+
+import streamlit as st
 
 # Add project root to path
 project_root = os.path.dirname(os.path.dirname(__file__))

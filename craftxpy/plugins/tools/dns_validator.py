@@ -1,7 +1,8 @@
 """DNS validation tool for CraftX.py."""
 
-import dns.resolver
 import dns.exception
+import dns.resolver
+
 from .base_tool import BaseTool
 
 
