@@ -3,15 +3,16 @@ CraftX.py Universal OAuth Authentication System
 Supports: Google, Microsoft, Apple, GitHub, ORCID, OKTA, Auth0, Discord, and more
 """
 
-import os
-import json
-import hashlib
-import secrets
 import base64
+import hashlib
+import json
+import os
+import secrets
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any
-import streamlit as st
+from typing import Any, Dict, List, Optional
+
 import requests
+import streamlit as st
 
 
 class UniversalAuth:
