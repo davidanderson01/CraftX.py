@@ -3,6 +3,10 @@
 Utilities for managing and hydrating file content.
 """
 
+<<<<<<< HEAD
+=======
+from typing import Optional
+>>>>>>> 3dc26ae3d2c1d45c22eabb2c306aa5c420330dc0
 import os
 from typing import Any, Dict, Optional
 
@@ -30,7 +34,8 @@ class FileHydrator:
             with open(filepath, 'w', encoding='utf-8') as f:
                 f.write(content)
             return True
-        except Exception:
+        except (IOError, OSError) as e:
+            print(f"Error writing file {filepath}: {e}")
             return False
 
     def read_file(self, filepath: str) -> Optional[str]:
@@ -45,5 +50,6 @@ class FileHydrator:
         try:
             with open(filepath, 'r', encoding='utf-8') as f:
                 return f.read()
-        except Exception:
+        except (IOError, OSError) as e:
+            print(f"Error reading file {filepath}: {e}")
             return None

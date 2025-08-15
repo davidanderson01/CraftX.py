@@ -6,7 +6,7 @@
 
 Your current DNS setup looks good:
 
-```
+```txt
 Type: A
 Name: craftx
 Content: 172.67.194.63

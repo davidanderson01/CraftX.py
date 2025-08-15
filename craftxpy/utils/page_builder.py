@@ -3,7 +3,7 @@
 HTML page building utilities for web interfaces.
 """
 
-from typing import Dict, List, Optional
+from typing import List
 
 
 class PageBuilder:

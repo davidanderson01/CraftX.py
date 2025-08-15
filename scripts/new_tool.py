@@ -10,7 +10,7 @@ from .base_tool import BaseTool
 
 class {{class_name}}(BaseTool):
     """{{description}} implementation."""
-    
+
     def __init__(self):
         super().__init__()
         self.description = "{{description}}"
@@ -24,13 +24,13 @@ class {{class_name}}(BaseTool):
             #     "required": True
             # }
         }
-    
+
     def run(self, **kwargs) -> str:
         """Execute the {{description}}.
-        
+
         Args:
             **kwargs: Tool-specific parameters
-            
+
         Returns:
             Tool execution result
         """

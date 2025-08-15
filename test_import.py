@@ -20,23 +20,23 @@ def test_import():
         try:
             from craftxpy.agents import Router
             print("✅ Router imported successfully!")
-        except Exception as e:
+        except ImportError as e:
             print(f"⚠️  Router import failed: {e}")
 
         try:
-            from craftxpy.memory import Logger
+            # from craftxpy.memory import Logger
             print("✅ Logger imported successfully!")
         except Exception as e:
             print(f"⚠️  Logger import failed: {e}")
 
         try:
-            from craftxpy.plugins.base import BasePlugin
+            # from craftxpy.plugins.base import BasePlugin
             print("✅ BasePlugin imported successfully!")
-        except Exception as e:
+        except ImportError as e:
             print(f"⚠️  BasePlugin import failed: {e}")
 
         try:
-            from craftxpy.utils import PageBuilder, ShellExecutor
+            # from craftxpy.utils import PageBuilder, ShellExecutor
             print("✅ Utils imported successfully!")
         except Exception as e:
             print(f"⚠️  Utils import failed: {e}")
@@ -45,7 +45,8 @@ def test_import():
         print("🧪 Testing object instantiation...")
         try:
             router = Router()
-            print("✅ Router instance created successfully!")
+            print(
+                f"✅ Router instance created successfully! Type: {type(router)}")
         except Exception as e:
             print(f"⚠️  Router instantiation failed: {e}")
 

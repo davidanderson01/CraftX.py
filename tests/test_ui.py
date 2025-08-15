@@ -3,6 +3,13 @@ Test suite for CraftX.py assistant UI functionality.
 Tests the Streamlit-based user interface components.
 """
 
+<<<<<<< HEAD
+=======
+import pytest
+import sys
+import os
+# import tempfile
+>>>>>>> 3dc26ae3d2c1d45c22eabb2c306aa5c420330dc0
 import json
 import os
 import sys
@@ -101,10 +108,9 @@ def test_run_assistant_command():
 
 def test_logs_handling():
     """Test that log files can be created and managed properly."""
-    project_root = os.path.dirname(os.path.dirname(__file__))
+    import tempfile
 
     # Test that we can create a temporary log file
-    import tempfile
     temp_dir = tempfile.gettempdir()
     temp_log_path = os.path.join(temp_dir, 'test_craftx.log')
 

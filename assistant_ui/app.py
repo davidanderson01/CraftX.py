@@ -6,22 +6,23 @@ A modern, interactive UI for CraftX.py intelligence framework.
 import json
 import os
 import sys
+<<<<<<< HEAD
 import tempfile
 from datetime import datetime
 
 import streamlit as st
+=======
+import streamlit as st
+from datetime import datetime
+>>>>>>> 3dc26ae3d2c1d45c22eabb2c306aa5c420330dc0
 
 # Add project root to path
 project_root = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(0, project_root)
-
+# pylint: disable=wrong-import-position
 # Configure Streamlit page
-st.set_page_config(
-    page_title="CraftX.py Assistant",
-    page_icon="🧠",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+st.set_page_config(page_title="CraftX.py Assistant", page_icon="🧠", layout="wide",
+                   initial_sidebar_state="expanded")
 
 # Custom CSS for modern styling
 st.markdown("""
@@ -157,18 +158,18 @@ def main():
                 # In a real implementation, this would route to the AI models
                 response = f"""
                 🤖 **{selected_model} Response:**
-                
+
                 I received your message: "{prompt}"
-                
-                This is a demo response from the CraftX.py assistant. In a full implementation, 
-                this would be processed by the selected AI model ({selected_model}) with 
+
+                This is a demo response from the CraftX.py assistant. In a full implementation,
+                this would be processed by the selected AI model ({selected_model}) with
                 access to the following capabilities:
-                
+
                 - 🔧 Tool integration: {"Enabled" if tools_enabled else "Disabled"}
                 - 🧠 Multi-model routing
                 - 💾 Persistent memory
                 - 🛡️ Secure execution
-                
+
                 Current timestamp: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
                 """
 

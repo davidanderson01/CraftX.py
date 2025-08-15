@@ -4,8 +4,12 @@ Tests the HTML pages and static site structure.
 """
 
 import os
+<<<<<<< HEAD
 import sys
 from pathlib import Path
+=======
+# from pathlib import Path
+>>>>>>> 3dc26ae3d2c1d45c22eabb2c306aa5c420330dc0
 
 import pytest
 

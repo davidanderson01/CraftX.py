@@ -4,7 +4,7 @@ Base plugin class and plugin system for extensible AI assistants.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 
 class BasePlugin(ABC):
@@ -33,7 +33,7 @@ class BasePlugin(ABC):
         Returns:
             Processed output
         """
-        pass
+        raise NotImplementedError("Subclasses must implement process method")
 
     def configure(self, config: Dict[str, Any]) -> None:
         """Configure the plugin.

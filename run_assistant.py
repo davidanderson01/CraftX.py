@@ -4,7 +4,12 @@ Simple script to run the CraftX.py assistant directly.
 This bypasses the interactive menu.
 """
 
+<<<<<<< HEAD
 import os
+=======
+import sys
+# import os
+>>>>>>> 3dc26ae3d2c1d45c22eabb2c306aa5c420330dc0
 import subprocess
 import sys
 

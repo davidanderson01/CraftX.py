@@ -3,6 +3,10 @@
 Utilities for managing large storage operations.
 """
 
+<<<<<<< HEAD
+=======
+from typing import Any, List, Optional
+>>>>>>> 3dc26ae3d2c1d45c22eabb2c306aa5c420330dc0
 import os
 from typing import Any, Dict, List, Optional
 
@@ -54,7 +58,9 @@ class LargeStorageManager:
             filepath = os.path.join(self.storage_path, f"{key}.data")
             with open(filepath, 'r', encoding='utf-8') as f:
                 return f.read()
-        except Exception:
+        except FileNotFoundError:
+            return None
+        except OSError:
             return None
 
     def list_keys(self) -> List[str]:

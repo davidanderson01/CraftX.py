@@ -21,7 +21,7 @@ def run_tests():
             "-v",
             "--tb=short",
             "--color=yes"
-        ], capture_output=False, cwd=os.path.dirname(__file__))
+        ], capture_output=False, cwd=os.path.dirname(__file__), check=False)
 
         if result.returncode == 0:
             print("\n✅ All tests passed! The project is properly configured.")
