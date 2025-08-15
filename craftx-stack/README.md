@@ -10,23 +10,23 @@ Quick notes:
 
 To deploy the attestation contract (example):
 
-1. Install Python deps:
+1. **Install Python deps:**
 
-```powershell
-python -m pip install -r requirements.txt
-```
+   ```powershell
+   python -m pip install -r requirements.txt
+   ```
 
-2. Populate `.env` in this folder (or copy from `secrets/.env` locally) and run:
+2. **Populate `.env` in this folder** (or copy from `secrets/.env` locally) and run:
 
-```powershell
-python scripts/deploy_contract.py
-```
+   ```powershell
+   python scripts/deploy_contract.py
+   ```
 
-3. Build and run containers:
+3. **Build and run containers:**
 
-```powershell
-docker compose up -d --build
-```
+   ```powershell
+   docker compose up -d --build
+   ```
 
 Cleanup performed by the assistant:
 
