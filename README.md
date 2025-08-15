@@ -130,24 +130,25 @@ The Streamlit-based interface provides:
 - **Website**: [https://craftx.elevatecraft.org](https://craftx.elevatecraft.org)
 - **Documentation**: [https://craftx.elevatecraft.org](https://craftx.elevatecraft.org)
 
-```
-
 ## 🛡️ Security
 
 CraftX.py follows security best practices:
 
 ### Credential Management
+
 - ✅ **Environment Variables**: All sensitive data stored in environment variables
 - ✅ **GitGuardian Compliant**: No hardcoded secrets in repository
 - ✅ **Template Files**: `.env.example` provided for easy setup
 
 ### Docker Security
+
 - ✅ **Non-root Users**: All containers run as non-privileged users
 - ✅ **Security Patches**: Latest Python and Alpine Linux with security updates
 - ✅ **Capability Restrictions**: Minimal container capabilities
 - ✅ **Read-only Filesystems**: Immutable container runtime
 
 ### Blockchain Security
+
 - ✅ **Smart Contract Attestation**: Ethereum-based proof of authenticity
 - ✅ **Secure Key Management**: Private keys via environment variables
 - ✅ **Contract Verification**: Deployed contract validation

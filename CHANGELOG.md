@@ -14,6 +14,15 @@ All notable changes to CraftX.py will be documented in this file.
   - Capability restrictions and read-only filesystems
   - Security-optimized base images
 
+### 🔧 Infrastructure Fixes
+
+- **Docker Compose**: Removed obsolete `version: "3.9"` attribute to eliminate warnings
+- **Package Dependencies**: Fixed incorrect package names in requirements.txt
+  - `oauth2lib` → `oauthlib` (correct package name)
+  - `microsoft-authentication` → `msal` (Microsoft Authentication Library)
+- **Virtual Environment**: Confirmed Python 3.13.5 environment with all dependencies
+- **Package Installation**: All requirements now install successfully
+
 ### 🐳 Docker Infrastructure
 
 - **Production-Ready Containers**: Multi-stage builds with security focus
