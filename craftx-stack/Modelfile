@@ -1,3 +1,5 @@
+# CraftX Model Configuration
+
 FROM llama3.2
 
 PARAMETER temperature 0.6
