@@ -75,6 +75,7 @@ docker-compose -f docker-compose.secure.yml up -d
 ```
 
 **Docker Features:**
+
 - 🛡️ Security-hardened containers (non-root users, capability restrictions)
 - 🐍 Latest Python 3.13 with security patches
 - 🤖 Ollama AI model serving
