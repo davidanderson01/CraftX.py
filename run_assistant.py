@@ -5,9 +5,12 @@ This bypasses the interactive menu.
 """
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import os
 =======
 import sys
+=======
+>>>>>>> 359f2c4415f1ed1dc1474b3da09c5fd788593487
 # import os
 >>>>>>> 3dc26ae3d2c1d45c22eabb2c306aa5c420330dc0
 import subprocess

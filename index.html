@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CraftX.py • Elevate your Python AI</title>
+    <style>
+        :root {
+            --accent: #2196F3;
+            --bg: #f9f9fb;
+            --dark: #222;
+            --light: #fff;
+            --radius: 6px;
+            --spacing: 1rem;
+            --font: 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Base resets */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font);
+            color: var(--dark);
+            background: var(--bg);
+            line-height: 1.5;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: var(--spacing);
+        }
+
+        header,
+        footer {
+            text-align: center;
+            padding: var(--spacing) 0;
+        }
+
+        /* Hero */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 4rem 0;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero p.subtitle {
+            font-size: 1.25rem;
+            color: #555;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .signin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.75rem;
+            margin-top: 2rem;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .btn-oauth {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem;
+            background: var(--light);
+            border: 1px solid #ccc;
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .btn-oauth:hover {
+            background: var(--accent);
+            color: var(--light);
+            border-color: var(--accent);
+        }
+
+        .btn-oauth svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.5rem;
+            fill: currentColor;
+        }
+
+        .btn-oauth.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Sections */
+        section {
+            margin-top: 3rem;
+        }
+
+        section h2 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        section p {
+            margin-top: 0.5rem;
+            color: #444;
+        }
+
+        /* Footer */
+        footer p {
+            font-size: 0.85rem;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="container">
+        <h1>CraftX.py</h1>
+        <p class="subtitle">Python-native intelligence, modular by design.</p>
+    </header>
+
+    <section class="hero container">
+        <p class="subtitle">
+            A next-generation AI framework that evolves with you. Sign in to download and start building intelligent,
+            ethical, and extensible Python apps today.
+        </p>
+        <div class="signin-grid" id="oauth-buttons">
+            <!-- Buttons will be enabled once JS detects your auth endpoint -->
+            <button class="btn-oauth" data-provider="microsoft">
+                <!-- example SVG icon, replace with official logos -->
+                <svg viewBox="0 0 24 24">
+                    <path d="M1 1h10v10H1zM13 1h10v10H13zM1 13h10v10H1zM13 13h10v10H13z" />
+                </svg>
+                Microsoft
+            </button>
+            <button class="btn-oauth" data-provider="apple">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M20 15c-.9 2.2-2.6 3.7-4.6 3.7-1.8 0-2.7-1-4-1s-2.3 1-4 1c-2 0-3.8-1.6-4.6-3.8C2 13.3 4.6 7.7 7.7 7.7c1.4 0 2.6.9 4 0 .8-.6 2.2-.9 3.3-.9 2.7 0 5.4 3.4 4 8.1z" />
+                </svg>
+                Apple
+            </button>
+            <button class="btn-oauth" data-provider="google">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M21 12.3c0-.8-.1-1.5-.3-2.2H12v4.1h4.9c-.2 1.1-.8 2-1.6 2.6l2.6 2 1.8-1.8c1.7-1.6 2.6-3.9 2.6-6.7z" />
+                </svg>
+                Google
+            </button>
+            <button class="btn-oauth" data-provider="okta">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 4h4v16H4zM9 4h4v16H9zM14 4h4v16h-4z" />
+                </svg>
+                Okta
+            </button>
+            <button class="btn-oauth" data-provider="orcid">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8 0-2 .8-3.8 2.1-5l10.9 10.9c-1.2 1.4-2.9 2.1-4.9 2.1zm5.9-3.4L7 6.1c1.4-1.2 3.2-2 5.1-2 4.4 0 8 3.6 8 8 0 2-.8 3.8-2.1 5z" />
+                </svg>
+                ORCID
+            </button>
+            <button class="btn-oauth" data-provider="github">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.8 10.9.6.1.8-.2.8-.5v-1.8c-3.2.7-3.8-1.5-3.8-1.5-.5-1.3-1.3-1.6-1.3-1.6-1-.7.1-.7.1-.7 1.1.1 1.7 1.1 1.7 1.1 1 .1 1.7-.7 1.7-.7.9-1.7 2.4-1.2 3-.9.1-.7.4-1.2.8-1.5-2.5-.3-5.1-1.3-5.1-5.7 0-1.3.5-2.4 1.2-3.3 0-.3-.5-1.4.1-2.8 0 0 1-.3 3.3 1.2 1-.3 2-.5 3-.5s2 .2 3 .5c2.3-1.5 3.3-1.2 3.3-1.2.6 1.4.1 2.5.1 2.8.8.9 1.2 2 1.2 3.3 0 4.4-2.6 5.4-5.1 5.7.4.3.8 1 .8 2v2.9c0 .3.2.6.8.5C20.7 21.4 24 17.1 24 12c0-6.3-5.2-11.5-12-11.5z" />
+                </svg>
+                GitHub
+            </button>
+        </div>
+    </section>
+
+    <section class="container" id="about">
+        <h2>Why CraftX.py?</h2>
+        <p>
+            Born from a passion for ethical AI and modular design, CraftX.py empowers developers to build next-level
+            Python applications. We keep the core lean, plugin-driven, and fully extensible—so your code can grow as
+            your ideas do.
+        </p>
+
+        <h2>About ElevateCraft</h2>
+        <p>
+            ElevateCraft is a community and platform dedicated to sovereignty, reproducibility, and responsible
+            innovation. Our mission is to uplift developers and organizations by providing transparent, open-source
+            tooling that respects privacy and fosters collaboration.
+        </p>
+
+        <h2>AI Oversight & Safety</h2>
+        <p>
+            Every download is vetted through an embedded AI Safety Officer powered by a proprietary model. This on-board
+            guardian scans your configuration and usage patterns to prevent malicious activity, ensuring CraftX.py
+            remains a force for good.
+        </p>
+    </section>
+
+    <footer class="container">
+        <p>&copy; 2025 ElevateCraft • MIT License • <a href="/terms">Terms</a> • <a href="/privacy">Privacy</a></p>
+    </footer>
+
+    <script>
+        // Placeholder OAuth initiation: your server should expose /auth/{provider}
+        document.querySelectorAll('.btn-oauth').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const provider = btn.dataset.provider;
+                window.location.href = `/auth/${provider}`;
+            });
+        });
+
+        // After login, server should redirect back with a valid token
+        // Example: ?token=eyJ... in URL
+        function enableDownload() {
+            // Replace hero with download CTA once authenticated
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('token')) {
+                const hero = document.querySelector('.hero');
+                hero.innerHTML = `
+          <a href="/download/craftxpy.zip?token=${urlParams.get('token')}"
+             class="btn-oauth" style="width:100%; margin-top:2rem;">
+            Download CraftX.py
+          </a>
+        `;
+            }
+        }
+
+        window.addEventListener('load', enableDownload);
+    </script>
+</body>
+
+</html>
+position: relative;
+z-index: 2;
+}
+
+.monogram {
+width: 50px;
+height: 50px;
+background: #00F0FF;
+border-radius: 10px;
+display: flex;
+align-items: center;
+justify-content: center;
+font-weight: bold;
+color: #1B1F3B;
+margin-right: 1rem;
+font-size: 1.2rem;
+}
+
+.logo-text {
+font-size: 3rem;
+font-weight: bold;
+color: #00F0FF;
+font-family: 'JetBrains Mono', monospace;
+}
+
+.main-logo {
+max-width: 200px;
+height: auto;
+margin-bottom: 1rem;
+filter: drop-shadow(0 4px 15px rgba(0,240,255,0.3));
+transition: transform 0.3s ease;
+}
+
+.main-logo:hover {
+transform: scale(1.05);
+}
+
+.fallback-logo {
+display: none;
+align-items: center;
+justify-content: center;
+}
+
+/* Show fallback if main logo fails to load */
+.logo-container:has(.main-logo[src=""]) .fallback-logo,
+.logo-container:has(.main-logo:not([src])) .fallback-logo {
+display: flex;
+}
+
+.tagline {
+font-size: 1.5rem;
+color: #FFB300;
+font-style: italic;
+margin-bottom: 3rem;
+}
+
+.cta-button {
+background: linear-gradient(45deg, #00F0FF, #FFB300);
+color: #1B1F3B;
+padding: 1rem 2rem;
+border: none;
+border-radius: 50px;
+font-weight: bold;
+font-size: 1.1rem;
+cursor: pointer;
+text-decoration: none;
+display: inline-block;
+transition: all 0.3s ease;
+box-shadow: 0 4px 15px rgba(0,240,255,0.3);
+}
+
+.cta-button:hover {
+transform: translateY(-2px);
+box-shadow: 0 6px 20px rgba(0,240,255,0.4);
+}
+
+.features {
+padding: 4rem 0;
+}
+
+.features-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+gap: 2rem;
+margin-top: 3rem;
+}
+
+.feature-card {
+background: rgba(46, 46, 46, 0.5);
+padding: 2rem;
+border-radius: 15px;
+border: 1px solid rgba(0,240,255,0.2);
+transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+transform: translateY(-5px);
+border-color: #00F0FF;
+box-shadow: 0 10px 30px rgba(0,240,255,0.1);
+}
+
+.feature-icon {
+font-size: 2rem;
+margin-bottom: 1rem;
+}
+
+.feature-title {
+color: #00F0FF;
+font-size: 1.3rem;
+margin-bottom: 1rem;
+font-weight: 600;
+}
+
+.section-title {
+text-align: center;
+font-size: 2.5rem;
+color: #00F0FF;
+margin-bottom: 1rem;
+}
+
+.section-subtitle {
+text-align: center;
+color: #FFB300;
+font-size: 1.2rem;
+margin-bottom: 2rem;
+}
+
+.code-block {
+background: #1E1E1E;
+border: 1px solid #333;
+border-radius: 10px;
+padding: 1.5rem;
+margin: 2rem 0;
+font-family: 'JetBrains Mono', monospace;
+color: #00F0FF;
+overflow-x: auto;
+}
+
+.footer {
+text-align: center;
+padding: 3rem 0;
+border-top: 1px solid rgba(0,240,255,0.2);
+margin-top: 4rem;
+}
+
+.footer-links {
+display: flex;
+justify-content: center;
+gap: 2rem;
+margin-bottom: 2rem;
+}
+
+.footer-links a {
+color: #00F0FF;
+text-decoration: none;
+transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+color: #FFB300;
+}
+
+.copyright {
+color: #888;
+font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+.logo-text {
+font-size: 2rem;
+}
+
+.tagline {
+font-size: 1.2rem;
+}
+
+.section-title {
+font-size: 2rem;
+}
+
+.footer-links {
+flex-direction: column;
+gap: 1rem;
+}
+}
+
+/* Moved nav styles from inline to CSS */
+.main-nav {
+background: rgba(0,0,0,0.8);
+padding: 1rem 0;
+position: sticky;
+top: 0;
+z-index: 100;
+}
+.main-nav-container {
+max-width: 1200px;
+margin: 0 auto;
+display: flex;
+justify-content: center;
+gap: 2rem;
+}
+.main-nav-link {
+color: white;
+text-decoration: none;
+padding: 0.5rem 1rem;
+border-radius: 5px;
+transition: background 0.3s;
+background: none;
+border: none;
+}
+.main-nav-link-active {
+background: rgba(255,255,255,0.2);
+}
+.main-nav-link:hover {
+background: rgba(255,255,255,0.1);
+}
+/* End of CSS */
+</style>
+
+<!-- Navigation -->
+<nav class="main-nav">
+    <div class="main-nav-container">
+        <a href="index.html" class="main-nav-link main-nav-link-active">Home</a>
+        <a href="docs.html" class="main-nav-link">Documentation</a>
+        <a href="examples.html" class="main-nav-link">Examples</a>
+        <a href="about.html" class="main-nav-link">About</a>
+        <a href="support.html" class="main-nav-link main-nav-support">💖 Support</a>
+    </div>
+</nav>
+
+<div class="container">
+    <header class="header">
+        <div class="logo-container">
+            <img src="assets/img/craftx-logo.png" alt="CraftX.py Logo" class="main-logo">
+            <div class="fallback-logo">
+                <div class="monogram">CX</div>
+                <div class="logo-text">CraftX.py</div>
+            </div>
+        </div>
+        <p class="tagline">Python-native intelligence, modular by design.</p>
+        <a href="#get-started" class="cta-button">Get Started 🚀</a>
+    </header>
+
+    <section class="features">
+        <h2 class="section-title">What is CraftX.py?</h2>
+        <p class="section-subtitle">A modular AI scripting framework for Python developers</p>
+
+        <div class="code-block">
+            # Quick Start Example
+            from craftxpy.agents.router import AgentRouter
+            from craftxpy.plugins.wizardcoder import WizardCoder
+
+            # Initialize AI model router
+            router = AgentRouter({"codegen": WizardCoder()})
+
+            # Generate code
+            response = router.route("codegen", "Create a FastAPI endpoint")
+            print(response)
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3 class="feature-title">Multiple AI Models</h3>
+                <p>Integrate WizardCoder, CommandR7B, CodeGeeX4, and Qwen2.5-Coder seamlessly. Switch between models
+                    based on your specific needs.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔧</div>
+                <h3 class="feature-title">Modular Tool System</h3>
+                <p>Extensible plugin architecture with built-in tools for DNS validation, SSL checking, file monitoring,
+                    and more.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3 class="feature-title">Security First</h3>
+                <p>GitGuardian-compliant credential management, security-hardened Docker containers, and blockchain
+                    attestation for enterprise-grade security.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🐳</div>
+                <h3 class="feature-title">Docker Ready</h3>
+                <p>Production-ready containers with Python 3.13, non-root users, security patches, and Ollama
+                    integration for scalable deployments.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⛓️</div>
+                <h3 class="feature-title">Blockchain Integration</h3>
+                <p>Ethereum smart contract deployment and attestation system for decentralized proof of authenticity and
+                    integrity.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">💾</div>
+                <h3 class="feature-title">Memory & Logging</h3>
+                <p>Persistent conversation history and session management to maintain context across interactions.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <h3 class="feature-title">Beautiful UI</h3>
+                <p>Modern Streamlit-based interface with real-time chat, tool integration, and developer mode.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🐍</div>
+                <h3 class="feature-title">Python-Native</h3>
+                <p>Built specifically for Python developers with clean APIs, type hints, and pythonic design patterns.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section id="get-started" class="features">
+        <h2 class="section-title">Get Started</h2>
+        <p class="section-subtitle">Ready to build with CraftX.py?</p>
+
+        <div class="code-block">
+            # Quick Install from PyPI
+            pip install craftxpy
+
+            # Development Installation
+            git clone https://github.com/davidanderson01/CraftX.py.git
+            cd CraftX.py
+            pip install -e .[dev]
+
+            # Docker Installation (Recommended for Production)
+            cd craftx-stack
+            cp .env.template .env # Edit with your config
+            docker-compose up -d
+
+            # Run the assistant
+            streamlit run assistant_ui/app.py
+        </div>
+    </section>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-links">
+            <a href="https://craftx.dev" target="_blank" rel="noopener">Documentation</a>
+            <a href="https://craftxpy.com" target="_blank" rel="noopener">Website</a>
+            <a href="https://craftx.ai" target="_blank" rel="noopener">AI Hub</a>
+            <a href="https://github.com/davidanderson01/craftxpy" target="_blank" rel="noopener">GitHub</a>
+        </div>
+        <p class="copyright">© 2025 CraftX.py - Python-native intelligence, modular by design.</p>
+    </div>
+</footer>
+
+<script>
+    // Logo fallback handling
+    document.addEventListener('DOMContentLoaded', function () {
+        const mainLogo = document.querySelector('.main-logo');
+        const fallbackLogo = document.querySelector('.fallback-logo');
+
+        if (mainLogo) {
+            mainLogo.onerror = function () {
+                this.style.display = 'none';
+                if (fallbackLogo) {
+                    fallbackLogo.style.display = 'flex';
+                }
+            };
+
+            // Check if image loads successfully
+            if (mainLogo.complete && mainLogo.naturalHeight === 0) {
+                mainLogo.style.display = 'none';
+                if (fallbackLogo) {
+                    fallbackLogo.style.display = 'flex';
+                }
+            }
+        }
+    });
+</script>
+</body>
+
+</html>

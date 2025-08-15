@@ -32,8 +32,11 @@ CraftX.py is a modular, Python-native AI framework designed for building intelli
 - **🧩 Plugin Architecture**: Extensible system for custom functionality
 - **💾 Flexible Storage**: JSON, SQLite, and hybrid storage backends
 - **🎨 Modern UI**: Beautiful Streamlit-based interface
-- **🛡️ Security First**: Command whitelisting and input validation
+- **🛡️ Security First**: Command whitelisting, input validation, and environment-based credentials
+- **🐳 Docker Ready**: Security-hardened containers with non-root users
+- **⛓️ Blockchain Integration**: Ethereum smart contract deployment and attestation
 - **📱 Cross-Platform**: Works on Windows, macOS, and Linux
+- **🔐 Environment Security**: GitGuardian-compliant credential management
 
 ## 📦 Installation
 
@@ -50,6 +53,34 @@ git clone https://github.com/davidanderson01/CraftX.py.git
 cd CraftX.py
 pip install -e .[dev]
 ```
+
+### 🐳 Docker Installation (Recommended for Production)
+
+CraftX.py includes security-hardened Docker containers:
+
+```bash
+# Clone and setup
+git clone https://github.com/davidanderson01/CraftX.py.git
+cd CraftX.py/craftx-stack
+
+# Create environment file
+cp .env.template .env
+# Edit .env with your configuration
+
+# Build and run with Docker Compose
+docker-compose up -d
+
+# Or use security-hardened version
+docker-compose -f docker-compose.secure.yml up -d
+```
+
+**Docker Features:**
+
+- 🛡️ Security-hardened containers (non-root users, capability restrictions)
+- 🐍 Latest Python 3.13 with security patches
+- 🤖 Ollama AI model serving
+- 🔐 Environment-based credential management
+- 📊 Health checks and monitoring
 
 ## 🚀 Quick Start
 
@@ -99,18 +130,29 @@ The Streamlit-based interface provides:
 - **Website**: [https://craftx.elevatecraft.org](https://craftx.elevatecraft.org)
 - **Documentation**: [https://craftx.elevatecraft.org](https://craftx.elevatecraft.org)
 
-## 🧪 Testing
-
-```bash
-# Run all tests with beautiful output
-python run_tests.py
-
-# Run with pytest
-python -m pytest tests/ -v
-
-# Run specific test
-python -m pytest tests/test_ui.py::test_logo_files -v
 ```
+
+## 🛡️ Security
+
+CraftX.py follows security best practices:
+
+### Credential Management
+- ✅ **Environment Variables**: All sensitive data stored in environment variables
+- ✅ **GitGuardian Compliant**: No hardcoded secrets in repository
+- ✅ **Template Files**: `.env.example` provided for easy setup
+
+### Docker Security
+- ✅ **Non-root Users**: All containers run as non-privileged users
+- ✅ **Security Patches**: Latest Python and Alpine Linux with security updates
+- ✅ **Capability Restrictions**: Minimal container capabilities
+- ✅ **Read-only Filesystems**: Immutable container runtime
+
+### Blockchain Security
+- ✅ **Smart Contract Attestation**: Ethereum-based proof of authenticity
+- ✅ **Secure Key Management**: Private keys via environment variables
+- ✅ **Contract Verification**: Deployed contract validation
+
+## 🧪 Testing
 
 ## 🌐 Static Website
 
@@ -133,6 +175,25 @@ Check out our example implementations in the [`examples/`](examples/) directory:
 - **Plugin Examples** - Custom plugin development
 
 ## 🔧 Configuration
+
+### Environment Variables
+
+For security, CraftX.py uses environment variables for sensitive data:
+
+```bash
+# Copy the example file
+cp .env.example .env
+
+# Edit with your credentials
+GOOGLE_DRIVE_AUTH_TOKEN=your_google_drive_token
+ONEDRIVE_AUTH_TOKEN=your_onedrive_token  
+ICLOUD_AUTH_TOKEN=your_icloud_token
+RPC_URL=your_ethereum_rpc_url
+CONTRACT_ADDRESS=your_deployed_contract_address
+PRIVATE_KEY=your_ethereum_private_key
+```
+
+### Python Configuration
 
 CraftX.py supports multiple configuration options:
 
