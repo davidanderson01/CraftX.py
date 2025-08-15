@@ -130,8 +130,6 @@ The Streamlit-based interface provides:
 - **Website**: [https://craftx.elevatecraft.org](https://craftx.elevatecraft.org)
 - **Documentation**: [https://craftx.elevatecraft.org](https://craftx.elevatecraft.org)
 
-```
-
 ## 🛡️ Security
 
 CraftX.py follows security best practices:
