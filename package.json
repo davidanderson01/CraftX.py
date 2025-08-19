@@ -1,0 +1,27 @@
+{
+  "name": "craftx-oauth-functions",
+  "version": "1.0.0",
+  "description": "Serverless OAuth functions for CraftX static site",
+  "main": "index.js",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'No build step needed for serverless functions'",
+    "deploy": "netlify deploy --prod"
+  },
+  "dependencies": {
+    "@auth0/auth0-spa-js": "^2.3.0",
+    "jsonwebtoken": "^9.0.2",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "netlify-cli": "^23.1.4"
+  },
+  "keywords": [
+    "oauth",
+    "serverless",
+    "netlify",
+    "craftx"
+  ],
+  "author": "CraftX Team",
+  "license": "MIT"
+}

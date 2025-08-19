@@ -4,23 +4,35 @@ This guide helps you configure OAuth authentication for your CraftX deployment, 
 
 ## Quick Start
 
-1. **Run the OAuth setup script:**
+1. **Setup analytics (optional but recommended):**
+
+   ```bash
+   python setup_analytics.py
+   ```
+
+2. **Run the OAuth setup script:**
 
    ```bash
    cd craftx-stack
    python oauth_setup.py
    ```
 
-2. **Start the CraftX server:**
+3. **Start the CraftX server:**
 
    ```bash
    python craftx.py
    ```
 
-3. **Visit your website:**
+4. **Visit your website:**
 
-   ```
+   ```text
    http://localhost:8000
+   ```
+
+5. **View analytics dashboard:**
+
+   ```text
+   http://localhost:8000/admin/analytics
    ```
 
 ## Supported OAuth Providers
@@ -133,14 +145,40 @@ curl http://localhost:8000/admin/oauth-status
 
 ## File Structure
 
-```
+```text
 craftx-stack/
 ├── craftx.py              # Main FastAPI server with OAuth endpoints
 ├── oauth_setup.py         # Interactive OAuth configuration script
+├── setup_analytics.py     # Analytics system setup script
+├── user_analytics.py      # User tracking and analytics system
+├── analytics_dashboard.py # Web dashboard for analytics
 ├── oauth_states/          # Temporary OAuth state storage
 ├── download_tokens/       # Download token storage
-└── auth_config.json       # OAuth provider configuration
+├── auth_config.json       # OAuth provider configuration
+└── user_analytics.db      # SQLite database for user analytics
 ```
+
+## Analytics Features
+
+The CraftX analytics system automatically tracks:
+
+- **👥 User Registration**: New user sign-ups by provider
+- **🔐 Authentication Events**: Login attempts, successes, and failures
+- **📊 User Demographics**: Geographic distribution, device types, browsers
+- **📈 Download Tracking**: Who downloads CraftX and when
+- **⏱️ Session Management**: Active users and session duration
+- **📱 Device Analytics**: Mobile vs desktop usage patterns
+- **🌍 Geographic Data**: Country/city distribution (with GeoIP)
+
+### Analytics Dashboard
+
+Visit `http://localhost:8000/admin/analytics` to view:
+
+- Real-time user statistics
+- Interactive charts and graphs
+- Recent user activity table
+- Export functionality (JSON/CSV)
+- Provider and device breakdowns
 
 ## Security Notes
 
@@ -154,7 +192,7 @@ craftx-stack/
 
 ### OAuth System Not Available
 
-```
+```text
 ⚠️ OAuth system not available. OAuth endpoints will be disabled.
 ```
 
@@ -162,7 +200,7 @@ craftx-stack/
 
 ### Invalid Redirect URI
 
-```
+```text
 Error: redirect_uri_mismatch
 ```
 
@@ -171,7 +209,7 @@ Error: redirect_uri_mismatch
 
 ### Provider Not Configured
 
-```
+```text
 Provider google not configured or missing client_id
 ```
 

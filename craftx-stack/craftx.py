@@ -30,12 +30,16 @@ try:
         os.path.dirname(os.path.abspath(__file__))))
     from craftxpy.utils.auth import universal_auth
     from oauth_config_loader import get_oauth_config
+    from user_analytics import analytics
+    from analytics_dashboard import add_analytics_routes
     OAUTH_AVAILABLE = True
 except ImportError:
     print("⚠️  OAuth system not available. OAuth endpoints will be disabled.")
     OAUTH_AVAILABLE = False
     universal_auth = None
     get_oauth_config = None
+    analytics = None
+    add_analytics_routes = None
 
 
 class OllamaProvider:
@@ -160,6 +164,11 @@ class AuthCallback(BaseModel):
 
 
 # OAuth endpoints
+if OAUTH_AVAILABLE:
+    # Add analytics dashboard routes
+    add_analytics_routes(app, analytics)
+
+
 @app.get("/")
 async def serve_index():
     """Serve the main index.html page"""
@@ -223,6 +232,18 @@ async def oauth_login(provider: str, request: Request):
             status_code=503, detail="OAuth system not available")
 
     try:
+        # Track authentication attempt
+        client_ip = request.client.host
+        user_agent = request.headers.get("user-agent", "Unknown")
+
+        analytics.track_auth_event(
+            provider=provider,
+            event_type="auth_attempt",
+            ip_address=client_ip,
+            user_agent=user_agent,
+            success=True,
+            metadata={"step": "initiate"}
+        )
         # Generate state for security
         state = secrets.token_urlsafe(32)
 
@@ -257,10 +278,21 @@ async def oauth_callback(provider: str, code: str, state: str, request: Request)
         raise HTTPException(
             status_code=503, detail="OAuth system not available")
 
+    client_ip = request.client.host
+    user_agent = request.headers.get("user-agent", "Unknown")
+
     try:
         # Verify state
         state_file = f"oauth_states/{state}.json"
         if not os.path.exists(state_file):
+            analytics.track_auth_event(
+                provider=provider,
+                event_type="auth_error",
+                ip_address=client_ip,
+                user_agent=user_agent,
+                success=False,
+                error_message="Invalid or expired state"
+            )
             raise HTTPException(
                 status_code=400, detail="Invalid or expired state")
 
@@ -271,6 +303,14 @@ async def oauth_callback(provider: str, code: str, state: str, request: Request)
         os.remove(state_file)
 
         if state_data["provider"] != provider:
+            analytics.track_auth_event(
+                provider=provider,
+                event_type="auth_error",
+                ip_address=client_ip,
+                user_agent=user_agent,
+                success=False,
+                error_message="Provider mismatch"
+            )
             raise HTTPException(status_code=400, detail="Provider mismatch")
 
         # Exchange code for token (simplified implementation)
@@ -287,14 +327,28 @@ async def oauth_callback(provider: str, code: str, state: str, request: Request)
         # Create session
         session_id = universal_auth.create_session(user_data, provider)
 
+        # Generate user_id for analytics (in real implementation, use provider's user ID)
+        user_id = f"{provider}_{hashlib.sha256(user_data['email'].encode()).hexdigest()[:8]}"
+
+        # Create analytics session
+        analytics_session_id = analytics.create_user_session(
+            user_id=user_id,
+            email=user_data['email'],
+            provider=provider,
+            ip_address=client_ip,
+            user_agent=user_agent
+        )
+
         # Generate download token
         download_token = secrets.token_urlsafe(32)
 
-        # Store download token
+        # Store download token with analytics session info
         os.makedirs("download_tokens", exist_ok=True)
         with open(f"download_tokens/{download_token}.json", "w") as f:
             json.dump({
                 "session_id": session_id,
+                "analytics_session_id": analytics_session_id,
+                "user_id": user_id,
                 "created_at": datetime.now().isoformat(),
                 "expires_at": (datetime.now() + timedelta(hours=1)).isoformat()
             }, f)
@@ -302,13 +356,23 @@ async def oauth_callback(provider: str, code: str, state: str, request: Request)
         # Redirect back to index with token
         return RedirectResponse(url=f"/?token={download_token}&provider={provider}")
 
+    except HTTPException:
+        raise
     except Exception as e:
+        analytics.track_auth_event(
+            provider=provider,
+            event_type="auth_error",
+            ip_address=client_ip,
+            user_agent=user_agent,
+            success=False,
+            error_message=str(e)
+        )
         raise HTTPException(
             status_code=500, detail=f"OAuth callback failed: {str(e)}")
 
 
 @app.get("/download/craftxpy.zip")
-async def download_craftxpy(token: str):
+async def download_craftxpy(token: str, request: Request):
     """Serve the CraftXPy download with token verification"""
     if not OAUTH_AVAILABLE:
         raise HTTPException(
@@ -334,6 +398,22 @@ async def download_craftxpy(token: str):
         # Verify session is still valid
         session_id = token_data["session_id"]
         session = universal_auth.get_session(session_id)
+
+        # Track download in analytics
+        if "user_id" in token_data and "analytics_session_id" in token_data:
+            analytics.track_download(
+                user_id=token_data["user_id"],
+                session_id=token_data["analytics_session_id"]
+            )
+            analytics.track_auth_event(
+                provider=session.get("provider", "unknown"),
+                event_type="download",
+                ip_address=request.client.host,
+                user_agent=request.headers.get("user-agent", "Unknown"),
+                user_id=token_data["user_id"],
+                success=True,
+                metadata={"download_token": token[:8]}
+            )
         if not session:
             raise HTTPException(status_code=401, detail="Invalid session")
 

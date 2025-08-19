@@ -80,7 +80,7 @@ ngrok http 8000
 
 **In your ORCID application form:**
 
-```
+```text
 Application name: CraftX.py
 Application URL: https://craftx.elevatecraft.org
 Application description: CraftX.py is a modular, Python-native AI framework designed for building intelligent applications with ease. It provides a clean, extensible architecture for integrating multiple AI models, managing conversations, and extending functionality through plugins.

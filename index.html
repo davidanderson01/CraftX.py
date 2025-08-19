@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://cdn.auth0.com https://appleid.cdn-apple.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.netlify.app https://*.googleapis.com https://api.github.com https://graph.microsoft.com https://appleid.apple.com https://orcid.org https://*.okta.com https://*.auth0.com; form-action 'self'; frame-ancestors 'none';" />
     <title>CraftX.py • Elevate your Python AI</title>
     <style>
         :root {
@@ -108,6 +110,66 @@
             cursor: not-allowed;
         }
 
+        /* WebAuthn/Passkey Styles */
+        .webauthn-section {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #ddd;
+        }
+
+        .divider span {
+            padding: 0 1rem;
+        }
+
+        .btn-passkey {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            gap: 0.5rem;
+        }
+
+        .btn-passkey:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-passkey:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .passkey-info {
+            display: block;
+            margin-top: 0.5rem;
+            color: #666;
+            font-size: 0.8rem;
+        }
+
         /* Sections */
         section {
             margin-top: 3rem;
@@ -145,36 +207,50 @@
         <div class="signin-grid" id="oauth-buttons">
             <!-- Buttons will be enabled once JS detects your auth endpoint -->
             <button class="btn-oauth" data-provider="microsoft">
-                <!-- example SVG icon, replace with official logos -->
                 <svg viewBox="0 0 24 24">
-                    <path d="M1 1h10v10H1zM13 1h10v10H13zM1 13h10v10H1zM13 13h10v10H13z" />
+                    <path fill="#F25022" d="M1 1h10v10H1z" />
+                    <path fill="#00A4EF" d="M13 1h10v10H13z" />
+                    <path fill="#7FBA00" d="M1 13h10v10H1z" />
+                    <path fill="#FFB900" d="M13 13h10v10H13z" />
                 </svg>
                 Microsoft
             </button>
             <button class="btn-oauth" data-provider="apple">
                 <svg viewBox="0 0 24 24">
-                    <path
-                        d="M20 15c-.9 2.2-2.6 3.7-4.6 3.7-1.8 0-2.7-1-4-1s-2.3 1-4 1c-2 0-3.8-1.6-4.6-3.8C2 13.3 4.6 7.7 7.7 7.7c1.4 0 2.6.9 4 0 .8-.6 2.2-.9 3.3-.9 2.7 0 5.4 3.4 4 8.1z" />
+                    <path fill="#000000"
+                        d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
                 </svg>
                 Apple
             </button>
             <button class="btn-oauth" data-provider="google">
                 <svg viewBox="0 0 24 24">
-                    <path
-                        d="M21 12.3c0-.8-.1-1.5-.3-2.2H12v4.1h4.9c-.2 1.1-.8 2-1.6 2.6l2.6 2 1.8-1.8c1.7-1.6 2.6-3.9 2.6-6.7z" />
+                    <path fill="#4285F4"
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                    <path fill="#34A853"
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                    <path fill="#FBBC05"
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                    <path fill="#EA4335"
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                 </svg>
                 Google
             </button>
             <button class="btn-oauth" data-provider="okta">
                 <svg viewBox="0 0 24 24">
-                    <path d="M4 4h4v16H4zM9 4h4v16H9zM14 4h4v16h-4z" />
+                    <path fill="#007DC1"
+                        d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 2.4c5.302 0 9.6 4.298 9.6 9.6s-4.298 9.6-9.6 9.6S2.4 17.302 2.4 12 6.698 2.4 12 2.4z" />
+                    <circle fill="#007DC1" cx="12" cy="12" r="4.8" />
+                    <circle fill="#FFFFFF" cx="12" cy="12" r="2.4" />
                 </svg>
                 Okta
             </button>
             <button class="btn-oauth" data-provider="orcid">
                 <svg viewBox="0 0 24 24">
-                    <path
-                        d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8 0-2 .8-3.8 2.1-5l10.9 10.9c-1.2 1.4-2.9 2.1-4.9 2.1zm5.9-3.4L7 6.1c1.4-1.2 3.2-2 5.1-2 4.4 0 8 3.6 8 8 0 2-.8 3.8-2.1 5z" />
+                    <path fill="#A6CE39" d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0z" />
+                    <circle fill="#FFFFFF" cx="7.369" cy="5.325" r="0.947" />
+                    <rect fill="#FFFFFF" x="6.647" y="7.416" width="1.444" height="10.041" />
+                    <path fill="#FFFFFF"
+                        d="M10.209 7.416h3.9c3.712 0 5.344 2.653 5.344 5.025 0 2.578-2.016 5.016-5.325 5.016h-3.919V7.416zm1.444 1.303v7.444h2.297c2.359 0 4.053-1.303 4.053-3.722 0-2.297-1.694-3.722-4.053-3.722h-2.297z" />
                 </svg>
                 ORCID
             </button>
@@ -185,6 +261,21 @@
                 </svg>
                 GitHub
             </button>
+        </div>
+
+        <!-- WebAuthn/Passkey Section -->
+        <div class="webauthn-section">
+            <div class="divider">
+                <span>or use a passkey</span>
+            </div>
+            <button class="btn-passkey" id="passkey-btn">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="currentColor"
+                        d="M6 10v2h3v-2a3 3 0 0 1 6 0v2h3v-2a6 6 0 0 0-12 0zm-2 2a2 2 0 0 1 2-2h1V8a5 5 0 0 1 10 0v2h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8zm8 5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" />
+                </svg>
+                Sign in with Passkey
+            </button>
+            <small class="passkey-info">Use your fingerprint, face, or security key</small>
         </div>
     </section>
 
@@ -217,13 +308,265 @@
     </footer>
 
     <script>
-        // Placeholder OAuth initiation: your server should expose /auth/{provider}
+        // Check if we have serverless functions support
+        const hasServerlessFunctions = window.location.hostname === 'craftx.elevatecraft.org' ||
+            window.location.hostname.includes('netlify.app');
+
+        // Check for authentication success
+        checkAuthSuccess();
+
+        // OAuth button functionality
         document.querySelectorAll('.btn-oauth').forEach(btn => {
             btn.addEventListener('click', () => {
                 const provider = btn.dataset.provider;
-                window.location.href = `/auth/${provider}`;
+
+                if (hasServerlessFunctions) {
+                    // Use serverless OAuth function via redirect
+                    window.location.href = `/auth/${provider}`;
+                } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                    // Local server - redirect to OAuth endpoint
+                    window.location.href = `/auth/${provider}`;
+                } else {
+                    // Fallback - show instructions for local setup
+                    showLocalSetupModal(provider);
+                }
             });
         });
+
+        // WebAuthn/Passkey functionality
+        const passkeyBtn = document.getElementById('passkey-btn');
+        if (passkeyBtn) {
+            passkeyBtn.addEventListener('click', handlePasskeyAuth);
+        }
+
+        async function handlePasskeyAuth() {
+            if (!window.PublicKeyCredential) {
+                alert('WebAuthn is not supported in this browser');
+                return;
+            }
+
+            try {
+                passkeyBtn.disabled = true;
+                passkeyBtn.textContent = 'Authenticating...';
+
+                // Try to authenticate with existing credential first
+                const credentialId = '49cdd33f2a906bffed155c040cabce072d77588c503dd31e25f66cc860a13055';
+
+                const credential = await navigator.credentials.get({
+                    publicKey: {
+                        challenge: new Uint8Array(32),
+                        rpId: window.location.hostname,
+                        allowCredentials: [{
+                            type: 'public-key',
+                            id: base64urlToBuffer(credentialId)
+                        }],
+                        userVerification: 'preferred',
+                        timeout: 60000
+                    }
+                });
+
+                if (credential) {
+                    // Send credential to server for verification
+                    const response = await fetch('/webauthn/authenticate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            credentialId: credentialId,
+                            assertion: {
+                                authenticatorData: bufferToBase64url(credential.response.authenticatorData),
+                                clientDataJSON: bufferToBase64url(credential.response.clientDataJSON),
+                                signature: bufferToBase64url(credential.response.signature)
+                            }
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        // Store authentication info
+                        sessionStorage.setItem('auth_token', result.token);
+                        sessionStorage.setItem('auth_provider', 'webauthn');
+                        sessionStorage.setItem('auth_user', result.user);
+
+                        showAuthSuccess('webauthn', result.user);
+                    } else {
+                        throw new Error(result.error);
+                    }
+                }
+            } catch (error) {
+                console.error('WebAuthn authentication failed:', error);
+                alert('Authentication failed. Please try again or use an OAuth provider.');
+            } finally {
+                passkeyBtn.disabled = false;
+                passkeyBtn.innerHTML = `
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="currentColor" d="M6 10v2h3v-2a3 3 0 0 1 6 0v2h3v-2a6 6 0 0 0-12 0zm-2 2a2 2 0 0 1 2-2h1V8a5 5 0 0 1 10 0v2h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8zm8 5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                    </svg>
+                    Sign in with Passkey
+                `;
+            }
+        }
+
+        // Helper functions for WebAuthn
+        function base64urlToBuffer(base64url) {
+            const padding = '='.repeat((4 - base64url.length % 4) % 4);
+            const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/') + padding;
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray.buffer;
+        }
+
+        function bufferToBase64url(buffer) {
+            const bytes = new Uint8Array(buffer);
+            let str = '';
+            for (let i = 0; i < bytes.byteLength; i++) {
+                str += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+        }
+
+        function checkAuthSuccess() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            const provider = urlParams.get('provider');
+            const user = urlParams.get('user');
+
+            if (token && provider && user) {
+                // Store authentication info
+                sessionStorage.setItem('auth_token', token);
+                sessionStorage.setItem('auth_provider', provider);
+                sessionStorage.setItem('auth_user', decodeURIComponent(user));
+
+                // Show success message and enable download
+                showAuthSuccess(provider, decodeURIComponent(user));
+
+                // Clean up URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+
+        function showAuthSuccess(provider, user) {
+            const successDiv = document.createElement('div');
+            successDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #4CAF50;
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 5px;
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+            `;
+            successDiv.innerHTML = `
+                <strong>✅ Authentication Successful!</strong><br>
+                Signed in with ${provider === 'webauthn' ? 'Passkey' : provider} as ${user}
+                <button onclick="this.parentElement.remove()" style="
+                    background: none;
+                    border: none;
+                    color: white;
+                    float: right;
+                    cursor: pointer;
+                    font-size: 1.2em;
+                ">×</button>
+            `;
+
+            document.body.appendChild(successDiv);
+
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (successDiv.parentElement) {
+                    successDiv.remove();
+                }
+            }, 5000);
+
+            // Enable download button
+            const downloadBtn = document.querySelector('.btn-download');
+            if (downloadBtn) {
+                downloadBtn.classList.remove('disabled');
+                downloadBtn.style.opacity = '1';
+                downloadBtn.style.cursor = 'pointer';
+            }
+        }
+
+        function showLocalSetupModal(provider) {
+            const modal = document.createElement('div');
+            modal.id = 'setupModal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+            `;
+
+            modal.innerHTML = `
+                <div style="
+                    background: white;
+                    padding: 2rem;
+                    border-radius: 10px;
+                    max-width: 600px;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                    text-align: left;
+                ">
+                    <h2 style="color: var(--accent); margin-bottom: 1rem;">🚀 Setup Required</h2>
+                    <p style="margin-bottom: 1rem;">To use ${provider.toUpperCase()} authentication, you need to run CraftX locally:</p>
+                    
+                    <div style="background: #f5f5f5; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">
+                        <h3>Quick Setup Steps:</h3>
+                        <ol style="margin: 1rem 0; padding-left: 1.5rem;">
+                            <li><strong>Clone the repository:</strong><br>
+                                <code style="background: #e0e0e0; padding: 2px 4px; border-radius: 3px;">git clone https://github.com/davidanderson01/CraftX.py.git</code>
+                            </li>
+                            <li><strong>Navigate to the directory:</strong><br>
+                                <code style="background: #e0e0e0; padding: 2px 4px; border-radius: 3px;">cd CraftX.py/craftx-stack</code>
+                            </li>
+                            <li><strong>Install dependencies:</strong><br>
+                                <code style="background: #e0e0e0; padding: 2px 4px; border-radius: 3px;">pip install -r requirements.txt</code>
+                            </li>
+                            <li><strong>Setup OAuth:</strong><br>
+                                <code style="background: #e0e0e0; padding: 2px 4px; border-radius: 3px;">python oauth_setup.py</code>
+                            </li>
+                            <li><strong>Start the server:</strong><br>
+                                <code style="background: #e0e0e0; padding: 2px 4px; border-radius: 3px;">python craftx.py</code>
+                            </li>
+                            <li><strong>Visit:</strong> <code style="background: #e0e0e0; padding: 2px 4px; border-radius: 3px;">http://localhost:8000</code></li>
+                        </ol>
+                    </div>
+                    
+                    <div style="background: #e8f5e8; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">
+                        <h4>📖 For detailed instructions:</h4>
+                        <p>View the complete OAuth setup guide: 
+                            <a href="https://github.com/davidanderson01/CraftX.py/blob/main/craftx-stack/OAUTH_SETUP.md" target="_blank" style="color: var(--accent);">
+                                OAuth Setup Guide
+                            </a>
+                        </p>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <button onclick="document.getElementById('setupModal').remove()" style="
+                            background: var(--accent);
+                            color: white;
+                            padding: 1rem 2rem;
+                            border: none;
+                            border-radius: 5px;
+                            cursor: pointer;
+                        ">Got it!</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+        }
 
         // After login, server should redirect back with a valid token
         // Example: ?token=eyJ... in URL
