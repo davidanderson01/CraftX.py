@@ -12,9 +12,9 @@
 
 🌐 **Live Demo**: [https://harmonious-naiad-3cd735.netlify.app](https://harmonious-naiad-3cd735.netlify.app) | 📚 **Documentation**: [docs.craftx.py](https://docs.craftx.py) | 🔗 **PyPI**: [craftxpy](https://pypi.org/project/craftxpy/)
 
-[Installation](#-installation) • [Quick Start](#-quick-start) • [Authentication](#-authentication) • [Documentation](#-documentation) • [Examples](#-examples) • [Support](#support)
+[Installation](#-installation) • [Quick Start](#-quick-start) • [Authentication](#-authentication--security) • [Documentation](#-documentation) • [Examples](#-examples) • [Support](#-support)
 
-## 💖 Support CraftX.py
+## 💖 Support
 
 If you find CraftX.py helpful, please consider supporting the project:
 
