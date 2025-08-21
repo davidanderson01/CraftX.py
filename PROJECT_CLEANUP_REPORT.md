@@ -5,21 +5,25 @@
 ### 🚨 **Critical Issues Found**
 
 #### **1. Duplicate Setup Files**
+
 - ❌ `setup.py` (current, v0.2.0)
 - ❌ `setup_old.py` (v0.1.2) - **DUPLICATE - REMOVE**
 - ❌ `setup_new.py` (v0.1.2) - **DUPLICATE - REMOVE**
 
 #### **2. Duplicate Storage Configurations**
+
 - ❌ `storage_config.json` (root directory)
 - ❌ `universal_storage/storage_config.json` (subdirectory)
 - **Impact**: Configuration conflicts and data inconsistency
 
 #### **3. Duplicate Requirements Files**
+
 - ✅ `requirements.txt` (main dependencies)
 - ❌ `custom_analytics_requirements.txt` - **MERGE OR REMOVE**
 - ❌ `craftx-stack/analytics_requirements.txt` - **DUPLICATE**
 
 #### **4. Duplicate Documentation Files**
+
 - ❌ `WEBSITE_SUMMARY.md`
 - ❌ `WEBSITE_SUMMARY_BACKUP.md` - **BACKUP - REMOVE**
 - ❌ `WEBSITE_SUMMARY_CLEAN.md` - **DUPLICATE - REMOVE**
@@ -29,18 +33,21 @@
 - ❌ `LINTING_STATUS_FINAL.md` - **FINAL VERSION**
 
 #### **5. Backup/Test Files Left in Root**
+
 - ❌ `test_app.py.bak` - **REMOVE**
 - ❌ `test_import.py.bak` - **REMOVE**
 - ❌ `backup_test_app.py` - **MOVE TO backup/**
 - ❌ `backup_test_import.py` - **MOVE TO backup/**
 
 #### **6. Environment Configuration Conflicts**
+
 - ❌ `.env` (current)
 - ❌ `.env.example` (template)
 - ❌ `.env.netlify` (Netlify-specific)
 - ❌ `netlify.env` (duplicate Netlify config)
 
 #### **7. Package Managers Conflict**
+
 - ✅ `package.json` (Node.js for Netlify Functions)
 - ✅ `package-lock.json` (auto-generated)
 - ❓ **Issue**: Python project with Node.js dependencies - verify necessity
@@ -50,17 +57,20 @@
 ### **IMMEDIATE CLEANUP** (High Priority)
 
 1. **Remove Duplicate Setup Files**
+
    ```bash
    rm setup_old.py setup_new.py
    ```
 
 2. **Consolidate Storage Configuration**
+
    ```bash
    # Keep universal_storage/storage_config.json
    rm storage_config.json
    ```
 
 3. **Remove Duplicate Documentation**
+
    ```bash
    rm WEBSITE_SUMMARY_BACKUP.md WEBSITE_SUMMARY_CLEAN.md
    rm OAUTH_SOLUTIONS.md  # Keep OAUTH_SOLUTIONS_FIXED.md
@@ -68,41 +78,44 @@
    ```
 
 4. **Clean Backup Files**
+
    ```bash
    rm *.bak
    mv backup_test_*.py backup/
    ```
 
 5. **Consolidate Environment Files**
+
    ```bash
    rm netlify.env  # Keep .env.netlify for Netlify-specific config
    ```
 
 ### **MEDIUM PRIORITY CLEANUP**
 
-6. **Merge Requirements Files**
+1. **Merge Requirements Files**
    - Review `custom_analytics_requirements.txt`
    - Merge unique dependencies into main `requirements.txt`
    - Remove duplicate requirements files
 
-7. **Verify Node.js Dependencies**
+2. **Verify Node.js Dependencies**
    - Confirm `package.json` is needed for Netlify Functions
    - If not using Netlify Functions, remove Node.js files
 
 ### **CONFIGURATION FIXES**
 
-8. **Update .gitignore**
+1. **Update .gitignore**
    - Add patterns to ignore future backup files
    - Ensure all temporary files are excluded
 
-9. **Fix Import Paths**
+2. **Fix Import Paths**
    - Check for hardcoded paths to removed files
    - Update documentation references
 
 ## 📝 **Files Safe to Remove**
 
 ### **Confirmed Duplicates (REMOVE IMMEDIATELY)**
-```
+
+```text
 setup_old.py
 setup_new.py
 storage_config.json (root)
@@ -116,7 +129,8 @@ test_import.py.bak
 ```
 
 ### **Files to Relocate**
-```
+
+```text
 backup_test_app.py → backup/
 backup_test_import.py → backup/
 ```
