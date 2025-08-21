@@ -33,7 +33,7 @@
 - **Effect**: Node.js dependencies showing as "red" (modified) in VS Code
 - **Solution**: ✅ Added proper Node.js ignore rules to `.gitignore`:
 
-  ```
+  ```gitignore
   # Node.js dependencies
   node_modules/
   npm-debug.log*
@@ -47,7 +47,7 @@
 
 ### **Primary Components**
 
-```
+```text
 CraftX.py/
 ├── index.html                     # Main website with OAuth integration
 ├── netlify/
