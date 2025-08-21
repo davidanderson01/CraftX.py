@@ -17,18 +17,17 @@
    // code with extra indentation
    ```
 
-````
+````markdown
 
 **After**:
 
-````markdown
+```markdown
 1. **Create Vercel Functions**
 2. **Create Vercel Functions**
 
    ```javascript
    // code with extra indentation
    ```
-
 ```
 
 **After**:
@@ -39,7 +38,6 @@
 ```javascript
 // code at proper indentation level
 ```
-
 ```
 
 ## ⚠️ **Remaining Issues**

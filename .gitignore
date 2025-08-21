@@ -36,6 +36,17 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Backup and duplicate files
+*.bak
+*.backup
+*_backup.*
+*_old.*
+*_new.*
+*_copy.*
+setup_old.py
+setup_new.py
+custom_analytics_requirements.txt
+
 # PyInstaller
 *.manifest
 *.spec
@@ -169,3 +180,12 @@ auth_config.json
 .fake
 # Local Netlify folder
 .netlify
+
+# Microsoft/Azure telemetry files
+*.applicationinsights.log
+ApplicationInsights.config
+.vs/
+appsettings.Development.json
+*.user
+.azure/
+.vscode/settings.json

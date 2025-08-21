@@ -48,17 +48,20 @@ CraftX.py is a modular, Python-native AI framework designed for building intelli
 CraftX.py includes a comprehensive authentication system deployed on Netlify:
 
 ### Multi-Provider OAuth Support
+
 - **GitHub OAuth** - Developer-friendly authentication
 - **Google OAuth** - Universal access with Google accounts
 - **Okta OAuth** - Enterprise SSO integration
 - **ORCID OAuth** - Academic and research authentication
 
 ### WebAuthn Passkey Authentication
+
 - **FIDO2/WebAuthn** - Modern passwordless authentication
 - **Hardware Security Keys** - Support for YubiKey, TouchID, Windows Hello
 - **Cross-Platform** - Works on desktop and mobile devices
 
 ### Security Features
+
 - **JWT Session Management** - Secure token-based sessions
 - **CORS Protection** - Cross-origin request security
 - **CSP Headers** - Content Security Policy enforcement

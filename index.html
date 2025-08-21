@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://cdn.auth0.com https://appleid.cdn-apple.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.netlify.app https://*.googleapis.com https://api.github.com https://graph.microsoft.com https://appleid.apple.com https://orcid.org https://*.okta.com https://*.auth0.com; form-action 'self'; frame-ancestors 'none';" />
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://appleid.cdn-apple.com https://cdn.auth0.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.github.io https://*.googleapis.com https://api.github.com https://graph.microsoft.com https://appleid.apple.com https://orcid.org https://integrator-1438440.okta.com; form-action 'self' https://appleid.apple.com https://accounts.google.com https://github.com https://login.microsoftonline.com https://orcid.org https://integrator-1438440.okta.com; frame-ancestors 'none';" />
     <title>CraftX.py • Elevate your Python AI</title>
     <style>
         :root {
@@ -190,6 +190,55 @@
             font-size: 0.85rem;
             color: #777;
         }
+
+        /* Authentication Modal */
+        .auth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .auth-modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-modal-content h3 {
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        .auth-modal-content p {
+            margin: 0.5rem 0;
+            color: #666;
+        }
+
+        .auth-modal-content .btn {
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .auth-modal-content .btn:hover {
+            background: #1976D2;
+        }
     </style>
 </head>
 
@@ -319,19 +368,162 @@
         document.querySelectorAll('.btn-oauth').forEach(btn => {
             btn.addEventListener('click', () => {
                 const provider = btn.dataset.provider;
-
-                if (hasServerlessFunctions) {
-                    // Use serverless OAuth function via redirect
-                    window.location.href = `/auth/${provider}`;
-                } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                    // Local server - redirect to OAuth endpoint
-                    window.location.href = `/auth/${provider}`;
-                } else {
-                    // Fallback - show instructions for local setup
-                    showLocalSetupModal(provider);
-                }
+                authenticateWithProvider(provider);
             });
         });
+
+        // GitHub Pages OAuth Configuration
+        const oauthConfig = {
+            github: {
+                clientId: 'Ov23liRUYFgTsZhTpYjs',
+                authUrl: 'https://github.com/login/oauth/authorize',
+                scope: 'user:email'
+            },
+            google: {
+                clientId: '53060370473-27ho267cg9fvra06acb1459kekreckuu.apps.googleusercontent.com',
+                authUrl: 'https://accounts.google.com/oauth2/auth',
+                scope: 'openid email profile'
+            },
+            okta: {
+                clientId: '0oau9ecw5cydP8f7y697',
+                authUrl: 'https://integrator-1438440.okta.com/oauth2/v1/authorize',
+                scope: 'openid email profile'
+            },
+            orcid: {
+                clientId: 'APP-0QF3NY1SS7CIEZZQ',
+                authUrl: 'https://orcid.org/oauth/authorize',
+                scope: '/authenticate'
+            },
+            microsoft: {
+                clientId: 'your-microsoft-client-id', // You'll need to get this from Azure
+                authUrl: 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
+                scope: 'openid email profile'
+            }
+        };
+
+        function authenticateWithProvider(provider) {
+            // Special handling for Apple
+            if (provider === 'apple') {
+                window.location.href = 'apple-signin.html';
+                return;
+            }
+
+            const config = oauthConfig[provider];
+            if (!config) {
+                alert(`${provider} authentication not configured yet`);
+                return;
+            }
+
+            // Generate state for security
+            const state = generateRandomState();
+            localStorage.setItem('oauth_state', state);
+            localStorage.setItem('oauth_provider', provider);
+
+            // Build OAuth URL
+            const redirectUri = window.location.origin + window.location.pathname;
+            const params = new URLSearchParams({
+                client_id: config.clientId,
+                redirect_uri: redirectUri,
+                scope: config.scope,
+                response_type: 'code',
+                state: state
+            });
+
+            // Special handling for different providers
+            if (provider === 'google') {
+                params.set('access_type', 'offline');
+                params.set('prompt', 'consent');
+            } else if (provider === 'microsoft') {
+                params.set('response_mode', 'query');
+            }
+
+            // Redirect to OAuth provider
+            window.location.href = `${config.authUrl}?${params.toString()}`;
+        }
+
+        function generateRandomState() {
+            return Math.random().toString(36).substring(2, 15) +
+                Math.random().toString(36).substring(2, 15);
+        }
+
+        // Handle OAuth callback
+        function handleOAuthCallback() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const state = urlParams.get('state');
+            const error = urlParams.get('error');
+            const auth = urlParams.get('auth');
+            const status = urlParams.get('status');
+
+            // Handle Apple Sign In callback
+            if (auth === 'apple') {
+                if (status === 'success') {
+                    showAuthSuccess('apple', 'success');
+                } else if (status === 'error') {
+                    const message = urlParams.get('message') || 'Unknown error';
+                    showAuthError(`Apple Sign In Error: ${message}`);
+                }
+                // Clean URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+                return;
+            }
+
+            if (error) {
+                showAuthError(`OAuth Error: ${error}`);
+                return;
+            }
+
+            if (code && state) {
+                const savedState = localStorage.getItem('oauth_state');
+                const provider = localStorage.getItem('oauth_provider');
+
+                if (state !== savedState) {
+                    showAuthError('Security error: Invalid state parameter');
+                    return;
+                }
+
+                // Show success message
+                showAuthSuccess(provider, code);
+
+                // Clean up
+                localStorage.removeItem('oauth_state');
+                localStorage.removeItem('oauth_provider');
+
+                // Clean URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+
+        function showAuthSuccess(provider, code) {
+            const modal = document.createElement('div');
+            modal.className = 'auth-modal';
+            modal.innerHTML = `
+                <div class="auth-modal-content">
+                    <h3>🎉 Authentication Successful!</h3>
+                    <p><strong>Provider:</strong> ${provider}</p>
+                    <p><strong>Status:</strong> ✅ Authenticated</p>
+                    <p>You can now download CraftX.py!</p>
+                    <button onclick="this.parentElement.parentElement.remove()" class="btn">Continue</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function showAuthError(message) {
+            const modal = document.createElement('div');
+            modal.className = 'auth-modal';
+            modal.innerHTML = `
+                <div class="auth-modal-content">
+                    <h3>❌ Authentication Error</h3>
+                    <p>${message}</p>
+                    <button onclick="this.parentElement.parentElement.remove()" class="btn">Try Again</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Check for OAuth callback on page load
+        window.addEventListener('load', handleOAuthCallback);
 
         // WebAuthn/Passkey functionality
         const passkeyBtn = document.getElementById('passkey-btn');

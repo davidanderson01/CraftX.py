@@ -19,6 +19,7 @@ CraftX.py is an open source project that builds innovative AI solutions, modular
 Experience CraftX.py's OAuth authentication system: **[https://harmonious-naiad-3cd735.netlify.app](https://harmonious-naiad-3cd735.netlify.app)**
 
 ✅ **What's Working:**
+
 - Multi-provider OAuth (GitHub, Google, Okta, ORCID)
 - WebAuthn passkey authentication
 - Serverless Netlify Functions
