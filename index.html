@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://appleid.cdn-apple.com https://cdn.auth0.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.github.io https://*.googleapis.com https://api.github.com https://graph.microsoft.com https://appleid.apple.com https://orcid.org https://integrator-1438440.okta.com; form-action 'self' https://appleid.apple.com https://accounts.google.com https://github.com https://login.microsoftonline.com https://orcid.org https://integrator-1438440.okta.com; frame-ancestors 'none';" />
     <title>CraftX.py • Elevate your Python AI</title>
     <style>
         :root {
@@ -108,6 +110,66 @@
             cursor: not-allowed;
         }
 
+        /* WebAuthn/Passkey Styles */
+        .webauthn-section {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #ddd;
+        }
+
+        .divider span {
+            padding: 0 1rem;
+        }
+
+        .btn-passkey {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            gap: 0.5rem;
+        }
+
+        .btn-passkey:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-passkey:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .passkey-info {
+            display: block;
+            margin-top: 0.5rem;
+            color: #666;
+            font-size: 0.8rem;
+        }
+
         /* Sections */
         section {
             margin-top: 3rem;
@@ -128,6 +190,55 @@
             font-size: 0.85rem;
             color: #777;
         }
+
+        /* Authentication Modal */
+        .auth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .auth-modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-modal-content h3 {
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        .auth-modal-content p {
+            margin: 0.5rem 0;
+            color: #666;
+        }
+
+        .auth-modal-content .btn {
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .auth-modal-content .btn:hover {
+            background: #1976D2;
+        }
     </style>
 </head>
 
@@ -145,36 +256,50 @@
         <div class="signin-grid" id="oauth-buttons">
             <!-- Buttons will be enabled once JS detects your auth endpoint -->
             <button class="btn-oauth" data-provider="microsoft">
-                <!-- example SVG icon, replace with official logos -->
                 <svg viewBox="0 0 24 24">
-                    <path d="M1 1h10v10H1zM13 1h10v10H13zM1 13h10v10H1zM13 13h10v10H13z" />
+                    <path fill="#F25022" d="M1 1h10v10H1z" />
+                    <path fill="#00A4EF" d="M13 1h10v10H13z" />
+                    <path fill="#7FBA00" d="M1 13h10v10H1z" />
+                    <path fill="#FFB900" d="M13 13h10v10H13z" />
                 </svg>
                 Microsoft
             </button>
             <button class="btn-oauth" data-provider="apple">
                 <svg viewBox="0 0 24 24">
-                    <path
-                        d="M20 15c-.9 2.2-2.6 3.7-4.6 3.7-1.8 0-2.7-1-4-1s-2.3 1-4 1c-2 0-3.8-1.6-4.6-3.8C2 13.3 4.6 7.7 7.7 7.7c1.4 0 2.6.9 4 0 .8-.6 2.2-.9 3.3-.9 2.7 0 5.4 3.4 4 8.1z" />
+                    <path fill="#000000"
+                        d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
                 </svg>
                 Apple
             </button>
             <button class="btn-oauth" data-provider="google">
                 <svg viewBox="0 0 24 24">
-                    <path
-                        d="M21 12.3c0-.8-.1-1.5-.3-2.2H12v4.1h4.9c-.2 1.1-.8 2-1.6 2.6l2.6 2 1.8-1.8c1.7-1.6 2.6-3.9 2.6-6.7z" />
+                    <path fill="#4285F4"
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                    <path fill="#34A853"
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                    <path fill="#FBBC05"
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                    <path fill="#EA4335"
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                 </svg>
                 Google
             </button>
             <button class="btn-oauth" data-provider="okta">
                 <svg viewBox="0 0 24 24">
-                    <path d="M4 4h4v16H4zM9 4h4v16H9zM14 4h4v16h-4z" />
+                    <path fill="#007DC1"
+                        d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 2.4c5.302 0 9.6 4.298 9.6 9.6s-4.298 9.6-9.6 9.6S2.4 17.302 2.4 12 6.698 2.4 12 2.4z" />
+                    <circle fill="#007DC1" cx="12" cy="12" r="4.8" />
+                    <circle fill="#FFFFFF" cx="12" cy="12" r="2.4" />
                 </svg>
                 Okta
             </button>
             <button class="btn-oauth" data-provider="orcid">
                 <svg viewBox="0 0 24 24">
-                    <path
-                        d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8 0-2 .8-3.8 2.1-5l10.9 10.9c-1.2 1.4-2.9 2.1-4.9 2.1zm5.9-3.4L7 6.1c1.4-1.2 3.2-2 5.1-2 4.4 0 8 3.6 8 8 0 2-.8 3.8-2.1 5z" />
+                    <path fill="#A6CE39" d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0z" />
+                    <circle fill="#FFFFFF" cx="7.369" cy="5.325" r="0.947" />
+                    <rect fill="#FFFFFF" x="6.647" y="7.416" width="1.444" height="10.041" />
+                    <path fill="#FFFFFF"
+                        d="M10.209 7.416h3.9c3.712 0 5.344 2.653 5.344 5.025 0 2.578-2.016 5.016-5.325 5.016h-3.919V7.416zm1.444 1.303v7.444h2.297c2.359 0 4.053-1.303 4.053-3.722 0-2.297-1.694-3.722-4.053-3.722h-2.297z" />
                 </svg>
                 ORCID
             </button>
@@ -185,6 +310,21 @@
                 </svg>
                 GitHub
             </button>
+        </div>
+
+        <!-- WebAuthn/Passkey Section -->
+        <div class="webauthn-section">
+            <div class="divider">
+                <span>or use a passkey</span>
+            </div>
+            <button class="btn-passkey" id="passkey-btn">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="currentColor"
+                        d="M6 10v2h3v-2a3 3 0 0 1 6 0v2h3v-2a6 6 0 0 0-12 0zm-2 2a2 2 0 0 1 2-2h1V8a5 5 0 0 1 10 0v2h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8zm8 5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" />
+                </svg>
+                Sign in with Passkey
+            </button>
+            <small class="passkey-info">Use your fingerprint, face, or security key</small>
         </div>
     </section>
 
@@ -212,17 +352,413 @@
     </section>
 
     <footer class="container">
-        <p>&copy; 2025 ElevateCraft • MIT License • <a href="/terms">Terms</a> • <a href="/privacy">Privacy</a></p>
+        <p>&copy; 2025 ElevateCraft • MIT License • <a href="/terms.html">Terms</a> • <a
+                href="/privacy.html">Privacy</a></p>
     </footer>
 
     <script>
-        // Placeholder OAuth initiation: your server should expose /auth/{provider}
+        // Check if we have serverless functions support
+        const hasServerlessFunctions = window.location.hostname === 'craftx.elevatecraft.org' ||
+            window.location.hostname.includes('netlify.app');
+
+        // Check for authentication success
+        checkAuthSuccess();
+
+        // OAuth button functionality
         document.querySelectorAll('.btn-oauth').forEach(btn => {
             btn.addEventListener('click', () => {
                 const provider = btn.dataset.provider;
-                window.location.href = `/auth/${provider}`;
+                authenticateWithProvider(provider);
             });
         });
+
+        // GitHub Pages OAuth Configuration
+        const oauthConfig = {
+            github: {
+                clientId: 'Ov23liRUYFgTsZhTpYjs',
+                authUrl: 'https://github.com/login/oauth/authorize',
+                scope: 'user:email'
+            },
+            google: {
+                clientId: '53060370473-27ho267cg9fvra06acb1459kekreckuu.apps.googleusercontent.com',
+                authUrl: 'https://accounts.google.com/oauth2/auth',
+                scope: 'openid email profile'
+            },
+            okta: {
+                clientId: '0oau9ecw5cydP8f7y697',
+                authUrl: 'https://integrator-1438440.okta.com/oauth2/v1/authorize',
+                scope: 'openid email profile'
+            },
+            orcid: {
+                clientId: 'APP-0QF3NY1SS7CIEZZQ',
+                authUrl: 'https://orcid.org/oauth/authorize',
+                scope: '/authenticate'
+            },
+            microsoft: {
+                clientId: 'your-microsoft-client-id', // You'll need to get this from Azure
+                authUrl: 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
+                scope: 'openid email profile'
+            }
+        };
+
+        function authenticateWithProvider(provider) {
+            // Special handling for Apple
+            if (provider === 'apple') {
+                window.location.href = 'apple-signin.html';
+                return;
+            }
+
+            const config = oauthConfig[provider];
+            if (!config) {
+                alert(`${provider} authentication not configured yet`);
+                return;
+            }
+
+            // Generate state for security
+            const state = generateRandomState();
+            localStorage.setItem('oauth_state', state);
+            localStorage.setItem('oauth_provider', provider);
+
+            // Build OAuth URL
+            const redirectUri = window.location.origin + window.location.pathname;
+            const params = new URLSearchParams({
+                client_id: config.clientId,
+                redirect_uri: redirectUri,
+                scope: config.scope,
+                response_type: 'code',
+                state: state
+            });
+
+            // Special handling for different providers
+            if (provider === 'google') {
+                params.set('access_type', 'offline');
+                params.set('prompt', 'consent');
+            } else if (provider === 'microsoft') {
+                params.set('response_mode', 'query');
+            }
+
+            // Redirect to OAuth provider
+            window.location.href = `${config.authUrl}?${params.toString()}`;
+        }
+
+        function generateRandomState() {
+            return Math.random().toString(36).substring(2, 15) +
+                Math.random().toString(36).substring(2, 15);
+        }
+
+        // Handle OAuth callback
+        function handleOAuthCallback() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const state = urlParams.get('state');
+            const error = urlParams.get('error');
+            const auth = urlParams.get('auth');
+            const status = urlParams.get('status');
+
+            // Handle Apple Sign In callback
+            if (auth === 'apple') {
+                if (status === 'success') {
+                    showAuthSuccess('apple', 'success');
+                } else if (status === 'error') {
+                    const message = urlParams.get('message') || 'Unknown error';
+                    showAuthError(`Apple Sign In Error: ${message}`);
+                }
+                // Clean URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+                return;
+            }
+
+            if (error) {
+                showAuthError(`OAuth Error: ${error}`);
+                return;
+            }
+
+            if (code && state) {
+                const savedState = localStorage.getItem('oauth_state');
+                const provider = localStorage.getItem('oauth_provider');
+
+                if (state !== savedState) {
+                    showAuthError('Security error: Invalid state parameter');
+                    return;
+                }
+
+                // Show success message
+                showAuthSuccess(provider, code);
+
+                // Clean up
+                localStorage.removeItem('oauth_state');
+                localStorage.removeItem('oauth_provider');
+
+                // Clean URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+
+        function showAuthSuccess(provider, code) {
+            const modal = document.createElement('div');
+            modal.className = 'auth-modal';
+            modal.innerHTML = `
+                <div class="auth-modal-content">
+                    <h3>🎉 Authentication Successful!</h3>
+                    <p><strong>Provider:</strong> ${provider}</p>
+                    <p><strong>Status:</strong> ✅ Authenticated</p>
+                    <p>You can now download CraftX.py!</p>
+                    <button onclick="this.parentElement.parentElement.remove()" class="btn">Continue</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function showAuthError(message) {
+            const modal = document.createElement('div');
+            modal.className = 'auth-modal';
+            modal.innerHTML = `
+                <div class="auth-modal-content">
+                    <h3>❌ Authentication Error</h3>
+                    <p>${message}</p>
+                    <button onclick="this.parentElement.parentElement.remove()" class="btn">Try Again</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Check for OAuth callback on page load
+        window.addEventListener('load', handleOAuthCallback);
+
+        // WebAuthn/Passkey functionality
+        const passkeyBtn = document.getElementById('passkey-btn');
+        if (passkeyBtn) {
+            passkeyBtn.addEventListener('click', handlePasskeyAuth);
+        }
+
+        async function handlePasskeyAuth() {
+            if (!window.PublicKeyCredential) {
+                alert('WebAuthn is not supported in this browser');
+                return;
+            }
+
+            try {
+                passkeyBtn.disabled = true;
+                passkeyBtn.textContent = 'Authenticating...';
+
+                // Try to authenticate with existing credential first
+                const credentialId = '49cdd33f2a906bffed155c040cabce072d77588c503dd31e25f66cc860a13055';
+
+                const credential = await navigator.credentials.get({
+                    publicKey: {
+                        challenge: new Uint8Array(32),
+                        rpId: window.location.hostname,
+                        allowCredentials: [{
+                            type: 'public-key',
+                            id: base64urlToBuffer(credentialId)
+                        }],
+                        userVerification: 'preferred',
+                        timeout: 60000
+                    }
+                });
+
+                if (credential) {
+                    // Send credential to server for verification
+                    const response = await fetch('/webauthn/authenticate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            credentialId: credentialId,
+                            assertion: {
+                                authenticatorData: bufferToBase64url(credential.response.authenticatorData),
+                                clientDataJSON: bufferToBase64url(credential.response.clientDataJSON),
+                                signature: bufferToBase64url(credential.response.signature)
+                            }
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        // Store authentication info
+                        sessionStorage.setItem('auth_token', result.token);
+                        sessionStorage.setItem('auth_provider', 'webauthn');
+                        sessionStorage.setItem('auth_user', result.user);
+
+                        showAuthSuccess('webauthn', result.user);
+                    } else {
+                        throw new Error(result.error);
+                    }
+                }
+            } catch (error) {
+                console.error('WebAuthn authentication failed:', error);
+                alert('Authentication failed. Please try again or use an OAuth provider.');
+            } finally {
+                passkeyBtn.disabled = false;
+                passkeyBtn.innerHTML = `
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="currentColor" d="M6 10v2h3v-2a3 3 0 0 1 6 0v2h3v-2a6 6 0 0 0-12 0zm-2 2a2 2 0 0 1 2-2h1V8a5 5 0 0 1 10 0v2h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8zm8 5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                    </svg>
+                    Sign in with Passkey
+                `;
+            }
+        }
+
+        // Helper functions for WebAuthn
+        function base64urlToBuffer(base64url) {
+            const padding = '='.repeat((4 - base64url.length % 4) % 4);
+            const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/') + padding;
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray.buffer;
+        }
+
+        function bufferToBase64url(buffer) {
+            const bytes = new Uint8Array(buffer);
+            let str = '';
+            for (let i = 0; i < bytes.byteLength; i++) {
+                str += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+        }
+
+        function checkAuthSuccess() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            const provider = urlParams.get('provider');
+            const user = urlParams.get('user');
+
+            if (token && provider && user) {
+                // Store authentication info
+                sessionStorage.setItem('auth_token', token);
+                sessionStorage.setItem('auth_provider', provider);
+                sessionStorage.setItem('auth_user', decodeURIComponent(user));
+
+                // Show success message and enable download
+                showAuthSuccess(provider, decodeURIComponent(user));
+
+                // Clean up URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+
+        function showAuthSuccess(provider, user) {
+            const successDiv = document.createElement('div');
+            successDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #4CAF50;
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 5px;
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+            `;
+            successDiv.innerHTML = `
+                <strong>✅ Authentication Successful!</strong><br>
+                Signed in with ${provider === 'webauthn' ? 'Passkey' : provider} as ${user}
+                <button onclick="this.parentElement.remove()" style="
+                    background: none;
+                    border: none;
+                    color: white;
+                    float: right;
+                    cursor: pointer;
+                    font-size: 1.2em;
+                ">×</button>
+            `;
+
+            document.body.appendChild(successDiv);
+
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (successDiv.parentElement) {
+                    successDiv.remove();
+                }
+            }, 5000);
+
+            // Enable download button
+            const downloadBtn = document.querySelector('.btn-download');
+            if (downloadBtn) {
+                downloadBtn.classList.remove('disabled');
+                downloadBtn.style.opacity = '1';
+                downloadBtn.style.cursor = 'pointer';
+            }
+        }
+
+        function showLocalSetupModal(provider) {
+            const modal = document.createElement('div');
+            modal.id = 'setupModal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+            `;
+
+            modal.innerHTML = `
+                <div style="
+                    background: white;
+                    padding: 2rem;
+                    border-radius: 10px;
+                    max-width: 600px;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                    text-align: left;
+                ">
+                    <h2 style="color: var(--accent); margin-bottom: 1rem;">🚀 Setup Required</h2>
+                    <p style="margin-bottom: 1rem;">To use ${provider.toUpperCase()} authentication, you need to run CraftX locally:</p>
+                    
+                    <div style="background: #f5f5f5; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">
+                        <h3>Quick Setup Steps:</h3>
+                        <ol style="margin: 1rem 0; padding-left: 1.5rem;">
+                            <li><strong>Clone the repository:</strong><br>
+                                <code style="background: #e0e0e0; padding: 2px 4px; border-radius: 3px;">git clone https://github.com/davidanderson01/CraftX.py.git</code>
+                            </li>
+                            <li><strong>Navigate to the directory:</strong><br>
+                                <code style="background: #e0e0e0; padding: 2px 4px; border-radius: 3px;">cd CraftX.py/craftx-stack</code>
+                            </li>
+                            <li><strong>Install dependencies:</strong><br>
+                                <code style="background: #e0e0e0; padding: 2px 4px; border-radius: 3px;">pip install -r requirements.txt</code>
+                            </li>
+                            <li><strong>Setup OAuth:</strong><br>
+                                <code style="background: #e0e0e0; padding: 2px 4px; border-radius: 3px;">python oauth_setup.py</code>
+                            </li>
+                            <li><strong>Start the server:</strong><br>
+                                <code style="background: #e0e0e0; padding: 2px 4px; border-radius: 3px;">python craftx.py</code>
+                            </li>
+                            <li><strong>Visit:</strong> <code style="background: #e0e0e0; padding: 2px 4px; border-radius: 3px;">http://localhost:8000</code></li>
+                        </ol>
+                    </div>
+                    
+                    <div style="background: #e8f5e8; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">
+                        <h4>📖 For detailed instructions:</h4>
+                        <p>View the complete OAuth setup guide: 
+                            <a href="https://github.com/davidanderson01/CraftX.py/blob/main/craftx-stack/OAUTH_SETUP.md" target="_blank" style="color: var(--accent);">
+                                OAuth Setup Guide
+                            </a>
+                        </p>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <button onclick="document.getElementById('setupModal').remove()" style="
+                            background: var(--accent);
+                            color: white;
+                            padding: 1rem 2rem;
+                            border: none;
+                            border-radius: 5px;
+                            cursor: pointer;
+                        ">Got it!</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+        }
 
         // After login, server should redirect back with a valid token
         // Example: ?token=eyJ... in URL
@@ -231,397 +767,185 @@
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('token')) {
                 const hero = document.querySelector('.hero');
+
+                // Show legal documents modal first
+                showLegalDocumentsModal();
+
                 hero.innerHTML = `
-          <a href="/download/craftxpy.zip?token=${urlParams.get('token')}"
-             class="btn-oauth" style="width:100%; margin-top:2rem;">
-            Download CraftX.py
-          </a>
+          <div style="text-align: center; padding: 2rem;">
+            <h2 style="color: var(--accent); margin-bottom: 1rem;">Welcome to CraftX.py!</h2>
+            <p style="margin-bottom: 1rem;">Please review and accept the legal documents below to proceed.</p>
+            <button id="acceptLegalDocs" class="btn-oauth" style="width:100%; margin-top:1rem; opacity: 0.5;" disabled>
+              Review Legal Documents First
+            </button>
+          </div>
         `;
+
+                // Update footer to show all legal documents for logged-in users
+                updateFooterForLoggedInUser();
             }
         }
 
-        window.addEventListener('load', enableDownload);
+        function showLegalDocumentsModal() {
+            const modal = document.createElement('div');
+            modal.id = 'legalModal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+            `;
+
+            modal.innerHTML = `
+                <div style="
+                    background: white;
+                    padding: 2rem;
+                    border-radius: 10px;
+                    max-width: 600px;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                    text-align: center;
+                ">
+                    <h2 style="color: var(--accent); margin-bottom: 1rem;">📋 Legal Documents</h2>
+                    <p style="margin-bottom: 2rem;">As a new user, please review these important documents:</p>
+                    
+                    <div style="display: grid; gap: 1rem; margin-bottom: 2rem;">
+                        <a href="/eula.html" target="_blank" style="
+                            background: var(--accent);
+                            color: white;
+                            padding: 1rem;
+                            border-radius: 5px;
+                            text-decoration: none;
+                            display: block;
+                        ">📜 End User License Agreement (EULA)</a>
+                        
+                        <a href="/nda.html" target="_blank" style="
+                            background: var(--accent);
+                            color: white;
+                            padding: 1rem;
+                            border-radius: 5px;
+                            text-decoration: none;
+                            display: block;
+                        ">🔒 Non-Disclosure Agreement (NDA)</a>
+                    </div>
+                    
+                    <div style="margin-bottom: 2rem;">
+                        <label style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <input type="checkbox" id="acceptEULA" />
+                            <span>I have read and accept the EULA</span>
+                        </label>
+                        <label style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 0.5rem;">
+                            <input type="checkbox" id="acceptNDA" />
+                            <span>I have read and accept the NDA</span>
+                        </label>
+                    </div>
+                    
+                    <button id="proceedButton" style="
+                        background: #ccc;
+                        color: white;
+                        padding: 1rem 2rem;
+                        border: none;
+                        border-radius: 5px;
+                        cursor: not-allowed;
+                        margin-right: 1rem;
+                    " disabled>Proceed to Download</button>
+                    
+                    <button onclick="document.getElementById('legalModal').remove()" style="
+                        background: #666;
+                        color: white;
+                        padding: 1rem 2rem;
+                        border: none;
+                        border-radius: 5px;
+                        cursor: pointer;
+                    ">Close</button>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            // Handle checkbox logic
+            const eulaCheckbox = document.getElementById('acceptEULA');
+            const ndaCheckbox = document.getElementById('acceptNDA');
+            const proceedButton = document.getElementById('proceedButton');
+
+            function updateProceedButton() {
+                if (eulaCheckbox.checked && ndaCheckbox.checked) {
+                    proceedButton.disabled = false;
+                    proceedButton.style.background = 'var(--accent)';
+                    proceedButton.style.cursor = 'pointer';
+                    proceedButton.textContent = 'Proceed to Download';
+                } else {
+                    proceedButton.disabled = true;
+                    proceedButton.style.background = '#ccc';
+                    proceedButton.style.cursor = 'not-allowed';
+                    proceedButton.textContent = 'Accept Documents to Continue';
+                }
+            }
+
+            eulaCheckbox.addEventListener('change', updateProceedButton);
+            ndaCheckbox.addEventListener('change', updateProceedButton);
+
+            proceedButton.addEventListener('click', function () {
+                if (eulaCheckbox.checked && ndaCheckbox.checked) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const token = urlParams.get('token');
+
+                    // Enable download button
+                    const downloadBtn = document.getElementById('acceptLegalDocs');
+                    if (downloadBtn) {
+                        downloadBtn.innerHTML = '🚀 Download CraftX.py';
+                        downloadBtn.disabled = false;
+                        downloadBtn.style.opacity = '1';
+                        downloadBtn.onclick = () => {
+                            window.location.href = `/download/craftxpy.zip?token=${token}`;
+                        };
+                    }
+
+                    // Close modal
+                    modal.remove();
+
+                    // Store acceptance in localStorage
+                    localStorage.setItem('craftx_legal_accepted', 'true');
+                    localStorage.setItem('craftx_legal_date', new Date().toISOString());
+                }
+            });
+        }
+
+        function updateFooterForLoggedInUser() {
+            const footerLinks = document.querySelector('.footer-links');
+            if (footerLinks && !footerLinks.querySelector('a[href="/eula.html"]')) {
+                const eulaLink = document.createElement('a');
+                eulaLink.href = '/eula.html';
+                eulaLink.textContent = 'EULA';
+
+                const ndaLink = document.createElement('a');
+                ndaLink.href = '/nda.html';
+                ndaLink.textContent = 'NDA';
+
+                footerLinks.appendChild(eulaLink);
+                footerLinks.appendChild(ndaLink);
+            }
+        }
+
+        // Check if user has already accepted legal documents
+        function checkLegalAcceptance() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('token') && localStorage.getItem('craftx_legal_accepted') === 'true') {
+                updateFooterForLoggedInUser();
+            }
+        }
+
+        window.addEventListener('load', function () {
+            enableDownload();
+            checkLegalAcceptance();
+        });
     </script>
-</body>
-
-</html>
-position: relative;
-z-index: 2;
-}
-
-.monogram {
-width: 50px;
-height: 50px;
-background: #00F0FF;
-border-radius: 10px;
-display: flex;
-align-items: center;
-justify-content: center;
-font-weight: bold;
-color: #1B1F3B;
-margin-right: 1rem;
-font-size: 1.2rem;
-}
-
-.logo-text {
-font-size: 3rem;
-font-weight: bold;
-color: #00F0FF;
-font-family: 'JetBrains Mono', monospace;
-}
-
-.main-logo {
-max-width: 200px;
-height: auto;
-margin-bottom: 1rem;
-filter: drop-shadow(0 4px 15px rgba(0,240,255,0.3));
-transition: transform 0.3s ease;
-}
-
-.main-logo:hover {
-transform: scale(1.05);
-}
-
-.fallback-logo {
-display: none;
-align-items: center;
-justify-content: center;
-}
-
-/* Show fallback if main logo fails to load */
-.logo-container:has(.main-logo[src=""]) .fallback-logo,
-.logo-container:has(.main-logo:not([src])) .fallback-logo {
-display: flex;
-}
-
-.tagline {
-font-size: 1.5rem;
-color: #FFB300;
-font-style: italic;
-margin-bottom: 3rem;
-}
-
-.cta-button {
-background: linear-gradient(45deg, #00F0FF, #FFB300);
-color: #1B1F3B;
-padding: 1rem 2rem;
-border: none;
-border-radius: 50px;
-font-weight: bold;
-font-size: 1.1rem;
-cursor: pointer;
-text-decoration: none;
-display: inline-block;
-transition: all 0.3s ease;
-box-shadow: 0 4px 15px rgba(0,240,255,0.3);
-}
-
-.cta-button:hover {
-transform: translateY(-2px);
-box-shadow: 0 6px 20px rgba(0,240,255,0.4);
-}
-
-.features {
-padding: 4rem 0;
-}
-
-.features-grid {
-display: grid;
-grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-gap: 2rem;
-margin-top: 3rem;
-}
-
-.feature-card {
-background: rgba(46, 46, 46, 0.5);
-padding: 2rem;
-border-radius: 15px;
-border: 1px solid rgba(0,240,255,0.2);
-transition: all 0.3s ease;
-}
-
-.feature-card:hover {
-transform: translateY(-5px);
-border-color: #00F0FF;
-box-shadow: 0 10px 30px rgba(0,240,255,0.1);
-}
-
-.feature-icon {
-font-size: 2rem;
-margin-bottom: 1rem;
-}
-
-.feature-title {
-color: #00F0FF;
-font-size: 1.3rem;
-margin-bottom: 1rem;
-font-weight: 600;
-}
-
-.section-title {
-text-align: center;
-font-size: 2.5rem;
-color: #00F0FF;
-margin-bottom: 1rem;
-}
-
-.section-subtitle {
-text-align: center;
-color: #FFB300;
-font-size: 1.2rem;
-margin-bottom: 2rem;
-}
-
-.code-block {
-background: #1E1E1E;
-border: 1px solid #333;
-border-radius: 10px;
-padding: 1.5rem;
-margin: 2rem 0;
-font-family: 'JetBrains Mono', monospace;
-color: #00F0FF;
-overflow-x: auto;
-}
-
-.footer {
-text-align: center;
-padding: 3rem 0;
-border-top: 1px solid rgba(0,240,255,0.2);
-margin-top: 4rem;
-}
-
-.footer-links {
-display: flex;
-justify-content: center;
-gap: 2rem;
-margin-bottom: 2rem;
-}
-
-.footer-links a {
-color: #00F0FF;
-text-decoration: none;
-transition: color 0.3s ease;
-}
-
-.footer-links a:hover {
-color: #FFB300;
-}
-
-.copyright {
-color: #888;
-font-size: 0.9rem;
-}
-
-@media (max-width: 768px) {
-.logo-text {
-font-size: 2rem;
-}
-
-.tagline {
-font-size: 1.2rem;
-}
-
-.section-title {
-font-size: 2rem;
-}
-
-.footer-links {
-flex-direction: column;
-gap: 1rem;
-}
-}
-
-/* Moved nav styles from inline to CSS */
-.main-nav {
-background: rgba(0,0,0,0.8);
-padding: 1rem 0;
-position: sticky;
-top: 0;
-z-index: 100;
-}
-.main-nav-container {
-max-width: 1200px;
-margin: 0 auto;
-display: flex;
-justify-content: center;
-gap: 2rem;
-}
-.main-nav-link {
-color: white;
-text-decoration: none;
-padding: 0.5rem 1rem;
-border-radius: 5px;
-transition: background 0.3s;
-background: none;
-border: none;
-}
-.main-nav-link-active {
-background: rgba(255,255,255,0.2);
-}
-.main-nav-link:hover {
-background: rgba(255,255,255,0.1);
-}
-/* End of CSS */
-</style>
-
-<!-- Navigation -->
-<nav class="main-nav">
-    <div class="main-nav-container">
-        <a href="index.html" class="main-nav-link main-nav-link-active">Home</a>
-        <a href="docs.html" class="main-nav-link">Documentation</a>
-        <a href="examples.html" class="main-nav-link">Examples</a>
-        <a href="about.html" class="main-nav-link">About</a>
-        <a href="support.html" class="main-nav-link main-nav-support">💖 Support</a>
-    </div>
-</nav>
-
-<div class="container">
-    <header class="header">
-        <div class="logo-container">
-            <img src="assets/img/craftx-logo.png" alt="CraftX.py Logo" class="main-logo">
-            <div class="fallback-logo">
-                <div class="monogram">CX</div>
-                <div class="logo-text">CraftX.py</div>
-            </div>
-        </div>
-        <p class="tagline">Python-native intelligence, modular by design.</p>
-        <a href="#get-started" class="cta-button">Get Started 🚀</a>
-    </header>
-
-    <section class="features">
-        <h2 class="section-title">What is CraftX.py?</h2>
-        <p class="section-subtitle">A modular AI scripting framework for Python developers</p>
-
-        <div class="code-block">
-            # Quick Start Example
-            from craftxpy.agents.router import AgentRouter
-            from craftxpy.plugins.wizardcoder import WizardCoder
-
-            # Initialize AI model router
-            router = AgentRouter({"codegen": WizardCoder()})
-
-            # Generate code
-            response = router.route("codegen", "Create a FastAPI endpoint")
-            print(response)
-        </div>
-
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">🤖</div>
-                <h3 class="feature-title">Multiple AI Models</h3>
-                <p>Integrate WizardCoder, CommandR7B, CodeGeeX4, and Qwen2.5-Coder seamlessly. Switch between models
-                    based on your specific needs.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">🔧</div>
-                <h3 class="feature-title">Modular Tool System</h3>
-                <p>Extensible plugin architecture with built-in tools for DNS validation, SSL checking, file monitoring,
-                    and more.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">🛡️</div>
-                <h3 class="feature-title">Security First</h3>
-                <p>GitGuardian-compliant credential management, security-hardened Docker containers, and blockchain
-                    attestation for enterprise-grade security.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">🐳</div>
-                <h3 class="feature-title">Docker Ready</h3>
-                <p>Production-ready containers with Python 3.13, non-root users, security patches, and Ollama
-                    integration for scalable deployments.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">⛓️</div>
-                <h3 class="feature-title">Blockchain Integration</h3>
-                <p>Ethereum smart contract deployment and attestation system for decentralized proof of authenticity and
-                    integrity.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">💾</div>
-                <h3 class="feature-title">Memory & Logging</h3>
-                <p>Persistent conversation history and session management to maintain context across interactions.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">🎨</div>
-                <h3 class="feature-title">Beautiful UI</h3>
-                <p>Modern Streamlit-based interface with real-time chat, tool integration, and developer mode.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">🐍</div>
-                <h3 class="feature-title">Python-Native</h3>
-                <p>Built specifically for Python developers with clean APIs, type hints, and pythonic design patterns.
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <section id="get-started" class="features">
-        <h2 class="section-title">Get Started</h2>
-        <p class="section-subtitle">Ready to build with CraftX.py?</p>
-
-        <div class="code-block">
-            # Quick Install from PyPI
-            pip install craftxpy
-
-            # Development Installation
-            git clone https://github.com/davidanderson01/CraftX.py.git
-            cd CraftX.py
-            pip install -e .[dev]
-
-            # Docker Installation (Recommended for Production)
-            cd craftx-stack
-            cp .env.template .env # Edit with your config
-            docker-compose up -d
-
-            # Run the assistant
-            streamlit run assistant_ui/app.py
-        </div>
-    </section>
-</div>
-
-<footer class="footer">
-    <div class="container">
-        <div class="footer-links">
-            <a href="https://craftx.dev" target="_blank" rel="noopener">Documentation</a>
-            <a href="https://craftxpy.com" target="_blank" rel="noopener">Website</a>
-            <a href="https://craftx.ai" target="_blank" rel="noopener">AI Hub</a>
-            <a href="https://github.com/davidanderson01/craftxpy" target="_blank" rel="noopener">GitHub</a>
-        </div>
-        <p class="copyright">© 2025 CraftX.py - Python-native intelligence, modular by design.</p>
-    </div>
-</footer>
-
-<script>
-    // Logo fallback handling
-    document.addEventListener('DOMContentLoaded', function () {
-        const mainLogo = document.querySelector('.main-logo');
-        const fallbackLogo = document.querySelector('.fallback-logo');
-
-        if (mainLogo) {
-            mainLogo.onerror = function () {
-                this.style.display = 'none';
-                if (fallbackLogo) {
-                    fallbackLogo.style.display = 'flex';
-                }
-            };
-
-            // Check if image loads successfully
-            if (mainLogo.complete && mainLogo.naturalHeight === 0) {
-                mainLogo.style.display = 'none';
-                if (fallbackLogo) {
-                    fallbackLogo.style.display = 'flex';
-                }
-            }
-        }
-    });
-</script>
 </body>
 
 </html>

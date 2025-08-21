@@ -2,7 +2,55 @@
 
 All notable changes to CraftX.py will be documented in this file.
 
-## [Latest] - 2025-08-15
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.2.0] - 2025-08-19 - Major OAuth Authentication System Release
+
+### Added - 🔐 Authentication & Security
+
+- **Multi-Provider OAuth Authentication System**
+  - GitHub OAuth integration with full user profile access
+  - Google OAuth 2.0 with secure token management
+  - Okta OAuth for enterprise SSO integration
+  - ORCID OAuth for academic and research authentication
+- **WebAuthn Passkey Authentication**
+  - FIDO2/WebAuthn implementation with ECDSA P-256 cryptography
+  - Hardware security key support (YubiKey, TouchID, Windows Hello)
+  - Cross-platform passwordless authentication
+- **JWT Session Management**
+  - Secure token-based authentication
+  - Stateless session handling for serverless architecture
+  - Configurable token expiration and refresh
+
+### Added - ☁️ Serverless Infrastructure
+
+- **Netlify Functions Deployment**
+  - Complete serverless OAuth handler (393+ lines)
+  - WebAuthn authentication handler (201+ lines)
+  - Node.js 18 runtime with modern JavaScript features
+  - Automatic function scaling and availability
+- **Security Headers & CORS**
+  - Content Security Policy (CSP) implementation
+  - CORS protection for cross-origin requests
+  - Security headers for production deployment
+  - Referrer policy and XSS protection
+
+### Added - 🌐 Live Demo & Web Interface
+
+- **Production Deployment**: [https://harmonious-naiad-3cd735.netlify.app](https://harmonious-naiad-3cd735.netlify.app)
+- **Interactive OAuth Testing**: Live demonstration of all authentication providers
+- **Responsive Design**: Mobile-friendly authentication interface
+- **Real-time Function Logs**: Live monitoring and debugging capabilities
+
+### Enhanced
+
+- **Package Version**: Upgraded to 0.2.0 reflecting major authentication features
+- **Package Metadata**: Updated description and project URLs
+- **Dependencies**: Added JWT, cryptography, and requests for auth features
+- **Classifiers**: Updated to Beta status with web and security categories
+
+## [0.1.3] - 2025-08-15
 
 ### 🛡️ Security Enhancements
 

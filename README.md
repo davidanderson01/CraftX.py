@@ -1,24 +1,27 @@
 # CraftX.py
 
-![CraftX.py Logo](assets/img/craftx-logo.png)
+![CraftX.py Logo](assets/img/craftx-logo.svg)
 
 [![PyPI version](https://badge.fury.io/py/craftxpy.svg)](https://badge.fury.io/py/craftxpy)
 [![Python Version](https://img.shields.io/pypi/pyversions/craftxpy.svg)](https://pypi.org/project/craftxpy/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Downloads](https://pepy.tech/badge/craftxpy)](https://pepy.tech/project/craftxpy)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/harmonious-naiad-3cd735/deploy-status)](https://app.netlify.com/sites/harmonious-naiad-3cd735/deploys)
 
 **Python-native intelligence, modular by design.**
 
-[Installation](#-installation) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Examples](#-examples) • [Support](#-support-craftxpy)
+🌐 **Live Demo**: [https://harmonious-naiad-3cd735.netlify.app](https://harmonious-naiad-3cd735.netlify.app) | 📚 **Documentation**: [docs.craftx.py](https://docs.craftx.py) | 🔗 **PyPI**: [craftxpy](https://pypi.org/project/craftxpy/)
 
-## 💖 Support CraftX.py
+[Installation](#-installation) • [Quick Start](#-quick-start) • [Authentication](#-authentication--security) • [Documentation](#-documentation) • [Examples](#-examples) • [Support](#-support)
+
+## 💖 Support
 
 If you find CraftX.py helpful, please consider supporting the project:
 
 [![Sponsor on GitHub](https://img.shields.io/badge/Sponsor_on_GitHub-F7514A?style=for-the-badge&logo=github-sponsors&logoColor=white)](https://github.com/sponsors/davidanderson01)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy_Me_a_Coffee-yellow?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://coff.ee/honnalulu0c)
 
-**Your support enables:** 🔧 Maintenance • 🤖 New AI models • 📦 Plugin development • 📚 Documentation • 🐛 Bug fixes
+**Your support enables:** 🔧 Maintenance • 🤖 New AI models • 📦 Plugin development • 📚 Documentation • 🐛 Bug fixes • 🔐 Security updates
 
 [Learn more about sponsoring →](SPONSORS.md)
 
@@ -31,12 +34,41 @@ CraftX.py is a modular, Python-native AI framework designed for building intelli
 - **🔌 Multi-Model Support**: Works with OpenAI, Claude, Ollama, and more
 - **🧩 Plugin Architecture**: Extensible system for custom functionality
 - **💾 Flexible Storage**: JSON, SQLite, and hybrid storage backends
-- **🎨 Modern UI**: Beautiful Streamlit-based interface
+- **🎨 Modern UI**: Beautiful Streamlit-based interface with OAuth authentication
 - **🛡️ Security First**: Command whitelisting, input validation, and environment-based credentials
 - **🐳 Docker Ready**: Security-hardened containers with non-root users
 - **⛓️ Blockchain Integration**: Ethereum smart contract deployment and attestation
 - **📱 Cross-Platform**: Works on Windows, macOS, and Linux
 - **🔐 Environment Security**: GitGuardian-compliant credential management
+- **🔑 OAuth Authentication**: Multi-provider OAuth (GitHub, Google, Okta, ORCID) + WebAuthn passkeys
+- **☁️ Serverless Ready**: Netlify Functions for scalable cloud deployment
+
+## 🔐 Authentication & Security
+
+CraftX.py includes a comprehensive authentication system deployed on Netlify:
+
+### Multi-Provider OAuth Support
+
+- **GitHub OAuth** - Developer-friendly authentication
+- **Google OAuth** - Universal access with Google accounts
+- **Okta OAuth** - Enterprise SSO integration
+- **ORCID OAuth** - Academic and research authentication
+
+### WebAuthn Passkey Authentication
+
+- **FIDO2/WebAuthn** - Modern passwordless authentication
+- **Hardware Security Keys** - Support for YubiKey, TouchID, Windows Hello
+- **Cross-Platform** - Works on desktop and mobile devices
+
+### Security Features
+
+- **JWT Session Management** - Secure token-based sessions
+- **CORS Protection** - Cross-origin request security
+- **CSP Headers** - Content Security Policy enforcement
+- **Environment Variables** - Secure credential management
+- **Serverless Architecture** - No persistent server state
+
+**🌐 Live Demo**: [Try the authentication system](https://harmonious-naiad-3cd735.netlify.app)
 
 ## 📦 Installation
 
