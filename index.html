@@ -352,156 +352,110 @@
     </section>
 
     <footer class="container">
-        <p>&copy; 2025 ElevateCraft • MIT License • <a href="/terms.html">Terms</a> • <a
-                href="/privacy.html">Privacy</a></p>
+        <p>&copy; 2025 ElevateCraft • MIT License • <a href="terms.html">Terms</a> • <a href="privacy.html">Privacy</a>
+        </p>
     </footer>
 
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js"></script>
     <script>
-        // Check if we have serverless functions support
-        const hasServerlessFunctions = window.location.hostname === 'craftx.elevatecraft.org' ||
-            window.location.hostname.includes('netlify.app');
-
-        // Check for authentication success
-        checkAuthSuccess();
-
-        // OAuth button functionality
-        document.querySelectorAll('.btn-oauth').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const provider = btn.dataset.provider;
-                authenticateWithProvider(provider);
-            });
-        });
-
-        // GitHub Pages OAuth Configuration
-        const oauthConfig = {
-            github: {
-                clientId: 'Ov23liRUYFgTsZhTpYjs',
-                authUrl: 'https://github.com/login/oauth/authorize',
-                scope: 'user:email'
-            },
-            google: {
-                clientId: '53060370473-27ho267cg9fvra06acb1459kekreckuu.apps.googleusercontent.com',
-                authUrl: 'https://accounts.google.com/oauth2/auth',
-                scope: 'openid email profile'
-            },
-            okta: {
-                clientId: '0oau9ecw5cydP8f7y697',
-                authUrl: 'https://integrator-1438440.okta.com/oauth2/v1/authorize',
-                scope: 'openid email profile'
-            },
-            orcid: {
-                clientId: 'APP-0QF3NY1SS7CIEZZQ',
-                authUrl: 'https://orcid.org/oauth/authorize',
-                scope: '/authenticate'
-            },
-            microsoft: {
-                clientId: 'your-microsoft-client-id', // You'll need to get this from Azure
-                authUrl: 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
-                scope: 'openid email profile'
+        // 1. Auth0 Configuration
+        // IMPORTANT: Replace these with your actual Auth0 application details.
+        // You can get these from your Auth0 dashboard.
+        const auth0Config = {
+            domain: "YOUR_AUTH0_DOMAIN", // e.g., dev-12345.us.auth0.com
+            clientId: "YOUR_AUTH0_CLIENT_ID",
+            authorizationParams: {
+                // This should match the "Allowed Callback URLs" in your Auth0 app settings
+                redirect_uri: window.location.origin + window.location.pathname
             }
         };
 
-        function authenticateWithProvider(provider) {
-            // Special handling for Apple
-            if (provider === 'apple') {
-                window.location.href = 'apple-signin.html';
-                return;
+        let auth0Client = null;
+
+        // 2. Initialize Auth0 on page load
+        window.addEventListener('load', async () => {
+            try {
+                auth0Client = await auth0.createAuth0Client(auth0Config);
+
+                // 3. Handle the redirect callback after a user logs in
+                if (location.search.includes("code=") && location.search.includes("state=")) {
+                    await auth0Client.handleRedirectCallback();
+                    // Clean the URL
+                    window.history.replaceState({}, document.title, "/");
+                }
+
+                // 4. Update the UI based on authentication state
+                await updateUI();
+
+                // 5. Add event listeners to the OAuth buttons
+                document.querySelectorAll('.btn-oauth').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const provider = e.currentTarget.dataset.provider;
+                        // Note: In Auth0, you configure "Connections". The name for Google is typically 'google-oauth2'.
+                        const connection = provider === 'google' ? 'google-oauth2' : provider;
+                        await login(connection);
+                    });
+                });
+
+                // Add event listener for the passkey button
+                document.getElementById('passkey-btn').addEventListener('click', handlePasskeyAuth);
+
+            } catch (err) {
+                console.error("Error initializing Auth0 client", err);
+                if (err.message.includes("Please provide a valid domain")) {
+                    alert("Authentication is not configured. Please replace 'YOUR_AUTH0_DOMAIN' and 'YOUR_AUTH0_CLIENT_ID' in index.html.");
+                }
             }
+        });
 
-            const config = oauthConfig[provider];
-            if (!config) {
-                alert(`${provider} authentication not configured yet`);
-                return;
+        // 6. Login Function
+        const login = async (connection) => {
+            if (!auth0Client) return;
+            try {
+                // This will redirect the user to the Auth0 login page
+                await auth0Client.loginWithRedirect({
+                    authorizationParams: {
+                        connection: connection
+                    }
+                });
+            } catch (err) {
+                console.error("Login failed", err);
             }
+        };
 
-            // Generate state for security
-            const state = generateRandomState();
-            localStorage.setItem('oauth_state', state);
-            localStorage.setItem('oauth_provider', provider);
-
-            // Build OAuth URL
-            const redirectUri = window.location.origin + window.location.pathname;
-            const params = new URLSearchParams({
-                client_id: config.clientId,
-                redirect_uri: redirectUri,
-                scope: config.scope,
-                response_type: 'code',
-                state: state
+        // 7. Logout Function (optional, can be linked to a new logout button)
+        const logout = () => {
+            if (!auth0Client) return;
+            auth0Client.logout({
+                logoutParams: {
+                    returnTo: window.location.origin
+                }
             });
+        };
 
-            // Special handling for different providers
-            if (provider === 'google') {
-                params.set('access_type', 'offline');
-                params.set('prompt', 'consent');
-            } else if (provider === 'microsoft') {
-                params.set('response_mode', 'query');
+        // 8. Update UI based on login status
+        const updateUI = async () => {
+            if (!auth0Client) return;
+            const isAuthenticated = await auth0Client.isAuthenticated();
+
+            if (isAuthenticated) {
+                const user = await auth0Client.getUser();
+                console.log("Authenticated user:", user);
+                showAuthSuccess(user.name || user.email);
+                // You could hide the sign-in buttons and show user info here
+            } else {
+                console.log("User is not authenticated.");
             }
+        };
 
-            // Redirect to OAuth provider
-            window.location.href = `${config.authUrl}?${params.toString()}`;
-        }
-
-        function generateRandomState() {
-            return Math.random().toString(36).substring(2, 15) +
-                Math.random().toString(36).substring(2, 15);
-        }
-
-        // Handle OAuth callback
-        function handleOAuthCallback() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code');
-            const state = urlParams.get('state');
-            const error = urlParams.get('error');
-            const auth = urlParams.get('auth');
-            const status = urlParams.get('status');
-
-            // Handle Apple Sign In callback
-            if (auth === 'apple') {
-                if (status === 'success') {
-                    showAuthSuccess('apple', 'success');
-                } else if (status === 'error') {
-                    const message = urlParams.get('message') || 'Unknown error';
-                    showAuthError(`Apple Sign In Error: ${message}`);
-                }
-                // Clean URL
-                window.history.replaceState({}, document.title, window.location.pathname);
-                return;
-            }
-
-            if (error) {
-                showAuthError(`OAuth Error: ${error}`);
-                return;
-            }
-
-            if (code && state) {
-                const savedState = localStorage.getItem('oauth_state');
-                const provider = localStorage.getItem('oauth_provider');
-
-                if (state !== savedState) {
-                    showAuthError('Security error: Invalid state parameter');
-                    return;
-                }
-
-                // Show success message
-                showAuthSuccess(provider, code);
-
-                // Clean up
-                localStorage.removeItem('oauth_state');
-                localStorage.removeItem('oauth_provider');
-
-                // Clean URL
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
-        }
-
-        function showAuthSuccess(provider, code) {
+        // 9. Display a success message
+        function showAuthSuccess(userIdentifier) {
             const modal = document.createElement('div');
             modal.className = 'auth-modal';
             modal.innerHTML = `
                 <div class="auth-modal-content">
                     <h3>🎉 Authentication Successful!</h3>
-                    <p><strong>Provider:</strong> ${provider}</p>
-                    <p><strong>Status:</strong> ✅ Authenticated</p>
+                    <p><strong>Welcome:</strong> ${userIdentifier}</p>
                     <p>You can now download CraftX.py!</p>
                     <button onclick="this.parentElement.parentElement.remove()" class="btn">Continue</button>
                 </div>
@@ -509,442 +463,73 @@
             document.body.appendChild(modal);
         }
 
-        function showAuthError(message) {
-            const modal = document.createElement('div');
-            modal.className = 'auth-modal';
-            modal.innerHTML = `
-                <div class="auth-modal-content">
-                    <h3>❌ Authentication Error</h3>
-                    <p>${message}</p>
-                    <button onclick="this.parentElement.parentElement.remove()" class="btn">Try Again</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        // Check for OAuth callback on page load
-        window.addEventListener('load', handleOAuthCallback);
-
-        // WebAuthn/Passkey functionality
-        const passkeyBtn = document.getElementById('passkey-btn');
-        if (passkeyBtn) {
-            passkeyBtn.addEventListener('click', handlePasskeyAuth);
-        }
-
+        // 10. Handle Passkey button
         async function handlePasskeyAuth() {
-            if (!window.PublicKeyCredential) {
-                alert('WebAuthn is not supported in this browser');
-                return;
-            }
-
-            try {
-                passkeyBtn.disabled = true;
-                passkeyBtn.textContent = 'Authenticating...';
-
-                // Try to authenticate with existing credential first
-                const credentialId = '49cdd33f2a906bffed155c040cabce072d77588c503dd31e25f66cc860a13055';
-
-                const credential = await navigator.credentials.get({
-                    publicKey: {
-                        challenge: new Uint8Array(32),
-                        rpId: window.location.hostname,
-                        allowCredentials: [{
-                            type: 'public-key',
-                            id: base64urlToBuffer(credentialId)
-                        }],
-                        userVerification: 'preferred',
-                        timeout: 60000
-                    }
-                });
-
-                if (credential) {
-                    // Send credential to server for verification
-                    const response = await fetch('/webauthn/authenticate', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            credentialId: credentialId,
-                            assertion: {
-                                authenticatorData: bufferToBase64url(credential.response.authenticatorData),
-                                clientDataJSON: bufferToBase64url(credential.response.clientDataJSON),
-                                signature: bufferToBase64url(credential.response.signature)
-                            }
-                        })
-                    });
-
-                    const result = await response.json();
-
-                    if (result.success) {
-                        // Store authentication info
-                        sessionStorage.setItem('auth_token', result.token);
-                        sessionStorage.setItem('auth_provider', 'webauthn');
-                        sessionStorage.setItem('auth_user', result.user);
-
-                        showAuthSuccess('webauthn', result.user);
-                    } else {
-                        throw new Error(result.error);
-                    }
-                }
-            } catch (error) {
-                console.error('WebAuthn authentication failed:', error);
-                alert('Authentication failed. Please try again or use an OAuth provider.');
-            } finally {
-                passkeyBtn.disabled = false;
-                passkeyBtn.innerHTML = `
-                    <svg viewBox="0 0 24 24" width="20" height="20">
-                        <path fill="currentColor" d="M6 10v2h3v-2a3 3 0 0 1 6 0v2h3v-2a6 6 0 0 0-12 0zm-2 2a2 2 0 0 1 2-2h1V8a5 5 0 0 1 10 0v2h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8zm8 5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-                    </svg>
-                    Sign in with Passkey
-                `;
-            }
+            // To implement this, you would enable "Passwordless" authentication in your
+            // Auth0 dashboard and then trigger it here.
+            alert("Passkey authentication should be configured as a passwordless connection in Auth0.");
         }
 
-        // Helper functions for WebAuthn
-        function base64urlToBuffer(base64url) {
-            const padding = '='.repeat((4 - base64url.length % 4) % 4);
-            const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/') + padding;
-            const rawData = window.atob(base64);
-            const outputArray = new Uint8Array(rawData.length);
-            for (let i = 0; i < rawData.length; ++i) {
-                outputArray[i] = rawData.charCodeAt(i);
-            }
-            return outputArray.buffer;
-        }
+        // 1. Okta Configuration
+        // IMPORTANT: Replace these with your actual Okta application details.
+        // You can get these from your Okta Developer Console.
+        const oktaConfig = {
+            baseUrl: "https://integrator-1438440.okta.com",
+            clientId: "0oau9ecw5cydP8f7y697",
+            redirectUri: window.location.origin + window.location.pathname,
+            authParams: {
+                issuer: "https://integrator-1438440.okta.com/oauth2/default", // Use the 'default' auth server for dev accounts
+                scopes: ['openid', 'profile', 'email'],
+            },
+            features: {
+                idpDiscovery: true
+            },
+            idpDiscovery: {
+                requestContext: window.location.origin + '/login'
+            },
+            idps: [
+                { 'type': 'GOOGLE', 'id': 'YOUR_GOOGLE_IDP_ID_FROM_OKTA' },
+                { 'type': 'GITHUB', 'id': 'YOUR_GITHUB_IDP_ID_FROM_OKTA' },
+                { 'type': 'APPLE', 'id': 'YOUR_APPLE_IDP_ID_FROM_OKTA' },
+                { 'type': 'ORCID', 'id': 'YOUR_ORCID_IDP_ID_FROM_OKTA' }
+            ]
+        };
 
-        function bufferToBase64url(buffer) {
-            const bytes = new Uint8Array(buffer);
-            let str = '';
-            for (let i = 0; i < bytes.byteLength; i++) {
-                str += String.fromCharCode(bytes[i]);
-            }
-            return window.btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-        }
+        // 2. Initialize the Okta Sign-In Widget
+        // Note: This example uses the Okta Sign-In Widget for authentication.
+        // You need to include the Okta Sign-In Widget script in your HTML for this to work.
+        // <script src="https://your-okta-domain.com/js/sdk/okta-signin-widget.min.js" type="text/javascript"></script>
 
-        function checkAuthSuccess() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const token = urlParams.get('token');
-            const provider = urlParams.get('provider');
-            const user = urlParams.get('user');
+    // 3. Create an instance of the Okta Sign-In Widget
+    // const widget = new OktaSignIn({
+    // el: '#widget-container',
+    // logo: 'path/to/your/logo.png',
+    // features: {
+    // registration: true
+    // },
+    // i18n: {
+    // en: {
+    // 'primaryauth.title': 'Sign in to CraftX.py',
+    // 'primaryauth.submit': 'Sign In',
+    // 'registration.title': 'Create an account',
+    // 'registration.submit': 'Register'
+    // }
+    // }
+    // });
 
-            if (token && provider && user) {
-                // Store authentication info
-                sessionStorage.setItem('auth_token', token);
-                sessionStorage.setItem('auth_provider', provider);
-                sessionStorage.setItem('auth_user', decodeURIComponent(user));
+    // 4. Render the widget
+    // widget.renderEl({ el: '#widget-container' });
 
-                // Show success message and enable download
-                showAuthSuccess(provider, decodeURIComponent(user));
+    // 5. Handle successful authentication
+    // widget.on('success', function (res) {
+    // console.log('Successfully authenticated!', res);
+    // // You can redirect the user or update the UI here
+    // });
 
-                // Clean up URL
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
-        }
-
-        function showAuthSuccess(provider, user) {
-            const successDiv = document.createElement('div');
-            successDiv.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #4CAF50;
-                color: white;
-                padding: 1rem 1.5rem;
-                border-radius: 5px;
-                z-index: 10000;
-                animation: slideIn 0.3s ease-out;
-            `;
-            successDiv.innerHTML = `
-                <strong>✅ Authentication Successful!</strong><br>
-                Signed in with ${provider === 'webauthn' ? 'Passkey' : provider} as ${user}
-                <button onclick="this.parentElement.remove()" style="
-                    background: none;
-                    border: none;
-                    color: white;
-                    float: right;
-                    cursor: pointer;
-                    font-size: 1.2em;
-                ">×</button>
-            `;
-
-            document.body.appendChild(successDiv);
-
-            // Auto-remove after 5 seconds
-            setTimeout(() => {
-                if (successDiv.parentElement) {
-                    successDiv.remove();
-                }
-            }, 5000);
-
-            // Enable download button
-            const downloadBtn = document.querySelector('.btn-download');
-            if (downloadBtn) {
-                downloadBtn.classList.remove('disabled');
-                downloadBtn.style.opacity = '1';
-                downloadBtn.style.cursor = 'pointer';
-            }
-        }
-
-        function showLocalSetupModal(provider) {
-            const modal = document.createElement('div');
-            modal.id = 'setupModal';
-            modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.8);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 10000;
-            `;
-
-            modal.innerHTML = `
-                <div style="
-                    background: white;
-                    padding: 2rem;
-                    border-radius: 10px;
-                    max-width: 600px;
-                    max-height: 80vh;
-                    overflow-y: auto;
-                    text-align: left;
-                ">
-                    <h2 style="color: var(--accent); margin-bottom: 1rem;">🚀 Setup Required</h2>
-                    <p style="margin-bottom: 1rem;">To use ${provider.toUpperCase()} authentication, you need to run CraftX locally:</p>
-                    
-                    <div style="background: #f5f5f5; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">
-                        <h3>Quick Setup Steps:</h3>
-                        <ol style="margin: 1rem 0; padding-left: 1.5rem;">
-                            <li><strong>Clone the repository:</strong><br>
-                                <code style="background: #e0e0e0; padding: 2px 4px; border-radius: 3px;">git clone https://github.com/davidanderson01/CraftX.py.git</code>
-                            </li>
-                            <li><strong>Navigate to the directory:</strong><br>
-                                <code style="background: #e0e0e0; padding: 2px 4px; border-radius: 3px;">cd CraftX.py/craftx-stack</code>
-                            </li>
-                            <li><strong>Install dependencies:</strong><br>
-                                <code style="background: #e0e0e0; padding: 2px 4px; border-radius: 3px;">pip install -r requirements.txt</code>
-                            </li>
-                            <li><strong>Setup OAuth:</strong><br>
-                                <code style="background: #e0e0e0; padding: 2px 4px; border-radius: 3px;">python oauth_setup.py</code>
-                            </li>
-                            <li><strong>Start the server:</strong><br>
-                                <code style="background: #e0e0e0; padding: 2px 4px; border-radius: 3px;">python craftx.py</code>
-                            </li>
-                            <li><strong>Visit:</strong> <code style="background: #e0e0e0; padding: 2px 4px; border-radius: 3px;">http://localhost:8000</code></li>
-                        </ol>
-                    </div>
-                    
-                    <div style="background: #e8f5e8; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">
-                        <h4>📖 For detailed instructions:</h4>
-                        <p>View the complete OAuth setup guide: 
-                            <a href="https://github.com/davidanderson01/CraftX.py/blob/main/craftx-stack/OAUTH_SETUP.md" target="_blank" style="color: var(--accent);">
-                                OAuth Setup Guide
-                            </a>
-                        </p>
-                    </div>
-                    
-                    <div style="text-align: center;">
-                        <button onclick="document.getElementById('setupModal').remove()" style="
-                            background: var(--accent);
-                            color: white;
-                            padding: 1rem 2rem;
-                            border: none;
-                            border-radius: 5px;
-                            cursor: pointer;
-                        ">Got it!</button>
-                    </div>
-                </div>
-            `;
-
-            document.body.appendChild(modal);
-        }
-
-        // After login, server should redirect back with a valid token
-        // Example: ?token=eyJ... in URL
-        function enableDownload() {
-            // Replace hero with download CTA once authenticated
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('token')) {
-                const hero = document.querySelector('.hero');
-
-                // Show legal documents modal first
-                showLegalDocumentsModal();
-
-                hero.innerHTML = `
-          <div style="text-align: center; padding: 2rem;">
-            <h2 style="color: var(--accent); margin-bottom: 1rem;">Welcome to CraftX.py!</h2>
-            <p style="margin-bottom: 1rem;">Please review and accept the legal documents below to proceed.</p>
-            <button id="acceptLegalDocs" class="btn-oauth" style="width:100%; margin-top:1rem; opacity: 0.5;" disabled>
-              Review Legal Documents First
-            </button>
-          </div>
-        `;
-
-                // Update footer to show all legal documents for logged-in users
-                updateFooterForLoggedInUser();
-            }
-        }
-
-        function showLegalDocumentsModal() {
-            const modal = document.createElement('div');
-            modal.id = 'legalModal';
-            modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.8);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 10000;
-            `;
-
-            modal.innerHTML = `
-                <div style="
-                    background: white;
-                    padding: 2rem;
-                    border-radius: 10px;
-                    max-width: 600px;
-                    max-height: 80vh;
-                    overflow-y: auto;
-                    text-align: center;
-                ">
-                    <h2 style="color: var(--accent); margin-bottom: 1rem;">📋 Legal Documents</h2>
-                    <p style="margin-bottom: 2rem;">As a new user, please review these important documents:</p>
-                    
-                    <div style="display: grid; gap: 1rem; margin-bottom: 2rem;">
-                        <a href="/eula.html" target="_blank" style="
-                            background: var(--accent);
-                            color: white;
-                            padding: 1rem;
-                            border-radius: 5px;
-                            text-decoration: none;
-                            display: block;
-                        ">📜 End User License Agreement (EULA)</a>
-                        
-                        <a href="/nda.html" target="_blank" style="
-                            background: var(--accent);
-                            color: white;
-                            padding: 1rem;
-                            border-radius: 5px;
-                            text-decoration: none;
-                            display: block;
-                        ">🔒 Non-Disclosure Agreement (NDA)</a>
-                    </div>
-                    
-                    <div style="margin-bottom: 2rem;">
-                        <label style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                            <input type="checkbox" id="acceptEULA" />
-                            <span>I have read and accept the EULA</span>
-                        </label>
-                        <label style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 0.5rem;">
-                            <input type="checkbox" id="acceptNDA" />
-                            <span>I have read and accept the NDA</span>
-                        </label>
-                    </div>
-                    
-                    <button id="proceedButton" style="
-                        background: #ccc;
-                        color: white;
-                        padding: 1rem 2rem;
-                        border: none;
-                        border-radius: 5px;
-                        cursor: not-allowed;
-                        margin-right: 1rem;
-                    " disabled>Proceed to Download</button>
-                    
-                    <button onclick="document.getElementById('legalModal').remove()" style="
-                        background: #666;
-                        color: white;
-                        padding: 1rem 2rem;
-                        border: none;
-                        border-radius: 5px;
-                        cursor: pointer;
-                    ">Close</button>
-                </div>
-            `;
-
-            document.body.appendChild(modal);
-
-            // Handle checkbox logic
-            const eulaCheckbox = document.getElementById('acceptEULA');
-            const ndaCheckbox = document.getElementById('acceptNDA');
-            const proceedButton = document.getElementById('proceedButton');
-
-            function updateProceedButton() {
-                if (eulaCheckbox.checked && ndaCheckbox.checked) {
-                    proceedButton.disabled = false;
-                    proceedButton.style.background = 'var(--accent)';
-                    proceedButton.style.cursor = 'pointer';
-                    proceedButton.textContent = 'Proceed to Download';
-                } else {
-                    proceedButton.disabled = true;
-                    proceedButton.style.background = '#ccc';
-                    proceedButton.style.cursor = 'not-allowed';
-                    proceedButton.textContent = 'Accept Documents to Continue';
-                }
-            }
-
-            eulaCheckbox.addEventListener('change', updateProceedButton);
-            ndaCheckbox.addEventListener('change', updateProceedButton);
-
-            proceedButton.addEventListener('click', function () {
-                if (eulaCheckbox.checked && ndaCheckbox.checked) {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const token = urlParams.get('token');
-
-                    // Enable download button
-                    const downloadBtn = document.getElementById('acceptLegalDocs');
-                    if (downloadBtn) {
-                        downloadBtn.innerHTML = '🚀 Download CraftX.py';
-                        downloadBtn.disabled = false;
-                        downloadBtn.style.opacity = '1';
-                        downloadBtn.onclick = () => {
-                            window.location.href = `/download/craftxpy.zip?token=${token}`;
-                        };
-                    }
-
-                    // Close modal
-                    modal.remove();
-
-                    // Store acceptance in localStorage
-                    localStorage.setItem('craftx_legal_accepted', 'true');
-                    localStorage.setItem('craftx_legal_date', new Date().toISOString());
-                }
-            });
-        }
-
-        function updateFooterForLoggedInUser() {
-            const footerLinks = document.querySelector('.footer-links');
-            if (footerLinks && !footerLinks.querySelector('a[href="/eula.html"]')) {
-                const eulaLink = document.createElement('a');
-                eulaLink.href = '/eula.html';
-                eulaLink.textContent = 'EULA';
-
-                const ndaLink = document.createElement('a');
-                ndaLink.href = '/nda.html';
-                ndaLink.textContent = 'NDA';
-
-                footerLinks.appendChild(eulaLink);
-                footerLinks.appendChild(ndaLink);
-            }
-        }
-
-        // Check if user has already accepted legal documents
-        function checkLegalAcceptance() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('token') && localStorage.getItem('craftx_legal_accepted') === 'true') {
-                updateFooterForLoggedInUser();
-            }
-        }
-
-        window.addEventListener('load', function () {
-            enableDownload();
-            checkLegalAcceptance();
-        });
+    // 6. Handle authentication errors
+    // widget.on('error', function (err) {
+    // console.error('Authentication error:', err);
+    // });
     </script>
 </body>
 
