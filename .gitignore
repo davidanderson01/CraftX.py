@@ -146,6 +146,8 @@ dmypy.json
 chat_logs/*.json
 *.html
 !index.html
+!terms.html
+!privacy.html
 temp/
 .streamlit/
 
