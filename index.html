@@ -307,6 +307,9 @@
                 // Show login form
                 showLoginForm();
             }
+        }).catch(function (err) {
+            console.error('Authentication check failed:', err);
+            showLoginForm();
         });
 
         // 3. Handle the callback after redirect
@@ -334,6 +337,8 @@
                     </form>
                     <div style="text-align: center; margin-top: 1rem;">
                         <button id="oauth-login" style="padding: 0.75rem 1.5rem; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">Sign in with OAuth</button>
+                        <br><br>
+                        <button id="test-config" style="padding: 0.5rem 1rem; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">Test Okta Config</button>
                     </div>
                 </div>
             `;
@@ -361,7 +366,59 @@
 
             // Handle OAuth login
             document.getElementById('oauth-login').addEventListener('click', function () {
-                oktaAuth.signInWithRedirect();
+                try {
+                    console.log('OAuth login clicked - clearing any existing transactions');
+                    
+                    // Clear any existing transactions first
+                    oktaAuth.clearTransactionMeta();
+                    
+                    // Build the authorization URL manually for debugging
+                    const authUrl = 'https://integrator-1438440.okta.com/oauth2/default/v1/authorize?' +
+                        'client_id=0oauoqj5bfJFAoN3x697&' +
+                        'response_type=code&' +
+                        'scope=openid%20profile%20email&' +
+                        'redirect_uri=' + encodeURIComponent('https://davidanderson01.github.io/CraftX.py/') + '&' +
+                        'state=' + btoa(Math.random().toString()).substring(0, 20) + '&' +
+                        'code_challenge_method=S256&' +
+                        'code_challenge=' + btoa(Math.random().toString()).substring(0, 43);
+                    
+                    console.log('Manual auth URL:', authUrl);
+                    
+                    // Try the SDK method first
+                    oktaAuth.signInWithRedirect().catch(function(err) {
+                        console.error('SDK redirect failed:', err);
+                        alert('SDK redirect failed. Trying manual redirect...');
+                        // Fallback to manual redirect
+                        window.location.href = authUrl;
+                    });
+                } catch (err) {
+                    console.error('OAuth click error:', err);
+                    alert('OAuth error: ' + err.message);
+                }
+            });
+
+            // Handle test config button
+            document.getElementById('test-config').addEventListener('click', function () {
+                const config = {
+                    issuer: oktaAuth.getIssuer(),
+                    clientId: oktaAuth.getClientId(),
+                    redirectUri: oktaAuth.getRedirectUri(),
+                    scopes: oktaAuth.getScopes()
+                };
+                
+                console.log('Okta Configuration:', config);
+                
+                // Test if we can reach the issuer
+                fetch(config.issuer + '/.well-known/openid_configuration')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Okta Discovery Document:', data);
+                        alert('✅ Okta configuration test passed!\n\nIssuer: ' + config.issuer + '\nClient ID: ' + config.clientId + '\nRedirect URI: ' + config.redirectUri + '\n\nCheck console for full details.');
+                    })
+                    .catch(err => {
+                        console.error('Config test failed:', err);
+                        alert('❌ Configuration test failed: ' + err.message);
+                    });
             });
         }
 
@@ -396,8 +453,8 @@
         }
 
         // 8. Add debug button (temporary)
-        window.addEventListener('load', function() {
-            setTimeout(function() {
+        window.addEventListener('load', function () {
+            setTimeout(function () {
                 const container = document.getElementById('widget-container');
                 if (container) {
                     const debugBtn = document.createElement('button');
