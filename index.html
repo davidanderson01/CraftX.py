@@ -392,14 +392,16 @@
             // Handle test config button
             document.getElementById('test-config').addEventListener('click', function () {
                 try {
+                    // Access the configuration directly from the oktaAuth object
                     const config = {
-                        issuer: oktaAuth.getIssuer(),
-                        clientId: oktaAuth.getClientId(),
-                        redirectUri: oktaAuth.getRedirectUri(),
-                        scopes: oktaAuth.getScopes()
+                        issuer: oktaAuth.options.issuer,
+                        clientId: oktaAuth.options.clientId,
+                        redirectUri: oktaAuth.options.redirectUri,
+                        scopes: oktaAuth.options.scopes || ['openid', 'profile', 'email']
                     };
                     
                     console.log('Okta Configuration:', config);
+                    console.log('Full oktaAuth object:', oktaAuth);
                     
                     // Test if we can reach the issuer
                     const discoveryUrl = config.issuer + '/.well-known/openid_configuration';
