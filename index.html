@@ -386,6 +386,28 @@
         function logout() {
             oktaAuth.signOut();
         }
+
+        // 7. Clear authentication state (for debugging)
+        function clearAuthState() {
+            oktaAuth.clearTransactionMeta();
+            localStorage.clear();
+            sessionStorage.clear();
+            location.reload();
+        }
+
+        // 8. Add debug button (temporary)
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const container = document.getElementById('widget-container');
+                if (container) {
+                    const debugBtn = document.createElement('button');
+                    debugBtn.textContent = 'Clear Auth State (Debug)';
+                    debugBtn.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 9999; padding: 8px; background: #ff4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;';
+                    debugBtn.onclick = clearAuthState;
+                    document.body.appendChild(debugBtn);
+                }
+            }, 1000);
+        });
     </script>
 </body>
 
