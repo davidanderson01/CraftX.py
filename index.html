@@ -5,247 +5,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://global.oktacdn.com https://static.cloudflareinsights.com https://*.okta.com; style-src 'self' 'unsafe-inline' https://global.oktacdn.com https://cdnjs.cloudflare.com https://*.okta.com; img-src 'self' data: https: https://global.oktacdn.com https://*.okta.com; font-src 'self' data: https://global.oktacdn.com https://*.okta.com; connect-src 'self' https://*.github.io https://*.googleapis.com https://api.github.com https://graph.microsoft.com https://appleid.apple.com https://orcid.org https://integrator-1438440.okta.com https://*.okta.com; form-action 'self' https://appleid.apple.com https://accounts.google.com https://github.com https://login.microsoftonline.com https://orcid.org https://integrator-1438440.okta.com;" />
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://global.oktacdn.com https://static.cloudflareinsights.com https://*.okta.com; style-src 'self' https://global.oktacdn.com https://cdnjs.cloudflare.com https://*.okta.com; img-src 'self' data: https: https://global.oktacdn.com https://*.okta.com; font-src 'self' data: https://global.oktacdn.com https://*.okta.com; connect-src 'self' https://*.github.io https://*.googleapis.com https://api.github.com https://graph.microsoft.com https://appleid.apple.com https://orcid.org https://integrator-1438440.okta.com https://*.okta.com https://global.oktacdn.com; form-action 'self' https://appleid.apple.com https://accounts.google.com https://github.com https://login.microsoftonline.com https://orcid.org https://integrator-1438440.okta.com;" />
     <title>CraftX.py • Elevate your Python AI</title>
-    <style>
-        :root {
-            --accent: #2196F3;
-            --bg: #f9f9fb;
-            --dark: #222;
-            --light: #fff;
-            --radius: 6px;
-            --spacing: 1rem;
-            --font: 'Segoe UI', Roboto, sans-serif;
-        }
-
-        /* Base resets */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: var(--font);
-            color: var(--dark);
-            background: var(--bg);
-            line-height: 1.5;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        /* Layout */
-        .container {
-            max-width: 960px;
-            margin: 0 auto;
-            padding: var(--spacing);
-        }
-
-        header,
-        footer {
-            text-align: center;
-            padding: var(--spacing) 0;
-        }
-
-        /* Hero */
-        .hero {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 4rem 0;
-        }
-
-        .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .hero p.subtitle {
-            font-size: 1.25rem;
-            color: #555;
-            max-width: 600px;
-            text-align: center;
-        }
-
-        .signin-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 0.75rem;
-            margin-top: 2rem;
-            width: 100%;
-            max-width: 600px;
-        }
-
-        .btn-oauth {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.75rem;
-            background: var(--light);
-            border: 1px solid #ccc;
-            border-radius: var(--radius);
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: background 0.2s, border-color 0.2s;
-        }
-
-        .btn-oauth:hover {
-            background: var(--accent);
-            color: var(--light);
-            border-color: var(--accent);
-        }
-
-        .btn-oauth svg {
-            width: 20px;
-            height: 20px;
-            margin-right: 0.5rem;
-            fill: currentColor;
-        }
-
-        .btn-oauth.disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        /* WebAuthn/Passkey Styles */
-        .webauthn-section {
-            margin-top: 2rem;
-            text-align: center;
-        }
-
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 1.5rem 0;
-            color: #666;
-            font-size: 0.85rem;
-        }
-
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: #ddd;
-        }
-
-        .divider span {
-            padding: 0 1rem;
-        }
-
-        .btn-passkey {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.75rem 1.5rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            gap: 0.5rem;
-        }
-
-        .btn-passkey:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-passkey:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .passkey-info {
-            display: block;
-            margin-top: 0.5rem;
-            color: #666;
-            font-size: 0.8rem;
-        }
-
-        /* Sections */
-        section {
-            margin-top: 3rem;
-        }
-
-        section h2 {
-            font-size: 1.75rem;
-            margin-bottom: 0.5rem;
-        }
-
-        section p {
-            margin-top: 0.5rem;
-            color: #444;
-        }
-
-        /* Footer */
-        footer p {
-            font-size: 0.85rem;
-            color: #777;
-        }
-
-        /* Authentication Modal */
-        .auth-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .auth-modal-content {
-            background: white;
-            padding: 2rem;
-            border-radius: var(--radius);
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .auth-modal-content h3 {
-            margin-bottom: 1rem;
-            color: var(--dark);
-        }
-
-        .auth-modal-content p {
-            margin: 0.5rem 0;
-            color: #666;
-        }
-
-        .auth-modal-content .btn {
-            margin-top: 1rem;
-            padding: 0.75rem 1.5rem;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        .auth-modal-content .btn:hover {
-            background: #1976D2;
-        }
-    </style>
+    <link rel="stylesheet" href="assets/styles.css?v=2" />
 </head>
 
 <body>
     <header class="container">
         <h1>CraftX.py</h1>
         <p class="subtitle">Python-native intelligence, modular by design.</p>
+        <div id="auth-status" class="auth-status hidden"></div>
     </header>
 
     <section class="hero container">
@@ -279,6 +48,41 @@
         </p>
     </section>
 
+    <!-- Get Started (shown after successful auth) -->
+    <section id="get-started" class="container hidden mt-2">
+        <h2>Get started</h2>
+        <p>You're signed in. Install and run CraftX.py locally:</p>
+        <div class="grid">
+            <div class="card card--flat">
+                <strong>1) Install from PyPI</strong>
+                <div class="row">
+                    <code id="cmd-install" class="code-chip">pip install craftxpy</code>
+                    <button class="btn" onclick="copyCmd('cmd-install')">Copy</button>
+                </div>
+            </div>
+            <div class="card card--flat">
+                <strong>2) Launch the UI</strong>
+                <div class="row">
+                    <code id="cmd-ui" class="code-chip">streamlit run assistant_ui/app.py</code>
+                    <button class="btn" onclick="copyCmd('cmd-ui')">Copy</button>
+                </div>
+            </div>
+            <div class="card card--flat">
+                <strong>3) Run the demo</strong>
+                <div class="row">
+                    <code id="cmd-demo" class="code-chip">python examples/demo.py</code>
+                    <button class="btn" onclick="copyCmd('cmd-demo')">Copy</button>
+                </div>
+            </div>
+            <div class="links-row">
+                <a class="btn" href="https://pypi.org/project/craftxpy/" target="_blank" rel="noopener">View on PyPI</a>
+                <a class="btn" href="https://github.com/davidanderson01/CraftX.py" target="_blank"
+                    rel="noopener">GitHub</a>
+                <a class="btn" href="https://craftx.elevatecraft.org" target="_blank" rel="noopener">Docs</a>
+            </div>
+        </div>
+    </section>
+
     <footer class="container">
         <p>&copy; 2025 ElevateCraft • MIT License • <a href="terms.html">Terms</a> • <a href="privacy.html">Privacy</a>
         </p>
@@ -287,12 +91,33 @@
     <script src="https://global.oktacdn.com/okta-auth-js/7.0.0/okta-auth-js.min.js"></script>
 
     <script>
+        // IdP IDs mapping: replace values with your Okta Social IdP IDs from
+        // Security > Identity Providers (e.g., "0oa..." for Google/Apple/GitHub/ORCID)
+        const IDP_IDS = {
+            google: '0oaupc3maq8iGRM54697', // Google IdP ID
+            apple: '0oaupb8r80Z4IngVc697',  // Apple IdP ID
+            github: '0oaupa0r6r0HlruYA697', // GitHub IdP ID
+            orcid: '0oaupctyr9JeYfadv697'   // ORCID IdP ID
+        };
+
         // 1. Okta Auth SDK Configuration
         // Compute redirect URI from the current page so it works on both
         // craftx.elevatecraft.org and GitHub Pages (repo path).
         (function () {
-            const origin = window.location.origin; // e.g., https://craftx.elevatecraft.org
-            let path = window.location.pathname;   // e.g., / or /CraftX.py/
+            // Normalize origin for local dev: Okta only allows http for 'localhost' (not 127.0.0.1/0.0.0.0)
+            const loc = window.location;
+            let origin = loc.origin;
+            try {
+                const u = new URL(origin);
+                const isLocalHttp = u.protocol === 'http:' && (u.hostname === '127.0.0.1' || u.hostname === '0.0.0.0');
+                if (isLocalHttp) {
+                    const port = u.port ? (":" + u.port) : '';
+                    origin = `${u.protocol}//localhost${port}`;
+                    console.warn('Redirect URI normalized for Okta local dev:', origin);
+                }
+            } catch (e) { /* noop */ }
+            // e.g., / or /CraftX.py/
+            let path = loc.pathname;
             // Normalize to the base path (end with '/') so the redirect matches an app URI exactly
             if (!path.endsWith('/')) {
                 path = path.substring(0, path.lastIndexOf('/') + 1);
@@ -310,50 +135,84 @@
             console.log('Using redirectUri:', dynamicRedirectUri);
         })();
 
-        // 2. Check if user is already authenticated
-        oktaAuth.isAuthenticated().then(function (isAuthenticated) {
-            if (isAuthenticated) {
-                // User is already logged in
-                oktaAuth.getUser().then(function (user) {
-                    showAuthSuccess(user.name || user.preferred_username || user.email);
-                });
-            } else {
-                // Show login form
+        // 2. Handle the callback after redirect FIRST, then check auth
+        (async function initAuthFlow() {
+            try {
+                if (oktaAuth.isLoginRedirect()) {
+                    try {
+                        await oktaAuth.handleLoginRedirect();
+                    } catch (err) {
+                        console.error('Login redirect error:', err);
+                        alert('Login redirect error: ' + (err.errorSummary || err.message || err.toString()));
+                        showLoginForm();
+                        return;
+                    }
+                }
+
+                const isAuthenticated = await oktaAuth.isAuthenticated();
+                if (!isAuthenticated) {
+                    showLoginForm();
+                    return;
+                }
+
+                // Try to fetch user via userinfo; fall back to ID token claims if CORS blocks it
+                try {
+                    const user = await oktaAuth.getUser();
+                    const display = resolveDisplayName(user);
+                    showAuthSuccess(display);
+                } catch (userErr) {
+                    console.warn('getUser failed (likely CORS). Falling back to ID token claims:', userErr);
+                    try {
+                        const idToken = await oktaAuth.tokenManager.get('idToken');
+                        const claims = idToken && idToken.claims ? idToken.claims : {};
+                        const display = resolveDisplayName(claims);
+                        showAuthSuccess(display);
+                    } catch (claimErr) {
+                        console.error('Failed to get ID token claims:', claimErr);
+                        showLoginForm();
+                    }
+                }
+            } catch (e) {
+                console.error('Auth init flow error:', e);
                 showLoginForm();
             }
-        }).catch(function (err) {
-            console.error('Authentication check failed:', err);
-            showLoginForm();
-        });
-
-        // 3. Handle the callback after redirect
-        if (oktaAuth.isLoginRedirect()) {
-            oktaAuth.handleLoginRedirect().then(function () {
-                oktaAuth.getUser().then(function (user) {
-                    showAuthSuccess(user.name || user.preferred_username || user.email);
-                });
-            }).catch(function (err) {
-                console.error('Login redirect error:', err);
-                alert('Login redirect error: ' + (err.errorSummary || err.message || err.toString()));
-                showLoginForm();
-            });
-        }
+        })();
 
         // 4. Show login form
         function showLoginForm() {
             const container = document.getElementById('widget-container');
             container.innerHTML = `
-                <div style="max-width: 400px; margin: 0 auto; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                    <h3 style="text-align: center; margin-bottom: 1.5rem; color: #333;">Sign in to CraftX.py</h3>
-                    <form id="login-form" style="display: flex; flex-direction: column; gap: 1rem;">
-                        <input type="email" id="username" placeholder="Email" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                        <input type="password" id="password" placeholder="Password" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                        <button type="submit" style="padding: 0.75rem; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer;">Sign In</button>
+                <div class="card">
+                    <h3>Sign in to CraftX.py</h3>
+                    <form id="login-form" class="form-column">
+                        <input type="email" id="username" placeholder="Email" required class="input">
+                        <input type="password" id="password" placeholder="Password" required class="input">
+                        <button type="submit" class="btn-primary">Sign In</button>
                     </form>
-                    <div style="text-align: center; margin-top: 1rem;">
-                        <button id="oauth-login" style="padding: 0.75rem 1.5rem; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">Sign in with OAuth</button>
-                        <br><br>
-                        <button id="test-config" style="padding: 0.5rem 1rem; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">Test Okta Config</button>
+                    <div class="center mt-1">
+                        <button id="oauth-login" class="btn-success">Sign in with Okta</button>
+                    </div>
+                    <div class="divider"><span>or</span></div>
+                    <div class="signin-grid">
+                        <button id="oauth-google" class="btn-oauth btn-google"><span class="icon" aria-hidden="true">G</span>Continue with Google</button>
+                        <button id="oauth-apple" class="btn-oauth btn-apple"><span class="icon" aria-hidden="true">A</span>Continue with Apple</button>
+                        <button id="oauth-github" class="btn-oauth btn-github"><span class="icon" aria-hidden="true">GH</span>Continue with GitHub</button>
+                        <button id="oauth-orcid" class="btn-oauth btn-orcid"><span class="icon" aria-hidden="true">iD</span>Continue with ORCID</button>
+                    </div>
+                    <div class="center mt-1">
+                        <button id="test-config" class="btn">Test Okta Config</button>
+                    </div>
+                    <div id="dev-tools" class="center mt-1 hidden">
+                        <p class="auth-status">Dev tools (localhost only)</p>
+                        <div class="row">
+                            <button id="copy-logout-uri" class="btn">Copy Logout Redirect URI</button>
+                        </div>
+                        <div class="signin-grid mt-1">
+                            <button id="copy-authorize-google" class="btn">Copy Google Authorize URL</button>
+                            <button id="copy-authorize-apple" class="btn">Copy Apple Authorize URL</button>
+                            <button id="copy-authorize-github" class="btn">Copy GitHub Authorize URL</button>
+                            <button id="copy-authorize-orcid" class="btn">Copy ORCID Authorize URL</button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -390,14 +249,31 @@
                     oktaAuth.token.getWithRedirect({
                         responseType: 'code',
                         scopes: ['openid', 'profile', 'email'],
-                        // prompt: 'login' // uncomment to force login every time
-                    }).catch(function(err) {
+                        prompt: 'login'
+                    }).catch(function (err) {
                         console.error('getWithRedirect failed:', err);
                         alert('OAuth redirect failed: ' + (err.errorSummary || err.message || err.toString()));
                     });
                 } catch (err) {
                     console.error('OAuth click error:', err);
                     alert('OAuth error: ' + err.message);
+                }
+            });
+
+            // Social IdP buttons
+            const idpButtons = [
+                { id: 'oauth-google', key: 'google' },
+                { id: 'oauth-apple', key: 'apple' },
+                { id: 'oauth-github', key: 'github' },
+                { id: 'oauth-orcid', key: 'orcid' },
+            ];
+            idpButtons.forEach(({ id, key }) => {
+                const btn = document.getElementById(id);
+                if (!btn) return;
+                btn.addEventListener('click', () => loginWithIdp(key));
+                if (!IDP_IDS[key]) {
+                    btn.classList.add('disabled');
+                    btn.title = 'Configure ' + key + ' IdP ID in code to enable';
                 }
             });
 
@@ -429,18 +305,77 @@
                     url.searchParams.set('code_challenge_method', 'S256');
                     url.searchParams.set('code_challenge', params.codeChallenge);
 
-                    console.log('Computed authorize URL:', url.toString());
-                    alert('✅ Local config looks good.\n\nIssuer: ' + cfg.issuer + '\nRedirect URI: ' + cfg.redirectUri + '\n\nCheck console for PKCE params and the computed authorize URL.\nIf a 400 persists, make sure this exact redirect_uri is whitelisted in your Okta SPA app.');
+                    const authUrl = url.toString();
+                    console.log('Computed authorize URL:', authUrl);
+                    try {
+                        await navigator.clipboard.writeText(authUrl);
+                        console.log('Authorize URL copied to clipboard');
+                    } catch (e) {
+                        console.warn('Failed to copy authorize URL to clipboard:', e);
+                    }
+                    const u = new URL(cfg.redirectUri);
+                    const needsLocalhost = (u.protocol === 'http:' && (u.hostname === '127.0.0.1' || u.hostname === '0.0.0.0'));
+                    const localNote = needsLocalhost
+                        ? '\n\nNote: Okta only allows http for localhost. Use http://localhost:' + (u.port || '8000') + '/ and add it to your Okta SPA app Redirect URIs.'
+                        : '';
+                    alert('✅ Local config looks good.\n\nIssuer: ' + cfg.issuer + '\nRedirect URI: ' + cfg.redirectUri + '\n\nComputed authorize URL (copied to clipboard):\n' + authUrl + '\n\nIf a 400 persists, make sure this exact redirect_uri is whitelisted in your Okta SPA app.' + localNote);
                 } catch (err) {
                     console.error('Test config error:', err);
                     alert('❌ Test config error: ' + (err.message || err.toString()));
                 }
             });
+
+            // Dev-only helpers
+            try {
+                if (location.hostname === 'localhost') {
+                    const dev = document.getElementById('dev-tools');
+                    if (dev) dev.classList.remove('hidden');
+                    const copyLogout = document.getElementById('copy-logout-uri');
+                    copyLogout?.addEventListener('click', function () {
+                        try { navigator.clipboard.writeText(oktaAuth.options.redirectUri); alert('Copied: ' + oktaAuth.options.redirectUri); } catch (_) { }
+                    });
+                    const addCopyHandler = (btnId, idpKey) => {
+                        const btn = document.getElementById(btnId);
+                        btn?.addEventListener('click', async function () {
+                            try {
+                                const cfg = oktaAuth.options;
+                                const params = await oktaAuth.token.prepareTokenParams({ responseType: 'code', scopes: cfg.scopes });
+                                const url = new URL(cfg.issuer.replace(/\/$/, '') + '/v1/authorize');
+                                url.searchParams.set('client_id', cfg.clientId);
+                                url.searchParams.set('response_type', 'code');
+                                url.searchParams.set('scope', cfg.scopes.join(' '));
+                                url.searchParams.set('redirect_uri', cfg.redirectUri);
+                                url.searchParams.set('state', params.state);
+                                url.searchParams.set('code_challenge_method', 'S256');
+                                url.searchParams.set('code_challenge', params.codeChallenge);
+                                url.searchParams.set('prompt', 'login');
+                                const idp = IDP_IDS[idpKey];
+                                if (idp) url.searchParams.set('idp', idp);
+                                const authUrl = url.toString();
+                                await navigator.clipboard.writeText(authUrl);
+                                alert('Authorize URL copied to clipboard:\n' + authUrl);
+                            } catch (e) {
+                                alert('Failed to build/copy URL: ' + (e.message || e.toString()));
+                            }
+                        });
+                    };
+                    addCopyHandler('copy-authorize-google', 'google');
+                    addCopyHandler('copy-authorize-apple', 'apple');
+                    addCopyHandler('copy-authorize-github', 'github');
+                    addCopyHandler('copy-authorize-orcid', 'orcid');
+                }
+            } catch (_) { }
         }
 
         // 5. Display success message
         function showAuthSuccess(userIdentifier) {
             document.getElementById('widget-container').style.display = 'none';
+            // Reveal the Get Started panel and scroll to it
+            try {
+                const gs = document.getElementById('get-started');
+                if (gs) gs.classList.remove('hidden');
+            } catch (e) { console.warn('Could not reveal get-started section:', e); }
+            updateAuthStatus(userIdentifier);
             const modal = document.createElement('div');
             modal.className = 'auth-modal';
             modal.innerHTML = `
@@ -448,54 +383,135 @@
                     <h3>🎉 Authentication Successful!</h3>
                     <p><strong>Welcome:</strong> ${userIdentifier}</p>
                     <p>You can now download CraftX.py!</p>
-                    <button onclick="this.parentElement.parentElement.remove()" class="btn">Continue</button>
-                    <button onclick="logout()" class="btn" style="background: #dc3545; margin-left: 0.5rem;">Logout</button>
+                    <button onclick="document.getElementById('get-started')?.scrollIntoView({behavior:'smooth'}); this.parentElement.parentElement.remove()" class="btn">Continue</button>
+                    <button onclick="logout()" class="btn btn-danger ml-05">Logout</button>
                 </div>
             `;
             document.body.appendChild(modal);
         }
 
         // 6. Logout function
-        function logout() {
-            oktaAuth.signOut();
-        }
-
-        // 7. Clear authentication state (for debugging)
-    function clearAuthState() {
+        async function logout() {
             try {
-                // Clear Okta tokens
-                oktaAuth.tokenManager.clear();
-        try { oktaAuth.transactionManager.clear(); } catch (e) { console.log('transactionManager.clear err', e); }
-                // Clear browser storage
-                localStorage.clear();
-                sessionStorage.clear();
-                // Clear any cookies (best effort)
-                document.cookie.split(";").forEach(function (c) {
-                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                // Optional UI reset before redirect (do not clear tokens yet; needed for id_token_hint)
+                try { document.getElementById('auth-status')?.classList.add('hidden'); } catch (e) { }
+                try { const wc = document.getElementById('widget-container'); if (wc) wc.style.display = ''; } catch (e) { }
+                try { document.querySelector('.auth-modal')?.remove(); } catch (e) { }
+
+                const postLogoutRedirectUri = (oktaAuth && oktaAuth.options && oktaAuth.options.redirectUri)
+                    ? oktaAuth.options.redirectUri
+                    : (function () {
+                        const origin = window.location.origin;
+                        let path = window.location.pathname;
+                        if (!path.endsWith('/')) {
+                            path = path.substring(0, path.lastIndexOf('/') + 1);
+                        }
+                        return origin + path;
+                    })();
+
+                // Fetch id_token first so we can safely clear tokens pre-redirect if needed
+                let idTokenStr = undefined;
+                try {
+                    const idt = await oktaAuth.tokenManager.get('idToken');
+                    idTokenStr = idt && idt.idToken;
+                } catch (_) { }
+
+                // Request Okta logout with redirect back; include id_token to ensure session termination
+                oktaAuth.signOut({ postLogoutRedirectUri, idToken: idTokenStr, clearTokensBeforeRedirect: true }).catch((err) => {
+                    const msg = (err && (err.errorSummary || err.message || String(err))) || '';
+                    if (String(msg).includes('post_logout_redirect_uri')) {
+                        alert('Logout redirect not allowed by Okta. Add this URL to your Okta app\'s "Logout redirect URIs":\n\n' + postLogoutRedirectUri + '\n\nOkta Admin → Applications → Your SPA → General → Logout redirect URIs.');
+                    }
+                    // Fallback: clear local state and navigate
+                    try { oktaAuth.tokenManager.clear(); } catch (e) { }
+                    try { oktaAuth.transactionManager.clear(); } catch (e) { }
+                    try { localStorage.removeItem('okta-token-storage'); } catch (e) { }
+                    // Try a non-redirect logout (may land on Okta page), then go back
+                    try { oktaAuth.signOut().catch(() => { }); } catch (e) { }
+                    setTimeout(() => { window.location.href = postLogoutRedirectUri; }, 300);
                 });
-                alert('Auth state cleared! Reloading page...');
-                location.reload();
-            } catch (err) {
-                console.error('Clear auth state error:', err);
-                alert('Error clearing auth state: ' + err.message);
+            } catch (e) {
+                window.location.reload();
             }
         }
 
-        // 8. Add debug button (temporary)
-        window.addEventListener('load', function () {
-            setTimeout(function () {
-                try {
-                    const debugBtn = document.createElement('button');
-                    debugBtn.textContent = 'Clear Auth State (Debug)';
-                    debugBtn.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 9999; padding: 8px; background: #ff4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;';
-                    debugBtn.onclick = clearAuthState;
-                    document.body.appendChild(debugBtn);
-                    console.log('Debug button added successfully');
-                } catch (err) {
-                    console.error('Failed to add debug button:', err);
-                }
-            }, 2000);
-        });
+        // 6b. Dev-only local logout (does not end Okta SSO, just clears local state)
+        function localLogout() {
+            try { oktaAuth.tokenManager.clear(); } catch (e) { }
+            try { oktaAuth.transactionManager.clear(); } catch (e) { }
+            try { localStorage.removeItem('okta-token-storage'); } catch (e) { }
+            try {
+                // Clear common Okta PKCE temp storage keys
+                Object.keys(sessionStorage).forEach(k => { if (k.startsWith('okta-')) sessionStorage.removeItem(k); });
+            } catch (e) { }
+            // Navigate back to app base
+            const origin = window.location.origin;
+            let path = window.location.pathname;
+            if (!path.endsWith('/')) {
+                path = path.substring(0, path.lastIndexOf('/') + 1);
+            }
+            window.location.href = origin + path;
+        }
+
+        // 7. Update header auth status and show a persistent logout
+        function updateAuthStatus(display) {
+            const el = document.getElementById('auth-status');
+            if (!el) return;
+            el.classList.remove('hidden');
+            const isLocal = window.location.hostname === 'localhost';
+            const extra = isLocal ? ` · <a class="logout" href="#" onclick="localLogout(); return false;">Local logout</a>` : '';
+            el.innerHTML = `Signed in as <strong>${display}</strong> · <a class="logout" href="#" onclick="logout(); return false;">Logout</a>${extra}`;
+        }
+
+        // Copy helper for Get Started commands
+        function copyCmd(id) {
+            try {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const text = el.textContent;
+                navigator.clipboard.writeText(text).then(() => {
+                    console.log('Copied:', text);
+                }).catch(err => {
+                    console.warn('Clipboard failed:', err);
+                });
+            } catch (e) {
+                console.warn('copyCmd error:', e);
+            }
+        }
+
+        // Prefer alias for display (nickname/preferred_username/displayName/alias > email > name)
+        function resolveDisplayName(source) {
+            if (!source) return 'Signed in';
+            return (
+                source.nickname ||
+                source.preferred_username ||
+                source.displayName ||
+                source.alias ||
+                source.email ||
+                source.name ||
+                'Signed in'
+            );
+        }
+
+        // Kick off a redirect to a specific IdP
+        function loginWithIdp(key) {
+            const idp = IDP_IDS[key];
+            if (!idp) {
+                alert('Set the ' + key + ' IdP ID in IDP_IDS at the top of the script.');
+                return;
+            }
+            try { oktaAuth.tokenManager.clear(); } catch (e) { }
+            try { oktaAuth.transactionManager.clear(); } catch (e) { }
+            oktaAuth.token.getWithRedirect({
+                responseType: 'code',
+                scopes: ['openid', 'profile', 'email'],
+                prompt: 'login',
+                authorizationParams: { idp }
+            }).catch(function (err) {
+                console.error('IdP redirect failed:', err);
+                alert('IdP redirect failed: ' + (err.errorSummary || err.message || err.toString()));
+            });
+        }
     </script>
 </body>
 
