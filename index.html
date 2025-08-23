@@ -284,39 +284,88 @@
         </p>
     </footer>
 
-    <script src="https://global.oktacdn.com/okta-signin-widget/7.4.0/js/okta-sign-in.min.js"
-        type="text/javascript"></script>
-    <link href="https://global.oktacdn.com/okta-signin-widget/7.4.0/css/okta-sign-in.min.css" type="text/css"
-        rel="stylesheet" />
+    <script src="https://global.oktacdn.com/okta-auth-js/7.0.0/okta-auth-js.min.js"></script>
 
     <script>
-        // 1. Okta Configuration (Ultra Simplified)
-        const oktaConfig = {
-            baseUrl: "https://integrator-1438440.okta.com",
-            clientId: "0oauoqj5bfJFAoN3x697",
-            redirectUri: "https://davidanderson01.github.io/CraftX.py/",
-            authParams: {
-                scopes: ['openid', 'profile', 'email']
+        // 1. Okta Auth SDK Configuration
+        const oktaAuth = new OktaAuth({
+            issuer: 'https://integrator-1438440.okta.com/oauth2/default',
+            clientId: '0oauoqj5bfJFAoN3x697',
+            redirectUri: 'https://davidanderson01.github.io/CraftX.py/',
+            scopes: ['openid', 'profile', 'email'],
+            pkce: true
+        });
+
+        // 2. Check if user is already authenticated
+        oktaAuth.isAuthenticated().then(function(isAuthenticated) {
+            if (isAuthenticated) {
+                // User is already logged in
+                oktaAuth.getUser().then(function(user) {
+                    showAuthSuccess(user.name || user.preferred_username || user.email);
+                });
+            } else {
+                // Show login form
+                showLoginForm();
             }
-        };
+        });
 
-        // 2. Create and render the widget
-        const signInWidget = new OktaSignIn(oktaConfig);
+        // 3. Handle the callback after redirect
+        if (oktaAuth.isLoginRedirect()) {
+            oktaAuth.handleLoginRedirect().then(function() {
+                oktaAuth.getUser().then(function(user) {
+                    showAuthSuccess(user.name || user.preferred_username || user.email);
+                });
+            }).catch(function(err) {
+                console.error('Login redirect error:', err);
+                showLoginForm();
+            });
+        }
 
-        signInWidget.renderEl({ el: '#widget-container' },
-            (res) => {
-                if (res.status === 'SUCCESS') {
-                    const userIdentifier = res.user.profile.firstName ? `${res.user.profile.firstName} ${res.user.profile.lastName}` : res.user.profile.login;
-                    showAuthSuccess(userIdentifier);
-                }
-            },
-            (err) => {
-                console.error('Authentication error:', err);
-                console.error('Full error details:', JSON.stringify(err, null, 2));
-            }
-        );
+        // 4. Show login form
+        function showLoginForm() {
+            const container = document.getElementById('widget-container');
+            container.innerHTML = `
+                <div style="max-width: 400px; margin: 0 auto; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <h3 style="text-align: center; margin-bottom: 1.5rem; color: #333;">Sign in to CraftX.py</h3>
+                    <form id="login-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <input type="email" id="username" placeholder="Email" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                        <input type="password" id="password" placeholder="Password" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                        <button type="submit" style="padding: 0.75rem; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer;">Sign In</button>
+                    </form>
+                    <div style="text-align: center; margin-top: 1rem;">
+                        <button id="oauth-login" style="padding: 0.75rem 1.5rem; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">Sign in with OAuth</button>
+                    </div>
+                </div>
+            `;
 
-        // 3. Display a success message
+            // Handle form submission
+            document.getElementById('login-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                oktaAuth.signInWithCredentials({
+                    username: username,
+                    password: password
+                }).then(function(transaction) {
+                    if (transaction.status === 'SUCCESS') {
+                        oktaAuth.getUser().then(function(user) {
+                            showAuthSuccess(user.name || user.preferred_username || user.email);
+                        });
+                    }
+                }).catch(function(err) {
+                    console.error('Login error:', err);
+                    alert('Login failed: ' + (err.errorSummary || err.message));
+                });
+            });
+
+            // Handle OAuth login
+            document.getElementById('oauth-login').addEventListener('click', function() {
+                oktaAuth.signInWithRedirect();
+            });
+        }
+
+        // 5. Display success message
         function showAuthSuccess(userIdentifier) {
             document.getElementById('widget-container').style.display = 'none';
             const modal = document.createElement('div');
@@ -327,9 +376,15 @@
                     <p><strong>Welcome:</strong> ${userIdentifier}</p>
                     <p>You can now download CraftX.py!</p>
                     <button onclick="this.parentElement.parentElement.remove()" class="btn">Continue</button>
+                    <button onclick="logout()" class="btn" style="background: #dc3545; margin-left: 0.5rem;">Logout</button>
                 </div>
             `;
             document.body.appendChild(modal);
+        }
+
+        // 6. Logout function
+        function logout() {
+            oktaAuth.signOut();
         }
     </script>
 </body>
