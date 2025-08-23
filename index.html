@@ -308,6 +308,12 @@
             });
 
             console.log('Using redirectUri:', dynamicRedirectUri);
+            try {
+                window.oktaAuth.authStateManager.start();
+                console.log('Okta authStateManager started');
+            } catch (e) {
+                console.warn('Failed to start authStateManager', e);
+            }
         })();
 
         // 2. Check if user is already authenticated
@@ -334,6 +340,7 @@
                 });
             }).catch(function (err) {
                 console.error('Login redirect error:', err);
+                alert('Login redirect error: ' + (err.errorSummary || err.message || err.toString()));
                 showLoginForm();
             });
         }
@@ -381,20 +388,17 @@
             // Handle OAuth login
             document.getElementById('oauth-login').addEventListener('click', function () {
                 try {
-                    console.log('OAuth login clicked - clearing tokens');
-                    
-                    // Clear any existing tokens
-                    try {
-                        oktaAuth.tokenManager.clear();
-                    } catch (clearErr) {
-                        console.log('Token clear failed (may be normal):', clearErr);
-                    }
-                    
-                    console.log('Starting OAuth redirect...');
-                    
-                    // Use the SDK method
-                    oktaAuth.signInWithRedirect().catch(function(err) {
-                        console.error('SDK redirect failed:', err);
+                    console.log('OAuth login clicked - clearing tokens & transactions');
+                    try { oktaAuth.tokenManager.clear(); } catch (e) { console.log('tokenManager.clear err', e); }
+                    try { oktaAuth.transactionManager.clear(); } catch (e) { console.log('transactionManager.clear err', e); }
+
+                    console.log('Starting OAuth redirect with explicit authorization params...');
+                    oktaAuth.token.getWithRedirect({
+                        responseType: 'code',
+                        scopes: ['openid', 'profile', 'email'],
+                        // prompt: 'login' // uncomment to force login every time
+                    }).catch(function(err) {
+                        console.error('getWithRedirect failed:', err);
                         alert('OAuth redirect failed: ' + (err.errorSummary || err.message || err.toString()));
                     });
                 } catch (err) {
@@ -413,14 +417,14 @@
                         redirectUri: oktaAuth.options.redirectUri,
                         scopes: oktaAuth.options.scopes || ['openid', 'profile', 'email']
                     };
-                    
+
                     console.log('Okta Configuration:', config);
                     console.log('Full oktaAuth object:', oktaAuth);
-                    
+
                     // Test if we can reach the issuer
                     const discoveryUrl = config.issuer + '/.well-known/openid_configuration';
                     console.log('Testing discovery URL:', discoveryUrl);
-                    
+
                     fetch(discoveryUrl)
                         .then(response => {
                             if (!response.ok) {
@@ -466,16 +470,17 @@
         }
 
         // 7. Clear authentication state (for debugging)
-        function clearAuthState() {
+    function clearAuthState() {
             try {
                 // Clear Okta tokens
                 oktaAuth.tokenManager.clear();
+        try { oktaAuth.transactionManager.clear(); } catch (e) { console.log('transactionManager.clear err', e); }
                 // Clear browser storage
                 localStorage.clear();
                 sessionStorage.clear();
                 // Clear any cookies (best effort)
-                document.cookie.split(";").forEach(function(c) { 
-                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+                document.cookie.split(";").forEach(function (c) {
+                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
                 });
                 alert('Auth state cleared! Reloading page...');
                 location.reload();
