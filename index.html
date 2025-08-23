@@ -308,12 +308,6 @@
             });
 
             console.log('Using redirectUri:', dynamicRedirectUri);
-            try {
-                window.oktaAuth.authStateManager.start();
-                console.log('Okta authStateManager started');
-            } catch (e) {
-                console.warn('Failed to start authStateManager', e);
-            }
         })();
 
         // 2. Check if user is already authenticated
@@ -407,42 +401,39 @@
                 }
             });
 
-            // Handle test config button
-            document.getElementById('test-config').addEventListener('click', function () {
+            // Handle test config button (no network): prepare PKCE params and log authorization URL
+            document.getElementById('test-config').addEventListener('click', async function () {
                 try {
-                    // Access the configuration directly from the oktaAuth object
-                    const config = {
-                        issuer: oktaAuth.options.issuer,
-                        clientId: oktaAuth.options.clientId,
-                        redirectUri: oktaAuth.options.redirectUri,
-                        scopes: oktaAuth.options.scopes || ['openid', 'profile', 'email']
-                    };
+                    const cfg = oktaAuth.options;
+                    console.log('Okta Configuration:', {
+                        issuer: cfg.issuer,
+                        clientId: cfg.clientId,
+                        redirectUri: cfg.redirectUri,
+                        scopes: cfg.scopes
+                    });
 
-                    console.log('Okta Configuration:', config);
-                    console.log('Full oktaAuth object:', oktaAuth);
+                    // Prepare token params locally (generates PKCE verifier/challenge)
+                    const params = await oktaAuth.token.prepareTokenParams({
+                        responseType: 'code',
+                        scopes: cfg.scopes
+                    });
+                    console.log('Prepared token params:', params);
 
-                    // Test if we can reach the issuer
-                    const discoveryUrl = config.issuer + '/.well-known/openid_configuration';
-                    console.log('Testing discovery URL:', discoveryUrl);
+                    // Construct an authorize URL for visual verification
+                    const url = new URL(cfg.issuer.replace(/\/$/, '') + '/v1/authorize');
+                    url.searchParams.set('client_id', cfg.clientId);
+                    url.searchParams.set('response_type', 'code');
+                    url.searchParams.set('scope', cfg.scopes.join(' '));
+                    url.searchParams.set('redirect_uri', cfg.redirectUri);
+                    url.searchParams.set('state', params.state);
+                    url.searchParams.set('code_challenge_method', 'S256');
+                    url.searchParams.set('code_challenge', params.codeChallenge);
 
-                    fetch(discoveryUrl)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('HTTP ' + response.status + ': ' + response.statusText);
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log('Okta Discovery Document:', data);
-                            alert('✅ Okta configuration test passed!\n\nIssuer: ' + config.issuer + '\nClient ID: ' + config.clientId + '\nRedirect URI: ' + config.redirectUri + '\nScopes: ' + config.scopes.join(', ') + '\n\nDiscovery endpoint is reachable. Check console for full details.');
-                        })
-                        .catch(err => {
-                            console.error('Config test failed:', err);
-                            alert('❌ Configuration test failed: ' + err.message + '\n\nCheck console for more details.');
-                        });
+                    console.log('Computed authorize URL:', url.toString());
+                    alert('✅ Local config looks good.\n\nIssuer: ' + cfg.issuer + '\nRedirect URI: ' + cfg.redirectUri + '\n\nCheck console for PKCE params and the computed authorize URL.\nIf a 400 persists, make sure this exact redirect_uri is whitelisted in your Okta SPA app.');
                 } catch (err) {
                     console.error('Test config error:', err);
-                    alert('❌ Test config error: ' + err.message);
+                    alert('❌ Test config error: ' + (err.message || err.toString()));
                 }
             });
         }
