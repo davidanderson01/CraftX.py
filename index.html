@@ -356,8 +356,10 @@
         </p>
     </footer>
 
-    <script src="https://global.oktacdn.com/okta-signin-widget/7.4.0/js/okta-sign-in.min.js" type="text/javascript"></script>
-    <link href="https://global.oktacdn.com/okta-signin-widget/7.4.0/css/okta-sign-in.min.css" type="text/css" rel="stylesheet" />
+    <script src="https://global.oktacdn.com/okta-signin-widget/7.4.0/js/okta-sign-in.min.js"
+        type="text/javascript"></script>
+    <link href="https://global.oktacdn.com/okta-signin-widget/7.4.0/css/okta-sign-in.min.css" type="text/css"
+        rel="stylesheet" />
 
     <script>
         // 1. Okta Configuration
@@ -414,7 +416,7 @@
         function showAuthSuccess(userIdentifier) {
             // Hide the widget after successful login
             document.getElementById('oauth-buttons').style.display = 'none';
-            
+
             const modal = document.createElement('div');
             modal.className = 'auth-modal';
             modal.innerHTML = `
