@@ -78,9 +78,11 @@ footer {
 .btn-oauth {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  min-height: 44px;
+  width: 100%;
   background: var(--light);
   border: 1px solid #ccc;
   border-radius: var(--radius);
@@ -89,11 +91,7 @@ footer {
   transition: background 0.2s, border-color 0.2s;
 }
 
-.btn-oauth:hover {
-  background: var(--accent);
-  color: var(--light);
-  border-color: var(--accent);
-}
+.btn-oauth:hover { background: #f6f8fa; border-color: #bfc7d1; }
 
 .btn-oauth svg {
   width: 20px;
@@ -103,26 +101,53 @@ footer {
 }
 
 /* Text-based icon fallback to ensure visibility without SVG */
-.btn-oauth .icon {
+/* Legacy badge style (kept if any spans remain) */
+.btn-oauth span.icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 24px;
   height: 24px;
-  margin-right: 0.25rem;
-  border: 2px solid currentColor;
+  margin-right: 0.5rem;
   border-radius: 50%;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1;
-  font-weight: 600;
-  background-color: #f0f0f0;
+  font-weight: 700;
+  background-color: rgba(0,0,0,0.06);
+  color: inherit;
+}
+/* Actual logo images */
+.btn-oauth img.icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 0.5rem;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 /* Brand tints for icon badges */
-.btn-google .icon { color: #4285F4; background-color: #e9f1ff; }
-.btn-apple .icon { color: #000000; background-color: #f2f2f2; }
-.btn-github .icon { color: #24292e; background-color: #eef0f2; }
-.btn-orcid .icon { color: #A6CE39; background-color: #f3fae8; }
+/* Brand button styles */
+.btn-google { background: #fff; color: #3c4043; border-color: #dadce0; }
+.btn-google:hover { background: #f8f9fa; border-color: #dadce0; }
+.btn-oauth svg.icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 0.5rem;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.btn-apple { background: #000; color: #fff; border-color: #000; }
+.btn-apple:hover { background: #111; border-color: #111; box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
+.btn-apple .icon { background-color: rgba(255,255,255,0.2); color: #fff; }
+
+.btn-github { background: #24292e; color: #fff; border-color: #24292e; }
+.btn-github:hover { background: #1f2428; border-color: #1f2428; box-shadow: 0 0 0 3px rgba(36,41,46,0.15); }
+.btn-github .icon { background-color: rgba(255,255,255,0.2); color: #fff; }
+
+.btn-orcid { background: #A6CE39; color: #fff; border-color: #A6CE39; }
+.btn-orcid:hover { background: #8fba24; border-color: #8fba24; box-shadow: 0 0 0 3px rgba(166,206,57,0.2); }
+.btn-orcid .icon { background-color: rgba(255,255,255,0.2); color: #fff; }
 
 .btn-oauth.disabled {
   opacity: 0.6;
