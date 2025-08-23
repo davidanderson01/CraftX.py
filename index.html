@@ -290,53 +290,35 @@
         rel="stylesheet" />
 
     <script>
-        // 1. Okta Configuration
+        // 1. Okta Configuration (Ultra Simplified)
         const oktaConfig = {
             baseUrl: "https://integrator-1438440.okta.com",
             clientId: "0oauoqj5bfJFAoN3x697",
-            redirectUri: window.location.origin + window.location.pathname,
+            redirectUri: "https://davidanderson01.github.io/CraftX.py/",
             authParams: {
-                issuer: "https://integrator-1438440.okta.com/oauth2/default",
-                scopes: ['openid', 'profile', 'email'],
-            },
-            features: {
-                registration: true // Enable self-service registration
-            },
-            i18n: {
-                en: {
-                    'primaryauth.title': 'Sign in to CraftX.py',
-                    'primaryauth.submit': 'Sign In',
-                    'registration.title': 'Create an account',
-                    'registration.submit': 'Register'
-                }
+                scopes: ['openid', 'profile', 'email']
             }
         };
 
-        // 2. Create an instance of the Okta Sign-In Widget
+        // 2. Create and render the widget
         const signInWidget = new OktaSignIn(oktaConfig);
 
-        // 3. Render the widget
-        signInWidget.renderEl({
-            el: '#widget-container'
-        }, function (res) {
-            // 4. Handle successful authentication
-            if (res.status === 'SUCCESS') {
-                console.log('Successfully authenticated!', res);
-                const userIdentifier = res.user.profile.firstName ? `${res.user.profile.firstName} ${res.user.profile.lastName}` : res.user.profile.login;
-                showAuthSuccess(userIdentifier);
-                // You can redirect to a protected page or update the UI further
-                // For example: signInWidget.tokenManager.add('id_token', res.tokens.idToken);
+        signInWidget.renderEl({ el: '#widget-container' },
+            (res) => {
+                if (res.status === 'SUCCESS') {
+                    const userIdentifier = res.user.profile.firstName ? `${res.user.profile.firstName} ${res.user.profile.lastName}` : res.user.profile.login;
+                    showAuthSuccess(userIdentifier);
+                }
+            },
+            (err) => {
+                console.error('Authentication error:', err);
+                console.error('Full error details:', JSON.stringify(err, null, 2));
             }
-        }, function (err) {
-            // 5. Handle authentication errors
-            console.error('Authentication error:', err);
-        });
+        );
 
-        // 6. Display a success message
+        // 3. Display a success message
         function showAuthSuccess(userIdentifier) {
-            // Hide the widget after successful login
             document.getElementById('widget-container').style.display = 'none';
-
             const modal = document.createElement('div');
             modal.className = 'auth-modal';
             modal.innerHTML = `
