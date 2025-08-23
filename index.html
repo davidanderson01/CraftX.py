@@ -356,100 +356,65 @@
         </p>
     </footer>
 
-    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js"></script>
+    <script src="https://global.oktacdn.com/okta-signin-widget/7.4.0/js/okta-sign-in.min.js" type="text/javascript"></script>
+    <link href="https://global.oktacdn.com/okta-signin-widget/7.4.0/css/okta-sign-in.min.css" type="text/css" rel="stylesheet" />
+
     <script>
-        // 1. Auth0 Configuration
-        // IMPORTANT: Replace these with your actual Auth0 application details.
-        // You can get these from your Auth0 dashboard.
-        const auth0Config = {
-            domain: "YOUR_AUTH0_DOMAIN", // e.g., dev-12345.us.auth0.com
-            clientId: "YOUR_AUTH0_CLIENT_ID",
-            authorizationParams: {
-                // This should match the "Allowed Callback URLs" in your Auth0 app settings
-                redirect_uri: window.location.origin + window.location.pathname
+        // 1. Okta Configuration
+        const oktaConfig = {
+            baseUrl: "https://integrator-1438440.okta.com",
+            clientId: "0oau9ecw5cydP8f7y697",
+            redirectUri: window.location.origin + window.location.pathname,
+            authParams: {
+                issuer: "https://integrator-1438440.okta.com/oauth2/default",
+                scopes: ['openid', 'profile', 'email'],
+            },
+            features: {
+                idpDiscovery: true,
+                registration: true // Enable self-service registration
+            },
+            idps: [
+                // Replace these with the actual IDP IDs from your Okta dashboard
+                // { 'type': 'GOOGLE', 'id': 'YOUR_GOOGLE_IDP_ID_FROM_OKTA' },
+                // { 'type': 'GITHUB', 'id': 'YOUR_GITHUB_IDP_ID_FROM_OKTA' },
+                // { 'type': 'APPLE', 'id': 'YOUR_APPLE_IDP_ID_FROM_OKTA' },
+                // { 'type': 'ORCID', 'id': 'YOUR_ORCID_IDP_ID_FROM_OKTA' }
+            ],
+            i18n: {
+                en: {
+                    'primaryauth.title': 'Sign in to CraftX.py',
+                    'primaryauth.submit': 'Sign In',
+                    'registration.title': 'Create an account',
+                    'registration.submit': 'Register'
+                }
             }
         };
 
-        let auth0Client = null;
+        // 2. Create an instance of the Okta Sign-In Widget
+        const signInWidget = new OktaSignIn(oktaConfig);
 
-        // 2. Initialize Auth0 on page load
-        window.addEventListener('load', async () => {
-            try {
-                auth0Client = await auth0.createAuth0Client(auth0Config);
-
-                // 3. Handle the redirect callback after a user logs in
-                if (location.search.includes("code=") && location.search.includes("state=")) {
-                    await auth0Client.handleRedirectCallback();
-                    // Clean the URL
-                    window.history.replaceState({}, document.title, "/");
-                }
-
-                // 4. Update the UI based on authentication state
-                await updateUI();
-
-                // 5. Add event listeners to the OAuth buttons
-                document.querySelectorAll('.btn-oauth').forEach(btn => {
-                    btn.addEventListener('click', async (e) => {
-                        const provider = e.currentTarget.dataset.provider;
-                        // Note: In Auth0, you configure "Connections". The name for Google is typically 'google-oauth2'.
-                        const connection = provider === 'google' ? 'google-oauth2' : provider;
-                        await login(connection);
-                    });
-                });
-
-                // Add event listener for the passkey button
-                document.getElementById('passkey-btn').addEventListener('click', handlePasskeyAuth);
-
-            } catch (err) {
-                console.error("Error initializing Auth0 client", err);
-                if (err.message.includes("Please provide a valid domain")) {
-                    alert("Authentication is not configured. Please replace 'YOUR_AUTH0_DOMAIN' and 'YOUR_AUTH0_CLIENT_ID' in index.html.");
-                }
+        // 3. Render the widget
+        signInWidget.renderEl({
+            el: '#oauth-buttons' // Render the widget in the same container as the old buttons
+        }, function (res) {
+            // 4. Handle successful authentication
+            if (res.status === 'SUCCESS') {
+                console.log('Successfully authenticated!', res);
+                const userIdentifier = res.user.profile.firstName ? `${res.user.profile.firstName} ${res.user.profile.lastName}` : res.user.profile.login;
+                showAuthSuccess(userIdentifier);
+                // You can redirect to a protected page or update the UI further
+                // For example: signInWidget.tokenManager.add('id_token', res.tokens.idToken);
             }
+        }, function (err) {
+            // 5. Handle authentication errors
+            console.error('Authentication error:', err);
         });
 
-        // 6. Login Function
-        const login = async (connection) => {
-            if (!auth0Client) return;
-            try {
-                // This will redirect the user to the Auth0 login page
-                await auth0Client.loginWithRedirect({
-                    authorizationParams: {
-                        connection: connection
-                    }
-                });
-            } catch (err) {
-                console.error("Login failed", err);
-            }
-        };
-
-        // 7. Logout Function (optional, can be linked to a new logout button)
-        const logout = () => {
-            if (!auth0Client) return;
-            auth0Client.logout({
-                logoutParams: {
-                    returnTo: window.location.origin
-                }
-            });
-        };
-
-        // 8. Update UI based on login status
-        const updateUI = async () => {
-            if (!auth0Client) return;
-            const isAuthenticated = await auth0Client.isAuthenticated();
-
-            if (isAuthenticated) {
-                const user = await auth0Client.getUser();
-                console.log("Authenticated user:", user);
-                showAuthSuccess(user.name || user.email);
-                // You could hide the sign-in buttons and show user info here
-            } else {
-                console.log("User is not authenticated.");
-            }
-        };
-
-        // 9. Display a success message
+        // 6. Display a success message
         function showAuthSuccess(userIdentifier) {
+            // Hide the widget after successful login
+            document.getElementById('oauth-buttons').style.display = 'none';
+            
             const modal = document.createElement('div');
             modal.className = 'auth-modal';
             modal.innerHTML = `
@@ -462,74 +427,6 @@
             `;
             document.body.appendChild(modal);
         }
-
-        // 10. Handle Passkey button
-        async function handlePasskeyAuth() {
-            // To implement this, you would enable "Passwordless" authentication in your
-            // Auth0 dashboard and then trigger it here.
-            alert("Passkey authentication should be configured as a passwordless connection in Auth0.");
-        }
-
-        // 1. Okta Configuration
-        // IMPORTANT: Replace these with your actual Okta application details.
-        // You can get these from your Okta Developer Console.
-        const oktaConfig = {
-            baseUrl: "https://integrator-1438440.okta.com",
-            clientId: "0oau9ecw5cydP8f7y697",
-            redirectUri: window.location.origin + window.location.pathname,
-            authParams: {
-                issuer: "https://integrator-1438440.okta.com/oauth2/default", // Use the 'default' auth server for dev accounts
-                scopes: ['openid', 'profile', 'email'],
-            },
-            features: {
-                idpDiscovery: true
-            },
-            idpDiscovery: {
-                requestContext: window.location.origin + '/login'
-            },
-            idps: [
-                { 'type': 'GOOGLE', 'id': 'YOUR_GOOGLE_IDP_ID_FROM_OKTA' },
-                { 'type': 'GITHUB', 'id': 'YOUR_GITHUB_IDP_ID_FROM_OKTA' },
-                { 'type': 'APPLE', 'id': 'YOUR_APPLE_IDP_ID_FROM_OKTA' },
-                { 'type': 'ORCID', 'id': 'YOUR_ORCID_IDP_ID_FROM_OKTA' }
-            ]
-        };
-
-        // 2. Initialize the Okta Sign-In Widget
-        // Note: This example uses the Okta Sign-In Widget for authentication.
-        // You need to include the Okta Sign-In Widget script in your HTML for this to work.
-        // <script src="https://your-okta-domain.com/js/sdk/okta-signin-widget.min.js" type="text/javascript"></script>
-
-    // 3. Create an instance of the Okta Sign-In Widget
-    // const widget = new OktaSignIn({
-    // el: '#widget-container',
-    // logo: 'path/to/your/logo.png',
-    // features: {
-    // registration: true
-    // },
-    // i18n: {
-    // en: {
-    // 'primaryauth.title': 'Sign in to CraftX.py',
-    // 'primaryauth.submit': 'Sign In',
-    // 'registration.title': 'Create an account',
-    // 'registration.submit': 'Register'
-    // }
-    // }
-    // });
-
-    // 4. Render the widget
-    // widget.renderEl({ el: '#widget-container' });
-
-    // 5. Handle successful authentication
-    // widget.on('success', function (res) {
-    // console.log('Successfully authenticated!', res);
-    // // You can redirect the user or update the UI here
-    // });
-
-    // 6. Handle authentication errors
-    // widget.on('error', function (err) {
-    // console.error('Authentication error:', err);
-    // });
     </script>
 </body>
 
