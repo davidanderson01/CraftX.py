@@ -293,23 +293,15 @@
         // 1. Okta Configuration
         const oktaConfig = {
             baseUrl: "https://integrator-1438440.okta.com",
-            clientId: "0oau9ecw5cydP8f7y697",
+            clientId: "0oauoqj5bfJFAoN3x697",
             redirectUri: window.location.origin + window.location.pathname,
             authParams: {
                 issuer: "https://integrator-1438440.okta.com/oauth2/default",
                 scopes: ['openid', 'profile', 'email'],
             },
             features: {
-                idpDiscovery: true,
                 registration: true // Enable self-service registration
             },
-            idps: [
-                // Replace these with the actual IDP IDs from your Okta dashboard
-                // { 'type': 'GOOGLE', 'id': 'YOUR_GOOGLE_IDP_ID_FROM_OKTA' },
-                // { 'type': 'GITHUB', 'id': 'YOUR_GITHUB_IDP_ID_FROM_OKTA' },
-                // { 'type': 'APPLE', 'id': 'YOUR_APPLE_IDP_ID_FROM_OKTA' },
-                // { 'type': 'ORCID', 'id': 'YOUR_ORCID_IDP_ID_FROM_OKTA' }
-            ],
             i18n: {
                 en: {
                     'primaryauth.title': 'Sign in to CraftX.py',
@@ -343,7 +335,7 @@
         // 6. Display a success message
         function showAuthSuccess(userIdentifier) {
             // Hide the widget after successful login
-            document.getElementById('oauth-buttons').style.display = 'none';
+            document.getElementById('widget-container').style.display = 'none';
 
             const modal = document.createElement('div');
             modal.className = 'auth-modal';
