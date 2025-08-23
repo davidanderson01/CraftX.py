@@ -288,13 +288,27 @@
 
     <script>
         // 1. Okta Auth SDK Configuration
-        const oktaAuth = new OktaAuth({
-            issuer: 'https://integrator-1438440.okta.com/oauth2/default',
-            clientId: '0oauoqj5bfJFAoN3x697',
-            redirectUri: 'https://davidanderson01.github.io/CraftX.py/',
-            scopes: ['openid', 'profile', 'email'],
-            pkce: true
-        });
+        // Compute redirect URI from the current page so it works on both
+        // craftx.elevatecraft.org and GitHub Pages (repo path).
+        (function () {
+            const origin = window.location.origin; // e.g., https://craftx.elevatecraft.org
+            let path = window.location.pathname;   // e.g., / or /CraftX.py/
+            // Normalize to the base path (end with '/') so the redirect matches an app URI exactly
+            if (!path.endsWith('/')) {
+                path = path.substring(0, path.lastIndexOf('/') + 1);
+            }
+            const dynamicRedirectUri = origin + path; // e.g., https://craftx.elevatecraft.org/ or https://davidanderson01.github.io/CraftX.py/
+
+            window.oktaAuth = new OktaAuth({
+                issuer: 'https://integrator-1438440.okta.com/oauth2/default',
+                clientId: '0oauoqj5bfJFAoN3x697',
+                redirectUri: dynamicRedirectUri,
+                scopes: ['openid', 'profile', 'email'],
+                pkce: true
+            });
+
+            console.log('Using redirectUri:', dynamicRedirectUri);
+        })();
 
         // 2. Check if user is already authenticated
         oktaAuth.isAuthenticated().then(function (isAuthenticated) {
