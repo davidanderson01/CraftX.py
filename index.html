@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://global.oktacdn.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://global.oktacdn.com https://cdnjs.cloudflare.com; img-src 'self' data: https:; font-src 'self' data: https://global.oktacdn.com; connect-src 'self' https://*.github.io https://*.googleapis.com https://api.github.com https://graph.microsoft.com https://appleid.apple.com https://orcid.org https://integrator-1438440.okta.com; form-action 'self' https://appleid.apple.com https://accounts.google.com https://github.com https://login.microsoftonline.com https://orcid.org https://integrator-1438440.okta.com; frame-ancestors 'none';" />
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://global.oktacdn.com https://static.cloudflareinsights.com https://*.okta.com; style-src 'self' 'unsafe-inline' https://global.oktacdn.com https://cdnjs.cloudflare.com https://*.okta.com; img-src 'self' data: https: https://global.oktacdn.com https://*.okta.com; font-src 'self' data: https://global.oktacdn.com https://*.okta.com; connect-src 'self' https://*.github.io https://*.googleapis.com https://api.github.com https://graph.microsoft.com https://appleid.apple.com https://orcid.org https://integrator-1438440.okta.com https://*.okta.com; form-action 'self' https://appleid.apple.com https://accounts.google.com https://github.com https://login.microsoftonline.com https://orcid.org https://integrator-1438440.okta.com;" />
     <title>CraftX.py • Elevate your Python AI</title>
     <style>
         :root {
@@ -297,10 +297,10 @@
         });
 
         // 2. Check if user is already authenticated
-        oktaAuth.isAuthenticated().then(function(isAuthenticated) {
+        oktaAuth.isAuthenticated().then(function (isAuthenticated) {
             if (isAuthenticated) {
                 // User is already logged in
-                oktaAuth.getUser().then(function(user) {
+                oktaAuth.getUser().then(function (user) {
                     showAuthSuccess(user.name || user.preferred_username || user.email);
                 });
             } else {
@@ -311,11 +311,11 @@
 
         // 3. Handle the callback after redirect
         if (oktaAuth.isLoginRedirect()) {
-            oktaAuth.handleLoginRedirect().then(function() {
-                oktaAuth.getUser().then(function(user) {
+            oktaAuth.handleLoginRedirect().then(function () {
+                oktaAuth.getUser().then(function (user) {
                     showAuthSuccess(user.name || user.preferred_username || user.email);
                 });
-            }).catch(function(err) {
+            }).catch(function (err) {
                 console.error('Login redirect error:', err);
                 showLoginForm();
             });
@@ -339,28 +339,28 @@
             `;
 
             // Handle form submission
-            document.getElementById('login-form').addEventListener('submit', function(e) {
+            document.getElementById('login-form').addEventListener('submit', function (e) {
                 e.preventDefault();
                 const username = document.getElementById('username').value;
                 const password = document.getElementById('password').value;
-                
+
                 oktaAuth.signInWithCredentials({
                     username: username,
                     password: password
-                }).then(function(transaction) {
+                }).then(function (transaction) {
                     if (transaction.status === 'SUCCESS') {
-                        oktaAuth.getUser().then(function(user) {
+                        oktaAuth.getUser().then(function (user) {
                             showAuthSuccess(user.name || user.preferred_username || user.email);
                         });
                     }
-                }).catch(function(err) {
+                }).catch(function (err) {
                     console.error('Login error:', err);
                     alert('Login failed: ' + (err.errorSummary || err.message));
                 });
             });
 
             // Handle OAuth login
-            document.getElementById('oauth-login').addEventListener('click', function() {
+            document.getElementById('oauth-login').addEventListener('click', function () {
                 oktaAuth.signInWithRedirect();
             });
         }
