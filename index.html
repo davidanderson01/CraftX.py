@@ -81,6 +81,35 @@
                 <a class="btn" href="https://craftx.elevatecraft.org" target="_blank" rel="noopener">Docs</a>
             </div>
         </div>
+
+        <!-- Full setup wizard (advanced) -->
+        <div id="full-setup" class="card mt-2">
+            <h3>Full setup (platform)</h3>
+            <p>Select a method and your OS. Then copy the one-liner script to prepare a venv, install deps, and launch
+                the UI.</p>
+            <div class="row setup-controls">
+                <div>
+                    <small>Method</small><br />
+                    <button class="btn" id="method-pypi" data-method="pypi">PyPI (module only)</button>
+                    <button class="btn" id="method-github" data-method="github">GitHub (full platform)</button>
+                </div>
+                <div>
+                    <small>OS</small><br />
+                    <button class="btn" id="os-windows" data-os="windows">Windows (PowerShell)</button>
+                    <button class="btn" id="os-unix" data-os="unix">macOS/Linux (bash)</button>
+                </div>
+            </div>
+            <div class="mt-1">
+                <pre id="setup-script" class="code-chip setup-script"></pre>
+                <div class="row setup-copy-row">
+                </div>
+            </div>
+            <div class="row setup-links">
+                    target="_blank" rel="noopener">Download ZIP</a>
+                <a class="btn" href="https://github.com/davidanderson01/CraftX.py" target="_blank" rel="noopener">Open
+                    on GitHub</a>
+            </div>
+        </div>
     </section>
 
     <footer class="container">
@@ -391,6 +420,7 @@
             try {
                 const gs = document.getElementById('get-started');
                 if (gs) gs.classList.remove('hidden');
+                try { initSetupWizard(); } catch (e) { console.warn('setup wizard init failed', e); }
             } catch (e) { console.warn('Could not reveal get-started section:', e); }
             updateAuthStatus(userIdentifier);
             const modal = document.createElement('div');
@@ -508,6 +538,103 @@
                 source.name ||
                 'Signed in'
             );
+        }
+
+        // Build the full setup script based on method + OS
+        function initSetupWizard() {
+            const state = {
+                method: 'github',
+                os: (navigator.platform && navigator.platform.toLowerCase().includes('win')) ? 'windows' : 'windows'
+            };
+            const $ = (id) => document.getElementById(id);
+
+            function getCommands(method, os) {
+                if (os === 'windows') {
+                    if (method === 'pypi') {
+                        return [
+                            '# Create and activate a virtual environment',
+                            'python -m venv .venv',
+                            '.\\.venv\\Scripts\\Activate.ps1',
+                            '',
+                            '# Upgrade pip and install the CraftX.py module',
+                            'python -m pip install -U pip',
+                            'pip install craftxpy',
+                            '',
+                            '# (Optional) Launch the UI if the repo is cloned locally',
+                            'streamlit run assistant_ui/app.py'
+                        ];
+                    } else {
+                        return [
+                            '# Clone the full platform repo',
+                            'git clone https://github.com/davidanderson01/CraftX.py',
+                            'cd CraftX.py',
+                            '',
+                            '# Create and activate venv',
+                            'python -m venv .venv',
+                            '.\\.venv\\Scripts\\Activate.ps1',
+                            '',
+                            '# Install dependencies and launch the UI',
+                            'python -m pip install -U pip',
+                            'pip install -r requirements.txt',
+                            'streamlit run assistant_ui/app.py'
+                        ];
+                    }
+                } else { // unix
+                    if (method === 'pypi') {
+                        return [
+                            '# Create and activate a virtual environment',
+                            'python3 -m venv .venv',
+                            'source .venv/bin/activate',
+                            '',
+                            '# Upgrade pip and install the CraftX.py module',
+                            'python -m pip install -U pip',
+                            'pip install craftxpy',
+                            '',
+                            '# (Optional) Launch the UI if the repo is cloned locally',
+                            'streamlit run assistant_ui/app.py'
+                        ];
+                    } else {
+                        return [
+                            '# Clone the full platform repo',
+                            'git clone https://github.com/davidanderson01/CraftX.py',
+                            'cd CraftX.py',
+                            '',
+                            '# Create and activate venv',
+                            'python3 -m venv .venv',
+                            'source .venv/bin/activate',
+                            '',
+                            '# Install dependencies and launch the UI',
+                            'python -m pip install -U pip',
+                            'pip install -r requirements.txt',
+                            'streamlit run assistant_ui/app.py'
+                        ];
+                    }
+                }
+            }
+
+            function render() {
+                const lines = getCommands(state.method, state.os);
+                const pre = $('setup-script');
+                if (pre) pre.textContent = lines.join('\n');
+
+                // Button active styling (minimal)
+                ['method-pypi', 'method-github', 'os-windows', 'os-unix'].forEach(id => $(id)?.classList.remove('btn-primary'));
+                if (state.method === 'pypi') $('method-pypi')?.classList.add('btn-primary'); else $('method-github')?.classList.add('btn-primary');
+                if (state.os === 'windows') $('os-windows')?.classList.add('btn-primary'); else $('os-unix')?.classList.add('btn-primary');
+            }
+
+            $('method-pypi')?.addEventListener('click', () => { state.method = 'pypi'; render(); });
+            $('method-github')?.addEventListener('click', () => { state.method = 'github'; render(); });
+            $('os-windows')?.addEventListener('click', () => { state.os = 'windows'; render(); });
+            $('os-unix')?.addEventListener('click', () => { state.os = 'unix'; render(); });
+            $('copy-setup-all')?.addEventListener('click', async () => {
+                try {
+                    const text = $('setup-script')?.textContent || '';
+                    await navigator.clipboard.writeText(text);
+                } catch (_) { }
+            });
+
+            render();
         }
 
         // Kick off a redirect to a specific IdP

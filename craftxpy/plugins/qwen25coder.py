@@ -7,18 +7,9 @@ class Qwen25Coder(BaseModelPlugin):
     """Qwen2.5-Coder AI model integration."""
 
     def __init__(self):
-        super().__init__()
-        self.version = "1.0.0"
+        super().__init__(name="qwen25coder", version="1.0.0",
+                         ollama_model="qwen2.5-coder:1.5b")
         self.description = "Qwen2.5-Coder - State-of-the-art code generation model"
 
-    def generate(self, prompt: str) -> str:
-        """Generate code using Qwen2.5-Coder model.
-
-        Args:
-            prompt: The coding prompt
-
-        Returns:
-            Generated code response
-        """
-        # Mock implementation - replace with actual Qwen2.5-Coder API integration
-        return f"[Qwen2.5-Coder] Generated response for: {prompt}"
+    def generate(self, prompt: str, **kwargs) -> str:
+        return self.generate_via_providers(prompt, **kwargs)

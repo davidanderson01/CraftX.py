@@ -1,0 +1,232 @@
+name: CraftX Sovereign CI with Zero-Cost Ethereum Anchoring
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  ETHEREUM_NETWORK: sepolia
+  CLOUDFLARE_GATEWAY: eth-anchor.craftx.elevatecraft.org
+  ATTESTATION_CONTRACT: "0x742d35Cc6634C0532925a3b8D138DcE15e0d1234" # Replace with actual contract
+
+jobs:
+  test-and-anchor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install system deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Install Python deps
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          # Extra test/runtime deps (safe no-ops if already in requirements)
+          pip install pytest pillow requests
+
+      - name: Run tests (pytest discovery)
+        run: |
+          pytest -q --disable-warnings --maxfail=1 || pytest -q
+
+      - name: Seal ledger digests
+        id: seal
+        run: |
+          mkdir -p attestation
+          BUILD_ID="craftx-$(date +%Y%m%d-%H%M%S)-${{ github.sha }}"
+          echo "build-id=$BUILD_ID" >> $GITHUB_OUTPUT
+
+          # Generate build manifest
+          cat > build_manifest.json << EOF
+          {
+            "build_id": "$BUILD_ID",
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "commit_sha": "${{ github.sha }}",
+            "branch": "${{ github.ref_name }}",
+            "repository": "${{ github.repository }}",
+            "workflow_run": "${{ github.run_number }}"
+          }
+          EOF
+
+          # Seal existing ledger files
+          if [ -d ledger ] && compgen -G "ledger/*" > /dev/null; then
+            for f in ledger/*; do
+              [ -f "$f" ] || continue
+              sha256sum "$f" > "attestation/$(basename "$f").sha256"
+            done
+          else
+            echo "No ledger files found to seal; creating placeholder." > attestation/README.txt
+          fi
+
+          # Generate merkle root of all critical files
+          find . -name "*.py" -o -name "*.yml" -o -name "*.json" -o -name "requirements.txt" | \
+            grep -v __pycache__ | \
+            sort | \
+            xargs sha256sum > attestation/file_hashes.txt
+
+          MERKLE_ROOT=$(cat attestation/file_hashes.txt | sha256sum | cut -d' ' -f1)
+          MANIFEST_HASH=$(sha256sum build_manifest.json | cut -d' ' -f1)
+          ATTESTATION_HASH=$(echo "$MERKLE_ROOT$MANIFEST_HASH" | sha256sum | cut -d' ' -f1)
+
+          echo "attestation-hash=$ATTESTATION_HASH" >> $GITHUB_OUTPUT
+
+          # Create final attestation record
+          cat > attestation/attestation.json << EOF
+          {
+            "build_id": "$BUILD_ID",
+            "merkle_root": "$MERKLE_ROOT",
+            "manifest_hash": "$MANIFEST_HASH", 
+            "attestation_hash": "$ATTESTATION_HASH",
+            "sealed_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "ethereum_network": "${{ env.ETHEREUM_NETWORK }}",
+            "github_context": {
+              "sha": "${{ github.sha }}",
+              "ref": "${{ github.ref }}",
+              "actor": "${{ github.actor }}",
+              "run_id": "${{ github.run_id }}"
+            }
+          }
+          EOF
+
+      - name: Upload ledgers + digests
+        uses: actions/upload-artifact@v4
+        with:
+          name: craftx-ledgers-${{ steps.seal.outputs.build-id }}
+          path: |
+            ledger/**
+            attestation/**
+            build_manifest.json
+          if-no-files-found: warn
+
+      - name: Anchor to Ethereum (Zero-Cost via Sepolia)
+        if: github.ref == 'refs/heads/main'
+        env:
+          ETHEREUM_PRIVATE_KEY: ${{ secrets.ETHEREUM_PRIVATE_KEY }}
+          ATTESTATION_HASH: ${{ steps.seal.outputs.attestation-hash }}
+          BUILD_ID: ${{ steps.seal.outputs.build-id }}
+        run: |
+          # Install Node.js and ethers for Ethereum interaction
+          curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+          sudo apt-get install -y nodejs
+          npm init -y
+          npm install ethers@6
+
+          # Create Ethereum anchoring script
+          cat > anchor_to_ethereum.js << 'EOF'
+          const { ethers } = require('ethers');
+
+          async function anchorToEthereum() {
+            try {
+              console.log('🔗 Connecting to Sepolia via Cloudflare Gateway...');
+              const provider = new ethers.JsonRpcProvider('https://${{ env.CLOUDFLARE_GATEWAY }}');
+              
+              const wallet = new ethers.Wallet(process.env.ETHEREUM_PRIVATE_KEY, provider);
+              console.log('👛 Wallet:', wallet.address);
+              
+              // Simple contract ABI for attestation storage
+              const contractABI = [
+                "function anchor(bytes32 hash, string memory buildId) external",
+                "function getAnchor(bytes32 hash) external view returns (string memory, uint256, address)"
+              ];
+              
+              const contract = new ethers.Contract(process.env.ATTESTATION_CONTRACT, contractABI, wallet);
+              
+              const attestationHash = process.env.ATTESTATION_HASH;
+              const buildId = process.env.BUILD_ID;
+              
+              console.log('📋 Anchoring attestation:', attestationHash);
+              console.log('🆔 Build ID:', buildId);
+              
+              // Check balance
+              const balance = await provider.getBalance(wallet.address);
+              console.log('💰 Balance:', ethers.formatEther(balance), 'ETH');
+              
+              if (balance < ethers.parseEther('0.001')) {
+                console.log('⚠️  Low balance! Get free Sepolia ETH:');
+                console.log('   📍 https://sepoliafaucet.com/');
+                console.log('   📍 https://faucet.sepolia.dev/');
+                console.log('   🏦 Wallet:', wallet.address);
+              }
+              
+              // Submit anchoring transaction
+              const tx = await contract.anchor('0x' + attestationHash, buildId, {
+                gasLimit: 100000
+              });
+              
+              console.log('📤 Transaction submitted:', tx.hash);
+              
+              const receipt = await tx.wait();
+              console.log('✅ Anchored on block:', receipt.blockNumber);
+              console.log('⛽ Gas used:', receipt.gasUsed.toString());
+              
+              // Verify the anchor
+              const [storedBuildId, timestamp] = await contract.getAnchor('0x' + attestationHash);
+              console.log('🔍 Verified - Build ID:', storedBuildId);
+              console.log('🕐 Timestamp:', new Date(Number(timestamp) * 1000).toISOString());
+              
+              // Save anchor details
+              console.log('🎯 ETHEREUM ANCHOR SUCCESS:');
+              console.log('   TX Hash:', tx.hash);
+              console.log('   Block:', receipt.blockNumber);
+              console.log('   Explorer: https://sepolia.etherscan.io/tx/' + tx.hash);
+              
+            } catch (error) {
+              console.error('❌ Ethereum anchoring failed:', error.message);
+              
+              if (error.message.includes('insufficient funds')) {
+                console.log('💡 Get free Sepolia ETH from faucets above');
+              }
+              
+              // Don't fail the build - just log
+              console.log('⚠️  Continuing without Ethereum anchor...');
+            }
+          }
+
+          anchorToEthereum();
+          EOF
+
+          # Run the anchoring script
+          node anchor_to_ethereum.js
+
+      - name: Anchor to attestation repo
+        if: github.ref == 'refs/heads/main'
+        env:
+          LEDGER_PAT: ${{ secrets.LEDGER_PAT }}
+          LEDGER_REPO: ${{ vars.LEDGER_REPO }}
+        run: |
+          if [ -z "$LEDGER_PAT" ]; then echo "Missing LEDGER_PAT secret"; exit 1; fi
+          # Default to <owner>/attestation-ledger if not provided via repo variable
+          if [ -z "$LEDGER_REPO" ]; then LEDGER_REPO="${{ github.repository_owner }}/attestation-ledger"; fi
+
+          git config --global user.name "CraftX CI"
+          git config --global user.email "ci@craftx.local"
+
+          git clone --depth 1 "https://x-access-token:${LEDGER_PAT}@github.com/${LEDGER_REPO}.git" attestation-ledger || {
+            echo "Attestation repo not found at ${LEDGER_REPO}. Create it or set vars.LEDGER_REPO to an existing repo."; exit 1;
+          }
+
+          cd attestation-ledger
+          RUN_DIR="runs/$(date -u +%Y-%m-%dT%H-%M-%SZ)"
+          mkdir -p "$RUN_DIR"
+          # Copy digests if they exist
+          if compgen -G "../attestation/*" > /dev/null; then
+            cp ../attestation/* "$RUN_DIR"/ || true
+          fi
+          # Also copy a manifest of source commit
+          echo "source_repo=${{ github.repository }}" > "$RUN_DIR/source.txt"
+          echo "source_sha=${{ github.sha }}" >> "$RUN_DIR/source.txt"
+
+          git add .
+          git commit -m "Add attestation digests for run $RUN_DIR" || echo "Nothing to commit"
+          git push origin HEAD:main

@@ -1,0 +1,7 @@
+FROM llava:13b
+
+PARAMETER temperature 0.7
+PARAMETER top_p 0.8
+PARAMETER num_ctx 4096
+
+SYSTEM """You are CraftX-ML, a helpful AI assistant designed to provide clear and accurate responses."""
