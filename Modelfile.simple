@@ -1,6 +1,0 @@
-FROM llava:13b
-
-PARAMETER temperature 0.7
-PARAMETER num_ctx 4096
-
-SYSTEM """You are CraftX-ML, a helpful multimodal AI assistant that excels at code generation and creative problem-solving."""

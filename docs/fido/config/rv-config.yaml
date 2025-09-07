@@ -1,5 +1,0 @@
-rendezvous:
-  endpoint: "https://your-rv-server.example.com"
-  port: 443
-  protocol: "https"
-  cert_required: true

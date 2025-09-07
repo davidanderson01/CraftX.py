@@ -1,3 +1,0 @@
-2025-08-24T03:51Z,tool:hash_file,sha256:6080f8cbae64bfc99aa53fa9846739c2887dfe38ba236f36542adc24c4af7127,tool,craftx-ml:v1,hash_file,kwargs-json
-2025-08-24T03:51Z,craftx.py,sha256:c8b9cc907fe419c3937fbe455ccb4012ab53c1f04eb8630a985d337080fdf50f,sealed,craftx-ml:v1,hash_file|docker_deploy|field_log|image_describe,orchestrator
-2025-08-24T03:52Z,craftx.py,sha256:14a1aeded09e7301dbddb08bb2d1b2fbae60f45f66f47554a038d972ed759f1e,sealed,craftx-ml:v1,hash_file|docker_deploy|field_log|image_describe,orchestrator
